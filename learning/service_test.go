@@ -1,6 +1,7 @@
 package learning_test
 
 import (
+	"context"
 	"os"
 	"strings"
 	"testing"
@@ -8,9 +9,38 @@ import (
 
 	"github.com/rudrakshkarpe/agentsmd-cli/learning"
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
+	reflector "github.com/rudrakshkarpe/agentsmd-cli/reflect"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
 	"github.com/rudrakshkarpe/agentsmd-cli/version"
 )
+
+type fakeReflector struct {
+	result reflector.Result
+}
+
+func (f fakeReflector) Reflect(context.Context, schema.Trajectory) (reflector.Result, error) {
+	return f.result, nil
+}
+
+func TestLearnAllowsNoOpAndPersistsTargetedRule(t *testing.T) {
+	p, _ := project.Open(t.TempDir())
+	if err := p.Scaffold(); err != nil {
+		t.Fatal(err)
+	}
+	service := learning.New(p)
+	trajectory := schema.Trajectory{SessionID: "session-1", Task: "demo"}
+	proposal, result, err := service.Learn(context.Background(), trajectory, fakeReflector{result: reflector.Result{Verdict: reflector.NotRelevant}})
+	if err != nil || proposal != nil || result.Verdict != reflector.NotRelevant {
+		t.Fatalf("proposal=%v result=%v err=%v", proposal, result, err)
+	}
+	proposal, _, err = service.Learn(context.Background(), trajectory, fakeReflector{result: reflector.Result{Verdict: reflector.MissingRule, Rule: "Read the fixture before editing the parser.", Confidence: 0.9}})
+	if err != nil || proposal == nil {
+		t.Fatalf("proposal=%v err=%v", proposal, err)
+	}
+	if proposal.Origin.Run != "session-1" || proposal.Origin.Task != "demo" {
+		t.Fatalf("origin=%+v", proposal.Origin)
+	}
+}
 
 func TestProposalPromotionIsGatedAndVersioned(t *testing.T) {
 	p, _ := project.Open(t.TempDir())

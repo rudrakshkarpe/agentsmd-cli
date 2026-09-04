@@ -2,6 +2,7 @@
 package learning
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/rudrakshkarpe/agentsmd-cli/ledger"
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
+	reflector "github.com/rudrakshkarpe/agentsmd-cli/reflect"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
 	"github.com/rudrakshkarpe/agentsmd-cli/version"
 )
@@ -20,6 +22,31 @@ import (
 type Service struct {
 	Project *project.Project
 	Now     func() time.Time
+}
+
+func (s *Service) Learn(ctx context.Context, trajectory schema.Trajectory, engine reflector.Reflector) (*schema.Proposal, reflector.Result, error) {
+	result, err := engine.Reflect(ctx, trajectory)
+	if err != nil {
+		return nil, reflector.Result{}, err
+	}
+	if err := reflector.Validate(result); err != nil {
+		return nil, result, err
+	}
+	if result.Verdict == reflector.NotRelevant {
+		return nil, result, nil
+	}
+	origin := result.Origin
+	if origin.Run == "" {
+		origin.Run = trajectory.SessionID
+	}
+	if origin.Task == "" {
+		origin.Task = trajectory.Task
+	}
+	proposal, err := s.Propose(result.Rule, origin)
+	if err != nil {
+		return nil, result, err
+	}
+	return &proposal, result, nil
 }
 
 func New(p *project.Project) *Service {
