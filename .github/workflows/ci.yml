@@ -40,7 +40,7 @@ jobs:
           go-version: ${{ matrix.go }}
           cache: true
       - run: go test ./...
-      - run: go build -trimpath ./cmd/agentsmd
+      - run: go build -trimpath -o agentsmd-test-binary ./cmd/agentsmd
 
   quality:
     runs-on: ubuntu-latest
