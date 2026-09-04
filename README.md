@@ -63,13 +63,13 @@ The write target is universal: all four tools read `AGENTS.md`. Capture is imple
 ### Shell installer (macOS and Linux)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rudrakshkarpe/agentsmd-cli/main/install.sh | sh
+curl -fsSL https://rudrakshkarpe.com/install.sh | sh
 ```
 
 The installer selects Apple Silicon, Intel macOS, or Linux automatically, verifies the release archive's SHA-256 checksum, and installs to `~/.local/bin`. Choose another directory when needed:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/rudrakshkarpe/agentsmd-cli/main/install.sh | \
+curl -fsSL https://rudrakshkarpe.com/install.sh | \
   AGENTSMD_INSTALL_DIR=/usr/local/bin sh
 ```
 
