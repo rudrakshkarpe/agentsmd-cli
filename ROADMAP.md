@@ -17,7 +17,8 @@ Phased, not dated. Each phase is independently useful and shippable.
 - The token-savings USP, demoable.
 
 ## Phase 3 — multi-adapter capture + daemon
-- Adapters: codex, cursor (tail JSONL), goose (export / SQLite).
+- Project-local SessionEnd connectors: Codex, Claude Code, Cursor, and goose. Complete.
+- Rich provider-specific transcript normalization beyond Claude Code.
 - `watch` daemon with staleness detection.
 
 ## Phase 4 — offline GEPA bridge

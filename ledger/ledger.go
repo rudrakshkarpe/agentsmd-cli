@@ -14,6 +14,11 @@ import (
 
 const DuplicateThreshold = 0.6
 
+const (
+	StartMarker = "<!-- agentsmd:learned:start -->"
+	EndMarker   = "<!-- agentsmd:learned:end -->"
+)
+
 var wordPattern = regexp.MustCompile(`[a-z0-9]+`)
 
 func Overlap(a, b string) float64 {
@@ -83,12 +88,31 @@ func nextID(rules []schema.Rule) string {
 
 func Render(value schema.Ledger) string {
 	var output strings.Builder
-	output.WriteString("# AGENTS.md\n\n## Lessons\n")
-	output.WriteString("<!-- managed by agentsmd; agents read these first -->\n\n")
+	output.WriteString("## Learned rules\n\n")
+	output.WriteString(StartMarker + "\n")
+	output.WriteString("<!-- Promoted by agentsmd after review. -->\n")
 	for _, rule := range value.Rules {
 		fmt.Fprintf(&output, "- [%s] %s  (cited: %d)\n", rule.ID, rule.Text, rule.Cited)
 	}
+	output.WriteString(EndMarker + "\n")
 	return output.String()
+}
+
+// Merge replaces only the agentsmd-managed block. Existing project guidance is
+// preserved, including files created before managed-block markers existed.
+func Merge(existing string, value schema.Ledger) string {
+	block := Render(value)
+	start := strings.Index(existing, StartMarker)
+	end := strings.Index(existing, EndMarker)
+	if start >= 0 && end >= start {
+		heading := strings.LastIndex(existing[:start], "## Learned rules")
+		if heading < 0 {
+			heading = start
+		}
+		end += len(EndMarker)
+		return strings.TrimRight(existing[:heading], "\n") + "\n\n" + block + strings.TrimLeft(existing[end:], "\n")
+	}
+	return strings.TrimRight(existing, "\n") + "\n\n" + block
 }
 
 type Issue struct {

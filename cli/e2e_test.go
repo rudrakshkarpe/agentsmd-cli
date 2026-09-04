@@ -2,6 +2,8 @@ package cli_test
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -19,6 +21,41 @@ func execute(t *testing.T, args ...string) string {
 		t.Fatalf("agentsmd %v: %v\n%s", args, err, output.String())
 	}
 	return output.String()
+}
+
+func TestPrimaryCLIExperience(t *testing.T) {
+	welcome := execute(t)
+	if !strings.Contains(welcome, "●●●") || !strings.Contains(welcome, "agentsmd doctor") {
+		t.Fatalf("welcome output=%q", welcome)
+	}
+	templates := execute(t, "templates")
+	if !strings.Contains(templates, "team") || !strings.Contains(templates, "monorepo") {
+		t.Fatalf("templates output=%q", templates)
+	}
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "go.mod"), []byte("module example.com/demo\n\ngo 1.23\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	execute(t, "--root", root, "init")
+	data, _ := os.ReadFile(filepath.Join(root, "AGENTS.md"))
+	if !strings.Contains(string(data), "Detected stack: Go") || !strings.Contains(string(data), "go test ./...") {
+		t.Fatalf("auto-generated AGENTS.md:\n%s", data)
+	}
+	output := execute(t, "--root", root, "connect", "codex")
+	if !strings.Contains(output, "connected codex") || !strings.Contains(output, "/hooks") {
+		t.Fatalf("connect output=%q", output)
+	}
+	if _, err := os.Stat(filepath.Join(root, ".codex", "hooks.json")); err != nil {
+		t.Fatal(err)
+	}
+	child := filepath.Join(root, "internal", "demo")
+	if err := os.MkdirAll(child, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	doctor := execute(t, "--root", child, "doctor")
+	if !strings.Contains(doctor, "AGENTS.md") || !strings.Contains(doctor, "Codex") {
+		t.Fatalf("doctor output=%q", doctor)
+	}
 }
 
 func TestTaskBoundaryLearningDemo(t *testing.T) {

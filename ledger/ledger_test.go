@@ -33,3 +33,16 @@ func TestIDsAreNotReusedAfterPruning(t *testing.T) {
 		t.Fatalf("got %s, want r005", rule.ID)
 	}
 }
+
+func TestMergePreservesProjectGuidance(t *testing.T) {
+	existing := "# AGENTS.md\n\n## Commands\n\n- Test: `go test ./...`\n"
+	value := schema.Ledger{Rules: []schema.Rule{{ID: "r000", Text: "Read the schema first."}}}
+	got := ledger.Merge(existing, value)
+	if !strings.Contains(got, "go test ./...") || !strings.Contains(got, "Read the schema first") {
+		t.Fatalf("merge lost content:\n%s", got)
+	}
+	updated := ledger.Merge(got, schema.Ledger{Rules: []schema.Rule{{ID: "r001", Text: "Run focused tests."}}})
+	if strings.Contains(updated, "Read the schema first") || strings.Count(updated, ledger.StartMarker) != 1 {
+		t.Fatalf("managed block was not replaced:\n%s", updated)
+	}
+}
