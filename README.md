@@ -252,6 +252,10 @@ The CLI is one consumer of reusable packages:
 - [ ] Validation gate with held-out regression checks
 - [x] Codex, Claude Code, Cursor, and goose SessionEnd connectors
 - [ ] Rich transcript normalization beyond Claude Code
+- [ ] Cross-CLI session and logical-task identity
+- [ ] Automatic Git, command, test, token, and duration evidence capture
+- [ ] Local session index with run inspection and progress comparisons
+- [ ] Idempotent task-boundary reflection queue
 - [ ] Watch daemon with session staleness detection
 - [ ] Offline GEPA optimization bridge
 - [ ] Reproducible benchmark report and token-savings evidence
