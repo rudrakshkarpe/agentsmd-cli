@@ -1,11 +1,17 @@
 package cli
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/rudrakshkarpe/agentsmd-cli/learning"
 	"github.com/rudrakshkarpe/agentsmd-cli/ledger"
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
+	reflector "github.com/rudrakshkarpe/agentsmd-cli/reflect"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
 	"github.com/spf13/cobra"
 )
@@ -45,19 +51,43 @@ func (a *app) printPending(cmd *cobra.Command) error {
 }
 
 func (a *app) learnCommand() *cobra.Command {
-	var rule, run, task string
+	var rule, run, task, trajectoryPath, reflectCommand string
 	command := &cobra.Command{
 		Use:   "learn",
 		Short: "Propose one targeted rule at a task boundary",
-		Long:  "Propose one targeted rule for review. Automatic trajectory reflection is added through the Reflector interface; --rule is the deterministic and demo-safe path.",
+		Long:  "Propose one targeted rule for review. Use --rule for deterministic manual input, or --trajectory with --reflect-command to run a provider that accepts trajectory JSON and returns a reflection verdict.",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			p, err := a.requireProject()
 			if err != nil {
 				return err
 			}
-			proposal, err := learning.New(p).Propose(rule, schema.Origin{Run: run, Task: task})
+			service := learning.New(p)
+			if rule != "" {
+				proposal, err := service.Propose(rule, schema.Origin{Run: run, Task: task})
+				if err != nil {
+					return err
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "proposed %s\n", proposal.ID)
+				return nil
+			}
+			if trajectoryPath == "" || reflectCommand == "" {
+				return fmt.Errorf("provide --rule, or both --trajectory and --reflect-command")
+			}
+			data, err := os.ReadFile(trajectoryPath)
 			if err != nil {
 				return err
+			}
+			var trajectory schema.Trajectory
+			if err := json.Unmarshal(data, &trajectory); err != nil {
+				return fmt.Errorf("decode trajectory: %w", err)
+			}
+			proposal, result, err := service.Learn(context.Background(), trajectory, reflector.Command{Argv: strings.Fields(reflectCommand), Timeout: 2 * time.Minute})
+			if err != nil {
+				return err
+			}
+			if proposal == nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "no proposal: %s\n", result.Verdict)
+				return nil
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "proposed %s\n", proposal.ID)
 			return nil
@@ -66,7 +96,8 @@ func (a *app) learnCommand() *cobra.Command {
 	command.Flags().StringVar(&rule, "rule", "", "imperative repository-specific rule")
 	command.Flags().StringVar(&run, "run", "", "source session identifier")
 	command.Flags().StringVar(&task, "task", "", "source task identifier")
-	_ = command.MarkFlagRequired("rule")
+	command.Flags().StringVar(&trajectoryPath, "trajectory", "", "normalized trajectory JSON")
+	command.Flags().StringVar(&reflectCommand, "reflect-command", "", "program that maps trajectory JSON to a verdict")
 	return command
 }
 
