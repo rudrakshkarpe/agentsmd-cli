@@ -1,13 +1,15 @@
-.PHONY: bootstrap format lint type test build package-check check clean
+.PHONY: bootstrap format lint type test build package-check py-check go-format go-vet go-test go-build go-check check clean
 
 PYTHON ?= python3
 VENV ?= .venv
 BIN := $(VENV)/bin
+GO_FILES := $(shell find cmd cli capture learning ledger project reflect schema template version -name '*.go' -type f)
 
 bootstrap:
 	$(PYTHON) -m venv $(VENV)
 	$(BIN)/python -m pip install --upgrade pip
 	$(BIN)/python -m pip install -e '.[dev]'
+	go mod download
 
 format:
 	$(BIN)/ruff format .
@@ -27,10 +29,26 @@ build:
 	$(BIN)/python -m build
 
 package-check: build
-	$(BIN)/twine check dist/*
+	$(BIN)/twine check dist/*.whl dist/*.tar.gz
 	$(BIN)/python scripts/smoke_wheel.py
 
-check: lint type test package-check
+py-check: lint type test package-check
+
+go-format:
+	@test -z "$$(gofmt -l $(GO_FILES))" || (gofmt -l $(GO_FILES) && exit 1)
+
+go-vet:
+	go vet ./...
+
+go-test:
+	go test -race ./...
+
+go-build:
+	go build -trimpath -o dist/agentsmd ./cmd/agentsmd
+
+go-check: go-format go-vet go-test go-build
+
+check: go-check py-check
 
 clean:
 	rm -rf build dist .mypy_cache .ruff_cache
