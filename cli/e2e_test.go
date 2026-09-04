@@ -48,7 +48,11 @@ func TestPrimaryCLIExperience(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, ".codex", "hooks.json")); err != nil {
 		t.Fatal(err)
 	}
-	doctor := execute(t, "--root", root, "doctor")
+	child := filepath.Join(root, "internal", "demo")
+	if err := os.MkdirAll(child, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	doctor := execute(t, "--root", child, "doctor")
 	if !strings.Contains(doctor, "AGENTS.md") || !strings.Contains(doctor, "Codex") {
 		t.Fatalf("doctor output=%q", doctor)
 	}

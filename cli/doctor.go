@@ -41,7 +41,10 @@ func (a *app) diagnose() []check {
 	} else {
 		result = append(result, check{"error", "Git", "not found; install Git to version project changes"})
 	}
-	p, _ := project.Open(a.root)
+	p, err := project.Require(a.root)
+	if err != nil {
+		p, _ = project.Open(a.root)
+	}
 	if _, err := os.Stat(p.ArtifactPath()); err == nil {
 		result = append(result, check{"ok", "AGENTS.md", p.ArtifactPath()})
 	} else {
