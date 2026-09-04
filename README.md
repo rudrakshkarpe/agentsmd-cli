@@ -14,7 +14,7 @@ Author, version, measure, and improve repository instructions from real agent tr
 
 </div>
 
-> **Active development.** The Go authoring, versioning, review gate, Claude Code capture, provider-neutral reflection, and macOS/Linux release paths work today. Multi-CLI capture, automated validation, and offline optimization are being built for the AgentCon Japan demo.
+> **Active development.** Project detection, the review gate, project-local Codex/Claude Code/Cursor/goose hooks, provider-neutral reflection, and macOS/Linux releases work today. Automated evaluation and offline optimization are still being built for the AgentCon Japan demo.
 
 ## Why agentsmd?
 
@@ -38,22 +38,22 @@ The write target is universal: all four tools read `AGENTS.md`. Capture is imple
 <td align="center" width="25%">
 <a href="https://claude.com/product/claude-code"><img src="https://github.com/anthropics.png?size=120" alt="Claude Code" width="48" height="48" /></a><br/>
 <strong>Claude Code</strong><br/>
-<sub>JSONL trajectory normalizer available</sub>
+<sub>Session hook + JSONL normalization</sub>
 </td>
 <td align="center" width="25%">
 <a href="https://github.com/openai/codex"><img src="https://github.com/openai.png?size=120" alt="Codex CLI" width="48" height="48" /></a><br/>
 <strong>Codex CLI</strong><br/>
-<sub>Reads AGENTS.md · capture adapter next</sub>
+<sub>Project SessionEnd hook</sub>
 </td>
 <td align="center" width="25%">
 <a href="https://cursor.com"><picture><source media="(prefers-color-scheme: dark)" srcset="https://svgl.app/library/cursor_dark.svg"><img src="https://svgl.app/library/cursor_light.svg" alt="Cursor" width="48" height="48" /></picture></a><br/>
 <strong>Cursor</strong><br/>
-<sub>Reads AGENTS.md · capture adapter planned</sub>
+<sub>Project sessionEnd hook</sub>
 </td>
 <td align="center" width="25%">
 <a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="goose" width="48" height="48" /></a><br/>
 <strong>goose</strong><br/>
-<sub>Reads AGENTS.md · session export planned</sub>
+<sub>Project hook plugin</sub>
 </td>
 </tr>
 </table>
@@ -98,17 +98,26 @@ go build -trimpath -o ./bin/agentsmd ./cmd/agentsmd
 
 ## Quick start
 
-Initialize the hidden ledger and create the rendered artifact:
+Let agentsmd inspect the repository and create a useful baseline:
 
 ```bash
-agentsmd init --template benchmark-kit
-agentsmd log
+cd your-project
+agentsmd init
+agentsmd doctor
 ```
 
-Record a repeatable task, propose one lesson, and review it before promotion:
+Connect the coding tools you actually use. Each command installs a project-local end-of-session hook:
 
 ```bash
-agentsmd record --task parser-regression --tokens 12400
+agentsmd connect codex
+agentsmd connect claude
+agentsmd connect cursor
+agentsmd connect goose
+```
+
+Captured sessions land in `.agentsmd/runs/`. A reflector—or a person during the current preview—can propose one targeted lesson, which stays pending until reviewed:
+
+```bash
 agentsmd learn \
   --task parser-regression \
   --run session-baseline \
@@ -116,23 +125,13 @@ agentsmd learn \
 
 agentsmd pending
 agentsmd promote <proposal-id>
-agentsmd blame
 ```
-
-After repeating the same task, report the observed token change:
-
-```bash
-agentsmd record --task parser-regression --tokens 7100
-agentsmd savings parser-regression
-```
-
-The numbers above demonstrate the command flow; they are not published benchmark results.
 
 ## How it works
 
 ### 1. Rules are structured data
 
-Rules live in `.agentsmd/ledger.json`, with stable IDs, provenance, citation counts, and per-task token runs. `AGENTS.md` is rendered from this ledger, which makes deduplication, pruning, blame, and merging possible.
+Rules live in `.agentsmd/ledger.json`, with stable IDs, provenance, citation counts, and per-task token runs. Only the marker-delimited learned-rules block is generated; project setup, commands, and hand-written guidance are preserved.
 
 ### 2. Versions explain why a change exists
 
@@ -177,27 +176,29 @@ Expected output shape:
 
 This contract keeps model providers outside the core. Direct providers and a GEPA bridge can implement the same interface.
 
-## Claude Code capture
+## CLI connections
 
-A Claude Code hook event contains a session ID and transcript path. Normalize it into the shared trajectory schema with:
+`agentsmd connect` configures the supported tools without replacing their existing settings:
 
-```bash
-agentsmd capture claude --event /path/to/hook-event.json
-```
+- Codex: `.codex/hooks.json`
+- Claude Code: `.claude/settings.local.json`
+- Cursor: `.cursor/hooks.json`
+- goose: `.agents/plugins/agentsmd/`
 
-The normalized trajectory is written to `.agentsmd/runs/<session-id>.json`. It includes assistant steps, tool calls and results, shell commands, and available token usage.
+All connectors capture a provider-neutral session envelope. Claude Code additionally normalizes its JSONL transcript into assistant steps, tool calls, shell commands, and token usage. Codex transcript internals are intentionally not parsed because their documented format is unstable.
 
 ## CLI
 
-| Family | Commands |
+| Goal | Command |
 |---|---|
-| Author | `init`, `template list`, `template use`, `edit`, `render`, `lint` |
-| Version | `commit`, `log`, `diff`, `revert`, `tag`, `blame` |
-| Capture | `capture claude` |
-| Learn | `learn`, `pending`, `status`, `promote`, `reject`, `prune` |
-| Measure | `record`, `savings` |
+| Detect the project and create `AGENTS.md` | `agentsmd init` |
+| Browse or apply reusable baselines | `agentsmd templates`, `agentsmd templates use NAME` |
+| Connect a coding tool | `agentsmd connect codex\|claude\|cursor\|goose` |
+| Diagnose the local setup | `agentsmd doctor` |
+| Review the improvement queue | `agentsmd pending`, `agentsmd promote ID`, `agentsmd reject ID` |
+| Propose a targeted rule | `agentsmd learn ...` |
 
-Run `agentsmd <command> --help` for flags and examples.
+Legacy authoring, versioning, and measurement commands remain compatible but are hidden from the primary help while their UX is consolidated.
 
 ## Repository layout
 
@@ -205,6 +206,7 @@ Run `agentsmd <command> --help` for flags and examples.
 AGENTS.md                 rendered instructions read by coding agents
 .agentsmd/
   config.yaml             project configuration
+  connections.json        portable records of configured CLI hooks
   ledger.json             rules, provenance, citations, token runs
   versions/               typed snapshots, index, and tags
   pending/                proposed rules awaiting review
@@ -223,6 +225,8 @@ The CLI is one consumer of reusable packages:
 | `version` | Typed snapshots, history, diff, tags, and revert |
 | `capture` | Adapter interface for coding-agent session formats |
 | `capture/claude` | Claude Code JSONL normalization |
+| `detect` | Conservative stack and command discovery |
+| `integration` | Project-local lifecycle hooks for supported coding tools |
 | `reflect` | Reflection verdict contract and command provider |
 | `learning` | Propose, review, promote, reject, prune, and measure workflow |
 | `cli` | Embeddable Cobra command tree |
@@ -246,7 +250,8 @@ The CLI is one consumer of reusable packages:
 - [x] Claude Code trajectory normalization
 - [x] Provider-neutral task-boundary reflector
 - [ ] Validation gate with held-out regression checks
-- [ ] Codex, Cursor, and goose capture adapters
+- [x] Codex, Claude Code, Cursor, and goose SessionEnd connectors
+- [ ] Rich transcript normalization beyond Claude Code
 - [ ] Watch daemon with session staleness detection
 - [ ] Offline GEPA optimization bridge
 - [ ] Reproducible benchmark report and token-savings evidence

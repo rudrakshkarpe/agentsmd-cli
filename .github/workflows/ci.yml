@@ -22,7 +22,7 @@ jobs:
         with:
           go-version: "1.25.x"
           cache: true
-      - run: test -z "$(gofmt -l $(find cmd cli capture learning ledger project reflect schema template version -name '*.go' -type f))"
+      - run: test -z "$(gofmt -l $(find cmd cli capture detect integration learning ledger project reflect schema template version -name '*.go' -type f))"
       - run: go vet ./...
       - run: go test -race ./...
 
