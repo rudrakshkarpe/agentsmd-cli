@@ -8,7 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const Version = "0.1.0-dev"
+// Version is replaced at release time with -ldflags. Keeping it a variable
+// lets source builds remain honest about not being an official release.
+var Version = "dev"
 
 type app struct {
 	root string

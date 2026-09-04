@@ -1,4 +1,4 @@
-.PHONY: bootstrap format lint type test build package-check py-check go-format go-vet go-test go-build go-check check clean
+.PHONY: bootstrap format lint type test build package-check py-check go-format go-vet go-test go-build go-check release-dry-run check clean
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -47,6 +47,9 @@ go-build:
 	go build -trimpath -o dist/agentsmd ./cmd/agentsmd
 
 go-check: go-format go-vet go-test go-build
+
+release-dry-run:
+	./scripts/package-release.sh v0.0.0-test dist/release
 
 check: go-check py-check
 
