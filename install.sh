@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-repository=${AGENTSMD_REPOSITORY:-rudrakshkarpe/agentsmd-cli}
-release_url=${AGENTSMD_RELEASE_URL:-https://github.com/${repository}/releases/latest/download}
+version=${AGENTSMD_VERSION:-v0.1.0}
+release_url=${AGENTSMD_RELEASE_URL:-https://rudrakshkarpe.com/downloads/agentsmd/${version}}
 install_dir=${AGENTSMD_INSTALL_DIR:-${HOME}/.local/bin}
 
 case "$(uname -s)" in
@@ -43,7 +43,7 @@ download() {
     --output "$destination"
 }
 
-echo "Installing agentsmd for ${os}/${arch} from GitHub Releases."
+echo "Installing agentsmd ${version} for ${os}/${arch} from rudrakshkarpe.com."
 download "$archive (about 1.3 MB)..." "$release_url/$archive" "$work_dir/$archive"
 download "checksums.txt..." "$release_url/checksums.txt" "$work_dir/checksums.txt"
 
