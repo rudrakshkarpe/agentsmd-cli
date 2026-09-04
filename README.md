@@ -9,14 +9,17 @@ AGENTS.md (Claude Code, Codex, Cursor, goose).
 > Skeleton / draft 0. Authoring and version-control commands run today.
 > The learning loop is wired but its reflect step is a stub. See `SPEC.md`.
 
-## Install (dev)
+## Build the Go CLI
 
 ```
 make bootstrap
-.venv/bin/agentsmd --version
+make go-check
+./dist/agentsmd --version
 ```
 
 See `DEVELOPMENT.md` and `CONTRIBUTING.md` for the local workflow and CI gates.
+
+The production CLI and public library are written in Go. The Python implementation remains temporarily as a compatibility reference and research surface.
 
 Long-term the real distribution is a single binary (`brew`, `curl | sh`).
 The skeleton is stdlib-only Python; the layout ports 1:1 to Go/cobra.

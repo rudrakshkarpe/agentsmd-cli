@@ -10,9 +10,9 @@ This repository develops `agentsmd`, a version-controlled authoring and self-imp
 
 ## Current state
 
-- Phase 1 authoring and version-control commands are implemented in the Python skeleton.
-- Phase 2 is next: implement the Claude transcript adapter and the reflection path so `learn -> pending -> promote -> savings` works end to end.
-- `agentsmd/loop.py::_reflect`, `agentsmd/adapters/claude.py::latest_trajectory`, `watch`, and `optimize` are intentionally incomplete.
+- The production implementation is Go; the Python skeleton remains an executable compatibility reference until parity is reached.
+- The Go packages cover schemas, project storage, ledger operations, templates, typed versions, the pending-rule gate, token recording, and the Cobra command tree.
+- Phase 2 is next: implement the Claude transcript adapter and reflection path so an actual trajectory drives `learn -> pending -> promote -> savings`.
 
 ## Invariants
 
@@ -27,9 +27,8 @@ This repository develops `agentsmd`, a version-controlled authoring and self-imp
 
 ## Development workflow
 
-- Use Python 3.9 or newer and install with `python -m pip install -e .` in a virtual environment.
-- Keep the core dependency-free unless a feature clearly requires an optional integration.
+- Use Go 1.23 or newer for production code. Use Python 3.9 or newer only for the compatibility prototype and research integrations.
+- Keep public Go packages small and keep provider-specific dependencies behind interfaces.
 - Add tests for behavior changes before considering a command complete.
-- Run `python -m compileall agentsmd` and the relevant test suite before handing off changes.
+- Run `make check` before handing off changes.
 - Keep commits small and describe the user-visible behavior or invariant they establish.
-
