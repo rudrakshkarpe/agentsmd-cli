@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to package (for a dry run)
+        required: true
+        default: v0.1.0
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25.x"
+          cache: true
+      - name: Select version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            echo "value=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Package release archives
+        run: ./scripts/package-release.sh "${{ steps.version.outputs.value }}"
+      - name: Smoke-test Linux archive
+        run: |
+          mkdir "$RUNNER_TEMP/agentsmd-smoke"
+          tar -xzf dist/release/agentsmd_linux_amd64.tar.gz -C "$RUNNER_TEMP/agentsmd-smoke"
+          "$RUNNER_TEMP/agentsmd-smoke/agentsmd" --version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agentsmd-${{ steps.version.outputs.value }}
+          path: dist/release/*
+          if-no-files-found: error
+      - name: Publish GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          dist/release/*
+          --verify-tag
+          --generate-notes
+          --title "agentsmd $GITHUB_REF_NAME"
