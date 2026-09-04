@@ -45,6 +45,18 @@ func TestConnectAllProviders(t *testing.T) {
 			t.Errorf("missing %s: %v", path, err)
 		}
 	}
+	gooseData, _ := os.ReadFile(filepath.Join(p.Root, ".agents", "plugins", "agentsmd", "hooks", "hooks.json"))
+	var gooseSettings struct {
+		Hooks map[string][]struct {
+			Hooks []map[string]any `json:"hooks"`
+		} `json:"hooks"`
+	}
+	if err := json.Unmarshal(gooseData, &gooseSettings); err != nil {
+		t.Fatal(err)
+	}
+	if len(gooseSettings.Hooks["SessionEnd"]) != 1 || len(gooseSettings.Hooks["SessionEnd"][0].Hooks) != 1 {
+		t.Fatalf("invalid goose hook nesting: %s", gooseData)
+	}
 }
 
 func TestConnectIsIdempotent(t *testing.T) {

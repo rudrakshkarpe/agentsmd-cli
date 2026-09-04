@@ -41,7 +41,7 @@ func Connect(p *project.Project, provider string) (Record, error) {
 	if err := mergeJSON(path, value); err != nil {
 		return Record{}, err
 	}
-	record := Record{Provider: provider, Path: path}
+	record := newRecord(p, provider, path)
 	return record, saveRecord(p, record)
 }
 
@@ -53,7 +53,7 @@ func hookSettings(event, command string, timeout int) map[string]any {
 func connectGoose(p *project.Project) (Record, error) {
 	dir := filepath.Join(p.Root, ".agents", "plugins", "agentsmd")
 	manifest := map[string]any{"name": "agentsmd", "version": "1.0.0", "description": "Capture goose sessions for AGENTS.md improvement"}
-	hooks := map[string]any{"hooks": map[string]any{"SessionEnd": []any{map[string]any{"type": "command", "command": "agentsmd hook goose", "timeout": 10}}}}
+	hooks := hookSettings("SessionEnd", "agentsmd hook goose", 10)
 	if err := writeJSON(filepath.Join(dir, "plugin.json"), manifest); err != nil {
 		return Record{}, err
 	}
@@ -61,8 +61,16 @@ func connectGoose(p *project.Project) (Record, error) {
 	if err := writeJSON(path, hooks); err != nil {
 		return Record{}, err
 	}
-	record := Record{Provider: "goose", Path: path}
+	record := newRecord(p, "goose", path)
 	return record, saveRecord(p, record)
+}
+
+func newRecord(p *project.Project, provider, path string) Record {
+	relative, err := filepath.Rel(p.Root, path)
+	if err != nil {
+		relative = path
+	}
+	return Record{Provider: provider, Path: relative}
 }
 
 func mergeJSON(path string, patch any) error {

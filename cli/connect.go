@@ -32,7 +32,7 @@ func (a *app) connectCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "connected %s\n%s\n", record.Provider, record.Path)
+			fmt.Fprintf(cmd.OutOrStdout(), "connected %s\n%s\n", record.Provider, filepath.Join(p.Root, record.Path))
 			if record.Provider == "codex" {
 				fmt.Fprintln(cmd.OutOrStdout(), "Review and trust the project hook with /hooks in Codex.")
 			}
