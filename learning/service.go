@@ -117,7 +117,11 @@ func (s *Service) Promote(id string) (*schema.Rule, *schema.Rule, error) {
 	if err := s.Project.SaveLedger(value); err != nil {
 		return nil, nil, err
 	}
-	if err := project.AtomicWrite(s.Project.ArtifactPath(), []byte(ledger.Render(value)), 0o644); err != nil {
+	existing, err := os.ReadFile(s.Project.ArtifactPath())
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, nil, err
+	}
+	if err := project.AtomicWrite(s.Project.ArtifactPath(), []byte(ledger.Merge(string(existing), value)), 0o644); err != nil {
 		return nil, nil, err
 	}
 	meta := map[string]any{"run": proposal.Origin.Run, "task": proposal.Origin.Task}

@@ -70,6 +70,29 @@ func TestProposalPromotionIsGatedAndVersioned(t *testing.T) {
 	}
 }
 
+func TestPromotionPreservesBaseline(t *testing.T) {
+	p, _ := project.Open(t.TempDir())
+	if err := p.Scaffold(); err != nil {
+		t.Fatal(err)
+	}
+	baseline := "# AGENTS.md\n\n## Commands\n\n- Test: `go test ./...`\n"
+	if err := project.AtomicWrite(p.ArtifactPath(), []byte(baseline), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	service := learning.New(p)
+	proposal, err := service.Propose("Inspect generated code before editing it.", schema.Origin{Run: "s2"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := service.Promote(proposal.ID); err != nil {
+		t.Fatal(err)
+	}
+	data, _ := os.ReadFile(p.ArtifactPath())
+	if !strings.Contains(string(data), "go test ./...") {
+		t.Fatalf("promotion overwrote baseline:\n%s", data)
+	}
+}
+
 func TestSavings(t *testing.T) {
 	p, _ := project.Open(t.TempDir())
 	if err := p.Scaffold(); err != nil {

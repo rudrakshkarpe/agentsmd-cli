@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/rudrakshkarpe/agentsmd-cli/detect"
 	"github.com/rudrakshkarpe/agentsmd-cli/ledger"
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
@@ -29,7 +30,7 @@ func (a *app) initCommand() *cobra.Command {
 			if err := p.Scaffold(); err != nil {
 				return err
 			}
-			content := "# AGENTS.md\n\n## Lessons\n"
+			content := "# AGENTS.md\n"
 			reason := "manual"
 			meta := map[string]any{}
 			if templateName != "" {
@@ -40,8 +41,15 @@ func (a *app) initCommand() *cobra.Command {
 				reason = "template"
 				meta["template"] = templateName
 			} else if !scratch {
-				return fmt.Errorf("choose --template NAME or --scratch")
+				profile, inspectErr := detect.Inspect(p.Root)
+				if inspectErr != nil {
+					return inspectErr
+				}
+				content = profile.Render()
+				reason = "auto-detected"
+				meta["stacks"] = profile.Stacks
 			}
+			content = ledger.Merge(content, structuredEmptyLedger())
 			if err := writeArtifact(p, content, force); err != nil {
 				return err
 			}
@@ -142,7 +150,11 @@ func (a *app) renderCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := project.AtomicWrite(p.ArtifactPath(), []byte(ledger.Render(value)), 0o644); err != nil {
+			existing, err := os.ReadFile(p.ArtifactPath())
+			if err != nil {
+				return err
+			}
+			if err := project.AtomicWrite(p.ArtifactPath(), []byte(ledger.Merge(string(existing), value)), 0o644); err != nil {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "rendered %d rules\n", len(value.Rules))
