@@ -34,6 +34,7 @@ func New() *cobra.Command {
 		state.editCommand(),
 		state.renderCommand(),
 		state.lintCommand(),
+		state.captureCommand(),
 		state.logCommand(),
 		state.diffCommand(),
 		state.commitCommand(),
