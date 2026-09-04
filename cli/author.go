@@ -97,17 +97,23 @@ func structuredEmptyLedger() schema.Ledger {
 }
 
 func (a *app) templateCommand() *cobra.Command {
-	command := &cobra.Command{Use: "template", Short: "List or apply templates"}
+	list := func(cmd *cobra.Command) error {
+		names, err := template.List()
+		if err != nil {
+			return err
+		}
+		descriptions := map[string]string{"minimal": "small universal baseline", "team": "shared review and collaboration rules", "monorepo": "multi-package repository workflow", "python-lib": "Python library conventions", "benchmark-kit": "reproducible evaluation projects"}
+		for _, name := range names {
+			fmt.Fprintf(cmd.OutOrStdout(), "%-16s %s\n", name, descriptions[name])
+		}
+		return nil
+	}
+	command := &cobra.Command{Use: "templates", Aliases: []string{"template"}, Short: "Browse or apply AGENTS.md templates", RunE: func(cmd *cobra.Command, _ []string) error { return list(cmd) }}
 	command.AddCommand(&cobra.Command{
 		Use:   "list",
 		Short: "List embedded templates",
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			names, err := template.List()
-			if err != nil {
-				return err
-			}
-			fmt.Fprintln(cmd.OutOrStdout(), strings.Join(names, "\n"))
-			return nil
+			return list(cmd)
 		},
 	})
 	command.AddCommand(&cobra.Command{

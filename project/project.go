@@ -54,12 +54,13 @@ func Require(start string) (*Project, error) {
 	return &Project{Root: root}, nil
 }
 
-func (p *Project) StateDir() string     { return filepath.Join(p.Root, DirName) }
-func (p *Project) ArtifactPath() string { return filepath.Join(p.Root, Artifact) }
-func (p *Project) LedgerPath() string   { return filepath.Join(p.StateDir(), "ledger.json") }
-func (p *Project) VersionsDir() string  { return filepath.Join(p.StateDir(), "versions") }
-func (p *Project) PendingDir() string   { return filepath.Join(p.StateDir(), "pending") }
-func (p *Project) RunsDir() string      { return filepath.Join(p.StateDir(), "runs") }
+func (p *Project) StateDir() string        { return filepath.Join(p.Root, DirName) }
+func (p *Project) ArtifactPath() string    { return filepath.Join(p.Root, Artifact) }
+func (p *Project) LedgerPath() string      { return filepath.Join(p.StateDir(), "ledger.json") }
+func (p *Project) VersionsDir() string     { return filepath.Join(p.StateDir(), "versions") }
+func (p *Project) PendingDir() string      { return filepath.Join(p.StateDir(), "pending") }
+func (p *Project) RunsDir() string         { return filepath.Join(p.StateDir(), "runs") }
+func (p *Project) ConnectionsPath() string { return filepath.Join(p.StateDir(), "connections.json") }
 
 func (p *Project) Scaffold() error {
 	for _, path := range []string{p.StateDir(), p.VersionsDir(), p.PendingDir(), p.RunsDir()} {
