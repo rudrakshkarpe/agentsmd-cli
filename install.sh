@@ -27,9 +27,25 @@ archive="agentsmd_${os}_${arch}.tar.gz"
 work_dir=$(mktemp -d)
 trap 'rm -rf "$work_dir"' EXIT HUP INT TERM
 
-echo "Downloading agentsmd for ${os}/${arch}..."
-curl -fsSL "$release_url/$archive" -o "$work_dir/$archive"
-curl -fsSL "$release_url/checksums.txt" -o "$work_dir/checksums.txt"
+download() {
+  label=$1
+  source_url=$2
+  destination=$3
+
+  echo "Downloading $label"
+  curl --fail --location --show-error \
+    --progress-bar \
+    --retry 3 \
+    --retry-delay 2 \
+    --connect-timeout 30 \
+    --max-time 300 \
+    "$source_url" \
+    --output "$destination"
+}
+
+echo "Installing agentsmd for ${os}/${arch} from GitHub Releases."
+download "$archive (about 1.3 MB)..." "$release_url/$archive" "$work_dir/$archive"
+download "checksums.txt..." "$release_url/checksums.txt" "$work_dir/checksums.txt"
 
 expected=$(awk -v name="$archive" '$2 == name || $2 == "*" name { print $1 }' "$work_dir/checksums.txt")
 if [ -z "$expected" ]; then

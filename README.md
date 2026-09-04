@@ -73,6 +73,12 @@ curl -fsSL https://raw.githubusercontent.com/rudrakshkarpe/agentsmd-cli/main/ins
   AGENTSMD_INSTALL_DIR=/usr/local/bin sh
 ```
 
+If GitHub's release CDN is slow on your route and Go is already installed, bypass the binary download:
+
+```bash
+GOBIN="$HOME/.local/bin" go install github.com/rudrakshkarpe/agentsmd-cli/cmd/agentsmd@latest
+```
+
 ### Go install
 
 Requirements: Go 1.23 or newer.
