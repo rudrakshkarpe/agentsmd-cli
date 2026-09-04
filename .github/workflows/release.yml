@@ -38,7 +38,7 @@ jobs:
           mkdir "$RUNNER_TEMP/agentsmd-smoke"
           tar -xzf dist/release/agentsmd_linux_amd64.tar.gz -C "$RUNNER_TEMP/agentsmd-smoke"
           "$RUNNER_TEMP/agentsmd-smoke/agentsmd" --version
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: agentsmd-${{ steps.version.outputs.value }}
           path: dist/release/*
