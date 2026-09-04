@@ -1,15 +1,15 @@
 """agentsmd CLI entrypoint. Three command families:
-  authoring     init, template, edit, render, lint
-  version ctrl  log, diff, status, commit, revert, tag, blame
-  the loop      watch, learn, pending, promote, reject, prune, optimize, savings
+authoring     init, template, edit, render, lint
+version ctrl  log, diff, status, commit, revert, tag, blame
+the loop      watch, learn, pending, promote, reject, prune, optimize, savings
 """
+
 import argparse
 import os
 import subprocess
-import sys
 
 from . import __version__, adapters, core, loop, templates, vc
-from .project import Project, find_root, ARTIFACT
+from .project import ARTIFACT, Project, find_root
 
 
 # ---------- authoring ----------
@@ -30,8 +30,12 @@ def cmd_init(args):
             content = _interactive_init()
         proj.artifact.write_text(content)
         print(f"created {ARTIFACT}")
-    vc.commit(proj, "init", reason="template" if args.template else "manual",
-              meta={"template": args.template} if args.template else {})
+    vc.commit(
+        proj,
+        "init",
+        reason="template" if args.template else "manual",
+        meta={"template": args.template} if args.template else {},
+    )
     print("initialized .agentsmd/  (run: agentsmd log)")
 
 
@@ -79,14 +83,16 @@ def cmd_lint(args):
     proj = Project.require()
     db = proj.load_ledger()
     issues = 0
-    seen = []
+    seen: list[dict] = []
     for r in db["rules"]:
         for s in seen:
             if core.overlap(r["text"], s["text"]) >= core.DEDUP_THRESHOLD:
-                print(f"duplicate: [{r['id']}] ~ [{s['id']}]"); issues += 1
+                print(f"duplicate: [{r['id']}] ~ [{s['id']}]")
+                issues += 1
         seen.append(r)
         if r["cited"] == 0:
-            print(f"never fired: [{r['id']}] {r['text']}"); issues += 1
+            print(f"never fired: [{r['id']}] {r['text']}")
+            issues += 1
     print(f"{issues} issue(s)" if issues else "clean")
 
 
@@ -104,7 +110,8 @@ def cmd_diff(args):
     proj = Project.require()
     hist = vc.log(proj)
     if len(hist) < 2 and not (args.a and args.b):
-        print("need two versions to diff"); return
+        print("need two versions to diff")
+        return
     a = args.a or hist[-2]["id"]
     b = args.b or hist[-1]["id"]
     print(vc.diff(proj, a, b))
@@ -182,7 +189,8 @@ def cmd_prune(args):
     proj = Project.require()
     db = proj.load_ledger()
     tasks_seen = sum(len(v) for v in db.get("runs", {}).values())
-    keep, dropped = [], []
+    keep: list[dict] = []
+    dropped: list[dict] = []
     for r in db["rules"]:
         (dropped if r["cited"] == 0 and tasks_seen >= 20 else keep).append(r)
     db["rules"] = keep
@@ -197,8 +205,10 @@ def cmd_savings(args):
     if not s:
         print(f"task {args.task}: need >= 2 runs")
     else:
-        print(f"task {s['task']}: {s['first']} -> {s['last']} tokens "
-              f"({s['pct']:+.0f}% by run #{s['runs']})")
+        print(
+            f"task {s['task']}: {s['first']} -> {s['last']} tokens "
+            f"({s['pct']:+.0f}% by run #{s['runs']})"
+        )
 
 
 def cmd_optimize(args):
@@ -216,11 +226,14 @@ def build_parser():
     sub = p.add_subparsers(dest="cmd", required=True)
 
     a = sub.add_parser("init", help="create AGENTS.md and .agentsmd/")
-    a.add_argument("--template"); a.add_argument("--scratch", action="store_true")
-    a.add_argument("--force", action="store_true"); a.set_defaults(fn=cmd_init)
+    a.add_argument("--template")
+    a.add_argument("--scratch", action="store_true")
+    a.add_argument("--force", action="store_true")
+    a.set_defaults(fn=cmd_init)
 
     t = sub.add_parser("template", help="list or use templates")
-    t.add_argument("action", choices=["list", "use"]); t.add_argument("name", nargs="?")
+    t.add_argument("action", choices=["list", "use"])
+    t.add_argument("name", nargs="?")
     t.set_defaults(fn=cmd_template)
 
     for name, fn, help_ in [
@@ -234,33 +247,45 @@ def build_parser():
         ("optimize", cmd_optimize, "offline GEPA batch run"),
         ("watch", cmd_watch, "start the capture daemon"),
     ]:
-        s = sub.add_parser(name, help=help_); s.set_defaults(fn=fn)
+        s = sub.add_parser(name, help=help_)
+        s.set_defaults(fn=fn)
 
-    lg = sub.add_parser("log", help="version history"); lg.set_defaults(fn=cmd_log)
+    lg = sub.add_parser("log", help="version history")
+    lg.set_defaults(fn=cmd_log)
 
     d = sub.add_parser("diff", help="diff two versions")
-    d.add_argument("a", nargs="?"); d.add_argument("b", nargs="?"); d.set_defaults(fn=cmd_diff)
+    d.add_argument("a", nargs="?")
+    d.add_argument("b", nargs="?")
+    d.set_defaults(fn=cmd_diff)
 
     c = sub.add_parser("commit", help="snapshot AGENTS.md")
-    c.add_argument("-m", "--message", required=True); c.set_defaults(fn=cmd_commit)
+    c.add_argument("-m", "--message", required=True)
+    c.set_defaults(fn=cmd_commit)
 
     r = sub.add_parser("revert", help="roll back to a version")
-    r.add_argument("version"); r.set_defaults(fn=cmd_revert)
+    r.add_argument("version")
+    r.set_defaults(fn=cmd_revert)
 
     tg = sub.add_parser("tag", help="name a version")
-    tg.add_argument("version"); tg.add_argument("name"); tg.set_defaults(fn=cmd_tag)
+    tg.add_argument("version")
+    tg.add_argument("name")
+    tg.set_defaults(fn=cmd_tag)
 
     ln = sub.add_parser("learn", help="reflect on last session, propose a rule")
-    ln.add_argument("--adapter", default="claude"); ln.set_defaults(fn=cmd_learn)
+    ln.add_argument("--adapter", default="claude")
+    ln.set_defaults(fn=cmd_learn)
 
     pr = sub.add_parser("promote", help="accept a pending rule")
-    pr.add_argument("id"); pr.set_defaults(fn=cmd_promote)
+    pr.add_argument("id")
+    pr.set_defaults(fn=cmd_promote)
 
     rj = sub.add_parser("reject", help="discard a pending rule")
-    rj.add_argument("id"); rj.set_defaults(fn=cmd_reject)
+    rj.add_argument("id")
+    rj.set_defaults(fn=cmd_reject)
 
     sv = sub.add_parser("savings", help="token savings for a task")
-    sv.add_argument("task"); sv.set_defaults(fn=cmd_savings)
+    sv.add_argument("task")
+    sv.set_defaults(fn=cmd_savings)
     return p
 
 

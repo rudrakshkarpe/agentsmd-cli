@@ -11,6 +11,7 @@ Install (one line in .claude/settings.json):
       "command": "agentsmd _hook claude"
   } ] } ] }
 """
+
 import json
 import sys
 
@@ -21,7 +22,11 @@ class ClaudeAdapter(Adapter):
     name = "claude"
 
     def capabilities(self):
-        return {"hooks": True, "transcript": "jsonl", "events": ["Stop", "SessionEnd", "PostToolUse"]}
+        return {
+            "hooks": True,
+            "transcript": "jsonl",
+            "events": ["Stop", "SessionEnd", "PostToolUse"],
+        }
 
     def read_hook_event(self):
         """Called by `agentsmd _hook claude`. Reads the hook JSON from stdin."""

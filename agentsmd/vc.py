@@ -10,6 +10,7 @@ That 'reason' metadata is the whole point: it lets `log` show HOW the file
 got better, which `git log` alone cannot. Production can back this with
 libgit2 for durability; the model stays the same.
 """
+
 import difflib
 import json
 import time
@@ -25,7 +26,7 @@ def _read_index(proj):
     p = _index_path(proj)
     if not p.exists():
         return []
-    return [json.loads(l) for l in p.read_text().splitlines() if l.strip()]
+    return [json.loads(line) for line in p.read_text().splitlines() if line.strip()]
 
 
 def commit(proj, message, reason="manual", meta=None):
@@ -38,9 +39,9 @@ def commit(proj, message, reason="manual", meta=None):
         "id": vid,
         "parent": idx[-1]["id"] if idx else None,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "reason": reason,                 # learned | manual | template
+        "reason": reason,  # learned | manual | template
         "message": message,
-        "meta": meta or {},               # e.g. {"task": "011", "token_delta": -6860}
+        "meta": meta or {},  # e.g. {"task": "011", "token_delta": -6860}
     }
     with open(_index_path(proj), "a") as f:
         f.write(json.dumps(entry) + "\n")

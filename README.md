@@ -12,9 +12,11 @@ AGENTS.md (Claude Code, Codex, Cursor, goose).
 ## Install (dev)
 
 ```
-pip install -e .
-agentsmd --version
+make bootstrap
+.venv/bin/agentsmd --version
 ```
+
+See `DEVELOPMENT.md` and `CONTRIBUTING.md` for the local workflow and CI gates.
 
 Long-term the real distribution is a single binary (`brew`, `curl | sh`).
 The skeleton is stdlib-only Python; the layout ports 1:1 to Go/cobra.

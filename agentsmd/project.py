@@ -1,5 +1,6 @@
 """Locates the .agentsmd project dir and reads/writes config. The layout
 mirrors git: AGENTS.md is the artifact at repo root, .agentsmd/ is machinery."""
+
 import json
 import pathlib
 

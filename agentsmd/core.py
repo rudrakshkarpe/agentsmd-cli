@@ -5,6 +5,7 @@ AGENTS.md file is RENDERED from them. This is what makes provenance,
 dedup, hit-counting and rule-level blame possible - a plain text file
 can't carry any of that.
 """
+
 import re
 import time
 
@@ -37,7 +38,7 @@ def add_rule(db, text, origin=None):
     rule = {
         "id": rid,
         "text": text.strip(),
-        "origin": origin or {},          # {run, task, version} -> powers `blame`
+        "origin": origin or {},  # {run, task, version} -> powers `blame`
         "cited": 0,
         "born": time.strftime("%Y-%m-%d"),
     }
@@ -47,8 +48,13 @@ def add_rule(db, text, origin=None):
 
 def render(db, header="# AGENTS.md\n"):
     """Return the full AGENTS.md text rendered from the ledger."""
-    lines = [header.rstrip(), "", "## Lessons",
-             "<!-- managed by agentsmd; agents read these first -->", ""]
+    lines = [
+        header.rstrip(),
+        "",
+        "## Lessons",
+        "<!-- managed by agentsmd; agents read these first -->",
+        "",
+    ]
     for r in db["rules"]:
         lines.append(f"- [{r['id']}] {r['text']}  (cited: {r['cited']})")
     return "\n".join(lines) + "\n"

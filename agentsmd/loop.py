@@ -9,6 +9,7 @@ The reflect step here is a stub. In production it calls an LLM (or GEPA's
 reflection component) with the normalized trajectory. Kept separate so the
 capture, reflection, and gate layers can evolve independently.
 """
+
 import json
 import time
 
@@ -20,12 +21,17 @@ def learn(proj, trajectory):
     if not proposal:
         return None
     pid = f"p{int(time.time())}"
-    (proj.pending_dir / f"{pid}.json").write_text(json.dumps({
-        "id": pid,
-        "text": proposal["text"],
-        "origin": proposal.get("origin", {}),
-        "proposed": time.strftime("%Y-%m-%dT%H:%M:%S"),
-    }, indent=2))
+    (proj.pending_dir / f"{pid}.json").write_text(
+        json.dumps(
+            {
+                "id": pid,
+                "text": proposal["text"],
+                "origin": proposal.get("origin", {}),
+                "proposed": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            },
+            indent=2,
+        )
+    )
     return pid
 
 
@@ -64,5 +70,10 @@ def savings(proj, task):
     if len(runs) < 2:
         return None
     first, last = runs[0], runs[-1]
-    return {"task": task, "first": first, "last": last,
-            "pct": 100 * (first - last) / first, "runs": len(runs)}
+    return {
+        "task": task,
+        "first": first,
+        "last": last,
+        "pct": 100 * (first - last) / first,
+        "runs": len(runs),
+    }

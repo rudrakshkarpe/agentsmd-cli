@@ -1,10 +1,11 @@
 """Capture adapters, one per CLI.
 
-  claude  hooks (Stop/SessionEnd) + transcript JSONL       [implemented: stub]
-  codex   watch ~/.codex/transcripts/*.jsonl               [planned]
-  cursor  watch ~/.cursor/*/transcript.jsonl               [planned]
-  goose   no hooks; export session / read SQLite store      [planned]
+claude  hooks (Stop/SessionEnd) + transcript JSONL       [implemented: stub]
+codex   watch ~/.codex/transcripts/*.jsonl               [planned]
+cursor  watch ~/.cursor/*/transcript.jsonl               [planned]
+goose   no hooks; export session / read SQLite store      [planned]
 """
+
 from .claude import ClaudeAdapter
 
 REGISTRY = {

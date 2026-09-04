@@ -1,6 +1,7 @@
 """Capture adapter interface. One per CLI. Capture differs per tool;
 everything downstream (normalize output -> reflect -> gate -> render)
 is written once. Adding a CLI = implementing this, nothing else."""
+
 from abc import ABC, abstractmethod
 
 
