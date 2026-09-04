@@ -42,6 +42,23 @@ jobs:
       - run: go test ./...
       - run: go build -trimpath -o agentsmd-test-binary ./cmd/agentsmd
 
+  installer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25.x"
+          cache: true
+      - name: Package release archives
+        run: ./scripts/package-release.sh v0.0.0-test
+      - name: Install and verify local archive
+        run: |
+          install_dir="$RUNNER_TEMP/agentsmd-bin"
+          AGENTSMD_RELEASE_URL="file://$GITHUB_WORKSPACE/dist/release" \
+            AGENTSMD_INSTALL_DIR="$install_dir" ./install.sh
+          test "$("$install_dir/agentsmd" --version)" = "agentsmd version 0.0.0-test"
+
   quality:
     runs-on: ubuntu-latest
     steps:

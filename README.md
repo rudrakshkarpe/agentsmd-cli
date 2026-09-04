@@ -14,7 +14,7 @@ Author, version, measure, and improve repository instructions from real agent tr
 
 </div>
 
-> **Active development.** The Go authoring, versioning, review gate, Claude Code capture, and provider-neutral reflection paths work today. Multi-CLI capture, automated validation, offline optimization, and release installers are being built for the AgentCon Japan demo.
+> **Active development.** The Go authoring, versioning, review gate, Claude Code capture, provider-neutral reflection, and macOS/Linux release paths work today. Multi-CLI capture, automated validation, and offline optimization are being built for the AgentCon Japan demo.
 
 ## Why agentsmd?
 
@@ -60,9 +60,28 @@ The write target is universal: all four tools read `AGENTS.md`. Capture is imple
 
 ## Install
 
-### Build from source
+### Shell installer (macOS and Linux)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rudrakshkarpe/agentsmd-cli/main/install.sh | sh
+```
+
+The installer selects Apple Silicon, Intel macOS, or Linux automatically, verifies the release archive's SHA-256 checksum, and installs to `~/.local/bin`. Choose another directory when needed:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/rudrakshkarpe/agentsmd-cli/main/install.sh | \
+  AGENTSMD_INSTALL_DIR=/usr/local/bin sh
+```
+
+### Go install
 
 Requirements: Go 1.23 or newer.
+
+```bash
+go install github.com/rudrakshkarpe/agentsmd-cli/cmd/agentsmd@latest
+```
+
+### Build from source
 
 ```bash
 git clone https://github.com/rudrakshkarpe/agentsmd-cli.git
@@ -70,14 +89,6 @@ cd agentsmd-cli
 go build -trimpath -o ./bin/agentsmd ./cmd/agentsmd
 ./bin/agentsmd --version
 ```
-
-Or install directly from the module:
-
-```bash
-go install github.com/rudrakshkarpe/agentsmd-cli/cmd/agentsmd@latest
-```
-
-Homebrew and signed release binaries are on the roadmap; the repository does not claim they exist yet.
 
 ## Quick start
 
@@ -233,7 +244,8 @@ The CLI is one consumer of reusable packages:
 - [ ] Watch daemon with session staleness detection
 - [ ] Offline GEPA optimization bridge
 - [ ] Reproducible benchmark report and token-savings evidence
-- [ ] Signed cross-platform releases and Homebrew installation
+- [x] Checksummed macOS and Linux release archives with a shell installer
+- [ ] Signed releases and Homebrew installation
 
 See the [development roadmap](ROADMAP.md), [120-slice commit plan](docs/COMMIT-ROADMAP.md), and [AgentCon demo plan](docs/AGENTCON-DEMO.md).
 
