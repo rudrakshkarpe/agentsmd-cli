@@ -1,0 +1,10 @@
+{
+  "verdict": "missing_rule",
+  "rule": "For envmerge configuration bugs, begin with internal/config/loader.go and loader_test.go; do not inspect or modify legacy.go unless the production call graph reaches it.",
+  "confidence": 0.87,
+  "origin": {
+    "run": "baseline-2",
+    "task": "empty-environment-override"
+  },
+  "rationale": "The production command calls config.Load, but this run also opened the compatibility-only legacy.go implementation. The extra branch did not contribute to the fix, so a narrow routing rule can keep future sessions on the executed path."
+}
