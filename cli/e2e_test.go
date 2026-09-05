@@ -38,7 +38,7 @@ func TestPrimaryCLIExperience(t *testing.T) {
 	}
 	execute(t, "--root", root, "init")
 	data, _ := os.ReadFile(filepath.Join(root, "AGENTS.md"))
-	if !strings.Contains(string(data), "Detected stack: Go") || !strings.Contains(string(data), "go test ./...") {
+	if !strings.Contains(string(data), "Detected stack: Go") || !strings.Contains(string(data), "go test ./...") || !strings.Contains(string(data), "## Agent working agreement") {
 		t.Fatalf("auto-generated AGENTS.md:\n%s", data)
 	}
 	automationOutput := execute(t, "--root", root, "automate", "--reflect-command", "reflector --json", "--evaluate-command", "go test ./...", "--auto-promote")

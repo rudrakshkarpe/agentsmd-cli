@@ -1,16 +1,24 @@
 # AGENTS.md
 
-## Setup
-- Run all sweeps from the repo root, never from subdirectories.
-- Config lives in `sweep_config.yaml`; edit via the provided make target, not by hand.
+## Benchmark protocol
 
-## Output contract
-- Every run must validate against the JSON schema before writing a summary.
-- Derived metrics (RTF, QPS) are computed, never hand-entered.
+- Record the task identifier, seed, model, token counts, wall time, and final result.
+- Keep evaluation tasks separate from held-out regression tasks.
+- Compare candidates across multiple seeds before promotion.
+- Reject candidates that improve the target task while regressing held-out tasks.
 
-## Self-improvement protocol
-- After each task, if you hit a wrong path, propose ONE rule that would have avoided it.
-- Do not duplicate an existing lesson. Prune lessons that never fire.
+## Reproducibility
+
+- Pin task data, harness versions, prompts, and evaluation commands.
+- Store raw outcomes separately from summaries; never edit results after a run.
+- Keep training/development examples isolated from held-out tasks.
+
+## Promotion gate
+
+- Define the baseline, acceptance threshold, cost ceiling, and regression budget before running candidates.
+- Promote only when the same evaluation procedure shows a repeatable gain.
+- Record the exact evidence and rejected alternatives for every accepted rule.
 
 ## Lessons
-<!-- managed by agentsmd; agents read these first. rules accumulate below. -->
+
+- Add one targeted, attributable rule per accepted learning event.
