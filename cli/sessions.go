@@ -31,8 +31,14 @@ func (a *app) sessionsCommand() *cobra.Command {
 				return err
 			}
 			if len(items) == 0 {
-				fmt.Fprintln(cmd.OutOrStdout(), "no captured sessions")
+				writeInfo(cmd, "no captured sessions")
 				return nil
+			}
+			ui := uiFor(cmd)
+			if ui.interactive {
+				fmt.Fprintln(cmd.OutOrStdout(), ui.icon("📡")+ui.brand("agentsmd CLI · sessions"))
+				fmt.Fprintln(cmd.OutOrStdout(), ui.muted("Recorded agent work and evaluation outcomes"))
+				fmt.Fprintln(cmd.OutOrStdout())
 			}
 			for _, item := range items {
 				outcome := item.Trajectory.Metadata["outcome"]
@@ -41,6 +47,15 @@ func (a *app) sessionsCommand() *cobra.Command {
 				}
 				if outcome == "" {
 					outcome = "captured"
+				}
+				if ui.interactive {
+					icon := "⚠️"
+					if outcome == "success" {
+						icon = "✅"
+					}
+					metrics := fmt.Sprintf("%5.1fs  files %d  tests %d/%d", item.Trajectory.WallTimeS, len(item.Trajectory.Files), item.Trajectory.TestResults.Passed, item.Trajectory.TestResults.Failed)
+					fmt.Fprintf(cmd.OutOrStdout(), "%s%s  %s  %s\n", ui.icon(icon), ui.accent(item.ID), ui.soft(item.Trajectory.Tool+" · "+outcome), ui.muted(metrics))
+					continue
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "%-28s %-8s %-10s %6.1fs files=%d tests=%d/%d\n", item.ID, item.Trajectory.Tool, outcome, item.Trajectory.WallTimeS, len(item.Trajectory.Files), item.Trajectory.TestResults.Passed, item.Trajectory.TestResults.Failed)
 			}

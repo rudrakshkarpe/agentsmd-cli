@@ -34,9 +34,14 @@ func (a *app) connectCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "connected %s\n%s\n", record.Provider, filepath.Join(p.Root, record.Path))
+			provider := record.Provider
+			if uiFor(cmd).interactive {
+				provider = displayProvider(record.Provider)
+			}
+			writeSuccess(cmd, fmt.Sprintf("connected %s", provider))
+			writeInfo(cmd, filepath.Join(p.Root, record.Path))
 			if record.Provider == "codex" {
-				fmt.Fprintln(cmd.OutOrStdout(), "Review and trust the project hook with /hooks in Codex.")
+				writeWarning(cmd, "Review and trust the project hook with /hooks in Codex.")
 			}
 			return nil
 		},

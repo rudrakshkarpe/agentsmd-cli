@@ -45,6 +45,15 @@ func (a *app) automateCommand() *cobra.Command {
 					return err
 				}
 			}
+			ui := uiFor(cmd)
+			if ui.interactive {
+				fmt.Fprintln(cmd.OutOrStdout(), ui.icon("🧠")+ui.brand("agentsmd CLI · automation"))
+				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Reflection "), ui.muted(displayCommand(config.ReflectCommand)))
+				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Evaluation "), ui.muted(displayCommand(config.EvaluateCommand)))
+				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Promotion  "), ui.muted(map[bool]string{true: "automatic", false: "manual"}[config.AutoPromote]))
+				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Confidence "), ui.muted(fmt.Sprintf("%.2f", config.MinConfidence)))
+				return nil
+			}
 			fmt.Fprintf(cmd.OutOrStdout(), "reflection: %s\nevaluation: %s\nauto-promote: %t\nminimum confidence: %.2f\n", displayCommand(config.ReflectCommand), displayCommand(config.EvaluateCommand), config.AutoPromote, config.MinConfidence)
 			return nil
 		},

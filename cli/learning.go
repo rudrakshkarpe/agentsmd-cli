@@ -42,10 +42,11 @@ func (a *app) printPending(cmd *cobra.Command) error {
 		return err
 	}
 	for _, item := range items {
-		fmt.Fprintf(cmd.OutOrStdout(), "%s task=%s %s\n", item.ID, item.Origin.Task, item.Text)
+		ui := uiFor(cmd)
+		fmt.Fprintf(cmd.OutOrStdout(), "%s%s %s %s\n", ui.icon("⏳"), ui.accent(item.ID), ui.muted("task="+item.Origin.Task), ui.soft(item.Text))
 	}
 	if len(items) == 0 {
-		fmt.Fprintln(cmd.OutOrStdout(), "no pending rules")
+		writeSuccess(cmd, "no pending rules")
 	}
 	return nil
 }
@@ -67,7 +68,7 @@ func (a *app) learnCommand() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "proposed %s\n", proposal.ID)
+				writeSuccess(cmd, fmt.Sprintf("proposed %s", proposal.ID))
 				return nil
 			}
 			if trajectoryPath == "" || reflectCommand == "" {
@@ -86,10 +87,10 @@ func (a *app) learnCommand() *cobra.Command {
 				return err
 			}
 			if proposal == nil {
-				fmt.Fprintf(cmd.OutOrStdout(), "no proposal: %s\n", result.Verdict)
+				writeInfo(cmd, fmt.Sprintf("no proposal: %s", result.Verdict))
 				return nil
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "proposed %s\n", proposal.ID)
+			writeSuccess(cmd, fmt.Sprintf("proposed %s", proposal.ID))
 			return nil
 		},
 	}
@@ -116,10 +117,10 @@ func (a *app) promoteCommand() *cobra.Command {
 				return err
 			}
 			if duplicate != nil {
-				fmt.Fprintf(cmd.OutOrStdout(), "already covered by %s\n", duplicate.ID)
+				writeInfo(cmd, fmt.Sprintf("already covered by %s", duplicate.ID))
 				return nil
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "promoted %s\n", rule.ID)
+			writeSuccess(cmd, fmt.Sprintf("promoted %s", rule.ID))
 			return nil
 		},
 	}
@@ -138,7 +139,7 @@ func (a *app) rejectCommand() *cobra.Command {
 			if err := learning.New(p).Reject(args[0]); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "rejected %s\n", args[0])
+			writeSuccess(cmd, fmt.Sprintf("rejected %s", args[0]))
 			return nil
 		},
 	}
