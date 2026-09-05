@@ -47,6 +47,7 @@ func New() *cobra.Command {
 		state.ingestCommand(),
 		state.processCommand(),
 		state.doctorCommand(),
+		state.updateCommand(),
 		state.sessionsCommand(),
 		state.templateCommand(),
 		state.editCommand(),
@@ -95,6 +96,7 @@ func printWelcome(cmd *cobra.Command) {
 	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🔌"), ui.accent("agentsmd connect <cli>"), ui.muted("connect Codex, Claude, goose or Cursor"))
 	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🧠"), ui.accent("agentsmd automate"), ui.muted("configure reflection and evaluation gates"))
 	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🩺"), ui.accent("agentsmd doctor"), ui.muted("check the project and installed CLIs"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🔄"), ui.accent("agentsmd update"), ui.muted("install the latest verified release"))
 	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("📡"), ui.accent("agentsmd sessions"), ui.muted("inspect captured coding sessions"))
 	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("❓"), ui.accent("agentsmd --help"), ui.muted("show every primary command"))
 }
