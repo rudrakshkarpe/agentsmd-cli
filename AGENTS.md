@@ -13,7 +13,9 @@ This repository develops `agentsmd`, a version-controlled authoring and self-imp
 - The production implementation is Go; the Python skeleton remains an executable compatibility reference until parity is reached.
 - The Go packages cover schemas, project storage, ledger operations, templates, typed versions, the pending-rule gate, token recording, and the Cobra command tree.
 - Project detection, Claude transcript normalization, provider-neutral reflection, and project-local connectors for Codex, Claude Code, Cursor, and goose are implemented.
-- The next reliability milestone is evidence-backed validation before promotion and richer normalization for non-Claude providers.
+- Lifecycle hooks now persist Git, file, duration, provider, and configured evaluation evidence; reflection runs in a durable background queue.
+- Automatic promotion is opt-in and must remain impossible without a successful evaluation command and confidence threshold.
+- The next reliability milestone is held-out validation, logical-task correlation, and richer normalization for non-Claude providers.
 
 ## Invariants
 

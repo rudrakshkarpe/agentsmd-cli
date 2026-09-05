@@ -14,7 +14,7 @@ Author, version, measure, and improve repository instructions from real agent tr
 
 </div>
 
-> **Active development.** Project detection, the review gate, project-local Codex/Claude Code/Cursor/goose hooks, provider-neutral reflection, and macOS/Linux releases work today. Automated evaluation and offline optimization are still being built for the AgentCon Japan demo.
+> **Active development.** Project detection, cross-CLI lifecycle capture, automatic reflection queues, command-based evaluation gates, opt-in automatic promotion, and macOS/Linux releases work today. Held-out evaluation and offline optimization are still being built for the AgentCon Japan demo.
 
 ## Why agentsmd?
 
@@ -115,7 +115,30 @@ agentsmd connect cursor
 agentsmd connect goose
 ```
 
-Captured sessions land in `.agentsmd/runs/`. A reflector—or a person during the current preview—can propose one targeted lesson, which stays pending until reviewed:
+Configure a reflector and the command that must pass before a proposal is eligible for automatic promotion:
+
+```bash
+agentsmd automate \
+  --reflect-command "./scripts/reflect-agentsmd" \
+  --evaluate-command "go test ./..."
+```
+
+This automatically reflects after capture but leaves successful proposals pending for review. Automatic promotion is an explicit additional policy:
+
+```bash
+agentsmd automate --auto-promote --min-confidence 0.90
+```
+
+`--auto-promote` is rejected unless both reflection and evaluation commands are configured. The evaluation command receives `AGENTSMD_PROPOSAL_ID`, `AGENTSMD_RULE`, and `AGENTSMD_RUN_ID` in its environment.
+
+Captured sessions land in `.agentsmd/runs/`. Inspect their provider, outcome, duration, changed files, and test summary with:
+
+```bash
+agentsmd sessions
+agentsmd sessions show <run-id>
+```
+
+A reflector—or a person—can propose one targeted lesson, which stays pending until reviewed:
 
 ```bash
 agentsmd learn \
@@ -185,7 +208,7 @@ This contract keeps model providers outside the core. Direct providers and a GEP
 - Cursor: `.cursor/hooks.json`
 - goose: `.agents/plugins/agentsmd/`
 
-All connectors capture a provider-neutral session envelope. Claude Code additionally normalizes its JSONL transcript into assistant steps, tool calls, shell commands, and token usage. Codex transcript internals are intentionally not parsed because their documented format is unstable.
+All connectors capture start/end lifecycle events into a provider-neutral trajectory. The end event is persisted immediately, while Git evidence, transcript parsing, reflection, and evaluation run in a detached local worker. Runs record available start/end times, wall duration, Git revisions, worktree status, changed files, final diff, provider status, evaluation command, test outcome, model, and tokens. Claude Code additionally normalizes its JSONL transcript into assistant steps, tool calls, shell commands, and token usage. Codex transcript internals are intentionally not parsed because their documented format is unstable.
 
 ## CLI
 
@@ -194,7 +217,9 @@ All connectors capture a provider-neutral session envelope. Claude Code addition
 | Detect the project and create `AGENTS.md` | `agentsmd init` |
 | Browse or apply reusable baselines | `agentsmd templates`, `agentsmd templates use NAME` |
 | Connect a coding tool | `agentsmd connect codex\|claude\|cursor\|goose` |
+| Configure automatic reflection and gating | `agentsmd automate` |
 | Diagnose the local setup | `agentsmd doctor` |
+| Inspect measured sessions | `agentsmd sessions`, `agentsmd sessions show RUN` |
 | Review the improvement queue | `agentsmd pending`, `agentsmd promote ID`, `agentsmd reject ID` |
 | Propose a targeted rule | `agentsmd learn ...` |
 
@@ -207,10 +232,15 @@ AGENTS.md                 rendered instructions read by coding agents
 .agentsmd/
   config.yaml             project configuration
   connections.json        portable records of configured CLI hooks
+  automation.json         reflection, evaluation, and promotion policy
   ledger.json             rules, provenance, citations, token runs
   versions/               typed snapshots, index, and tags
   pending/                proposed rules awaiting review
   runs/                   normalized trajectories and measurements
+  sessions/               lifecycle baselines
+  inbox/                  durable raw hook events
+  queue/                  idempotent background reflection jobs
+  evaluations/            gate results and command output
 ```
 
 ## Go library
@@ -227,6 +257,8 @@ The CLI is one consumer of reusable packages:
 | `capture/claude` | Claude Code JSONL normalization |
 | `detect` | Conservative stack and command discovery |
 | `integration` | Project-local lifecycle hooks for supported coding tools |
+| `session` | Lifecycle baselines plus Git, duration, file, and status evidence |
+| `automation` | Durable reflection jobs, evaluation records, and gated promotion |
 | `reflect` | Reflection verdict contract and command provider |
 | `learning` | Propose, review, promote, reject, prune, and measure workflow |
 | `cli` | Embeddable Cobra command tree |
@@ -237,6 +269,7 @@ The CLI is one consumer of reusable packages:
 
 - Local-first storage; no transcript upload is required by the core.
 - Learned rules never bypass the pending-review gate.
+- Automatic promotion is disabled by default and cannot be enabled without an evaluation command.
 - Whole-file reflective rewrites are avoided; learning produces targeted deltas.
 - Version and proposal identifiers reject path traversal.
 - CI tests Go 1.23 and 1.25 on Linux, macOS, and Windows and runs the race detector.
@@ -250,12 +283,15 @@ The CLI is one consumer of reusable packages:
 - [x] Claude Code trajectory normalization
 - [x] Provider-neutral task-boundary reflector
 - [ ] Validation gate with held-out regression checks
-- [x] Codex, Claude Code, Cursor, and goose SessionEnd connectors
+- [x] Codex, Claude Code, Cursor, and goose lifecycle connectors
 - [ ] Rich transcript normalization beyond Claude Code
-- [ ] Cross-CLI session and logical-task identity
-- [ ] Automatic Git, command, test, token, and duration evidence capture
-- [ ] Local session index with run inspection and progress comparisons
-- [ ] Idempotent task-boundary reflection queue
+- [ ] Logical-task identity across related sessions
+- [x] Provider-qualified session identity and automatic Git/duration evidence capture
+- [x] Configurable command/test outcome capture through the evaluation gate
+- [x] Local session listing and complete run inspection
+- [x] Idempotent background reflection queue
+- [x] Opt-in automatic promotion behind evaluation and confidence gates
+- [ ] Logical-task correlation and before/after progress comparisons
 - [ ] Watch daemon with session staleness detection
 - [ ] Offline GEPA optimization bridge
 - [ ] Reproducible benchmark report and token-savings evidence

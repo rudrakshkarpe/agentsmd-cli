@@ -22,13 +22,17 @@ Phased, not dated. Each phase is independently useful and shippable.
 - `watch` daemon with staleness detection.
 
 ## Phase 4 — cross-CLI session tracking
-- Give every run a provider-qualified ID and correlate related runs under a stable logical task ID.
-- Capture task-boundary and session-end lifecycle events without double-counting resumed sessions.
-- Record timestamps, working tree revisions, changed files, commands, test outcomes, token usage, wall time, model, and provider when the source exposes them.
-- Maintain a local, append-only run index with `sessions list`, `sessions show`, and `progress` views.
-- Queue reflection outside latency-sensitive hooks; retries must be idempotent and recoverable after interruption.
-- Compare equivalent tasks before and after a promoted rule using success rate, regressions, tokens, and completion time.
-- Keep raw transcripts local by default and support configurable redaction before any external reflector receives a trajectory.
+- [x] Give every run a provider-qualified ID.
+- [ ] Correlate related runs under a stable logical task ID.
+- [x] Capture session-start and session-end lifecycle events without duplicating completed reflection jobs.
+- [x] Record timestamps, working tree revisions, changed files, final diffs, evaluation outcomes, wall time, model, provider, and available tokens.
+- [x] Provide local `sessions` and `sessions show` inspection.
+- [ ] Add task-level `progress` comparisons.
+- [x] Queue reflection outside latency-sensitive hooks with durable job results.
+- [ ] Add explicit recovery for interrupted/stale worker locks.
+- [x] Require an evaluation command and confidence threshold for opt-in automatic promotion.
+- [ ] Compare equivalent tasks before and after a promoted rule using success rate, regressions, tokens, and completion time.
+- [ ] Keep raw transcripts local by default and support configurable redaction before any external reflector receives a trajectory.
 
 Definition of done: a Codex, Claude Code, Cursor, or goose task can be traced from capture to proposal, promotion, and a later measured outcome without manual bookkeeping. Promotion remains gated by a human or evaluation policy.
 
