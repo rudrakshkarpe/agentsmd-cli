@@ -35,7 +35,9 @@ func New() *cobra.Command {
 	root.SetOut(state.out)
 	root.SetErr(state.err)
 	root.SetHelpFunc(func(cmd *cobra.Command, _ []string) { printHelp(cmd) })
-	root.SetVersionTemplate("🌱 agentsmd CLI version {{.Version}}\n")
+	// Keep the version line stable for installers and shell scripts. The
+	// interactive landing screen and help identify the product as agentsmd CLI.
+	root.SetVersionTemplate("agentsmd version {{.Version}}\n")
 	root.PersistentFlags().StringVar(&state.root, "root", ".", "project directory")
 	root.AddCommand(
 		state.initCommand(),

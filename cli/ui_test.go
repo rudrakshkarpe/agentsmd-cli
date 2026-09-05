@@ -36,3 +36,17 @@ func TestHelpIdentifiesAgentsmdCLIWithoutANSIWhenPiped(t *testing.T) {
 		t.Fatalf("piped help contains ANSI: %q", output.String())
 	}
 }
+
+func TestVersionOutputRemainsScriptCompatible(t *testing.T) {
+	command := New()
+	var output bytes.Buffer
+	command.SetOut(&output)
+	command.SetErr(&output)
+	command.SetArgs([]string{"--version"})
+	if err := command.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := output.String(), "agentsmd version "+Version+"\n"; got != want {
+		t.Fatalf("version=%q want %q", got, want)
+	}
+}
