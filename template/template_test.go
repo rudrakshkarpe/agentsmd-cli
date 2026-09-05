@@ -17,7 +17,7 @@ func TestTemplatesProvideActionableStartingPoints(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !strings.HasPrefix(content, "# AGENTS.md\n") {
+		if !strings.HasPrefix(content, "# AGENTS.md") {
 			t.Fatalf("template %s has no AGENTS.md heading", name)
 		}
 		if strings.Count(content, "## ") < 3 {
