@@ -49,6 +49,7 @@ func New() *cobra.Command {
 		state.doctorCommand(),
 		state.updateCommand(),
 		state.sessionsCommand(),
+		state.benchmarkCommand(),
 		state.templateCommand(),
 		state.editCommand(),
 		state.renderCommand(),

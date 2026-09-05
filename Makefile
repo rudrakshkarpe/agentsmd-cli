@@ -3,7 +3,7 @@
 PYTHON ?= python3
 VENV ?= .venv
 BIN := $(VENV)/bin
-GO_FILES := $(shell find automation cmd cli capture detect integration learning ledger project reflect schema session template version -name '*.go' -type f)
+GO_FILES := $(shell find automation benchmark cmd cli capture detect integration learning ledger project reflect schema session template version -name '*.go' -type f)
 
 bootstrap:
 	$(PYTHON) -m venv $(VENV)
