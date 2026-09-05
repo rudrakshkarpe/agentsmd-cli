@@ -24,12 +24,29 @@ func (a *app) doctorCommand() *cobra.Command {
 		Short: "Check project setup and supported coding CLIs",
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			checks := a.diagnose()
-			fmt.Fprintln(cmd.OutOrStdout(), "agentsmd doctor")
+			ui := uiFor(cmd)
+			fmt.Fprintln(cmd.OutOrStdout(), ui.icon("🩺")+ui.brand("agentsmd CLI · doctor"))
+			fmt.Fprintln(cmd.OutOrStdout(), ui.muted("Checking project health and agent integrations…"))
+			fmt.Fprintln(cmd.OutOrStdout())
+			warnings := 0
 			for _, item := range checks {
+				if item.level != "ok" {
+					warnings++
+				}
+				if ui.interactive {
+					symbol := map[string]string{"ok": "✅", "warn": "⚠️", "error": "❌"}[item.level]
+					fmt.Fprintf(cmd.OutOrStdout(), "%s%s %s\n", ui.icon(symbol), ui.brand(item.name), ui.muted("— "+item.detail))
+					continue
+				}
 				symbol := map[string]string{"ok": "✓", "warn": "!", "error": "✗"}[item.level]
 				fmt.Fprintf(cmd.OutOrStdout(), "[%s] %s — %s\n", symbol, item.name, item.detail)
 			}
-			fmt.Fprintln(cmd.OutOrStdout(), "\nWarnings are optional integrations; connect only the CLIs you use.")
+			fmt.Fprintln(cmd.OutOrStdout())
+			if warnings == 0 {
+				writeSuccess(cmd, "Everything is ready.")
+			} else {
+				writeInfo(cmd, "Optional integrations may be connected when you need them.")
+			}
 			return nil
 		},
 	}

@@ -60,7 +60,10 @@ func (a *app) initCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "initialized %s (%s)\n", p.Root, item.ID)
+			writeSuccess(cmd, fmt.Sprintf("initialized %s (%s)", p.Root, item.ID))
+			if uiFor(cmd).interactive {
+				writeInfo(cmd, "Next: run `agentsmd doctor`, then connect your coding CLI.")
+			}
 			return nil
 		},
 	}
@@ -103,8 +106,12 @@ func (a *app) templateCommand() *cobra.Command {
 			return err
 		}
 		descriptions := map[string]string{"minimal": "small universal baseline", "team": "shared review and collaboration rules", "monorepo": "multi-package repository workflow", "python-lib": "Python library conventions", "benchmark-kit": "reproducible evaluation projects"}
+		if uiFor(cmd).interactive {
+			writeSection(cmd, "📚", "agentsmd CLI · templates")
+		}
 		for _, name := range names {
-			fmt.Fprintf(cmd.OutOrStdout(), "%-16s %s\n", name, descriptions[name])
+			ui := uiFor(cmd)
+			fmt.Fprintf(cmd.OutOrStdout(), "%s%s\n", ui.accent(fmt.Sprintf("%-16s", name)), ui.muted(descriptions[name]))
 		}
 		return nil
 	}
@@ -136,7 +143,7 @@ func (a *app) templateCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "applied %s (%s)\n", args[0], item.ID)
+			writeSuccess(cmd, fmt.Sprintf("applied %s (%s)", args[0], item.ID))
 			return nil
 		},
 	})
@@ -163,7 +170,7 @@ func (a *app) renderCommand() *cobra.Command {
 			if err := project.AtomicWrite(p.ArtifactPath(), []byte(ledger.Merge(string(existing), value)), 0o644); err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "rendered %d rules\n", len(value.Rules))
+			writeSuccess(cmd, fmt.Sprintf("rendered %d rules", len(value.Rules)))
 			return nil
 		},
 	}
@@ -186,7 +193,11 @@ func (a *app) lintCommand() *cobra.Command {
 			for _, issue := range issues {
 				fmt.Fprintf(cmd.OutOrStdout(), "%s [%s] %s\n", issue.Kind, issue.RuleID, issue.Message)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "%d issue(s)\n", len(issues))
+			if len(issues) == 0 {
+				writeSuccess(cmd, "0 issues — AGENTS.md is clean")
+			} else {
+				writeWarning(cmd, fmt.Sprintf("%d issue(s)", len(issues)))
+			}
 			return nil
 		},
 	}
