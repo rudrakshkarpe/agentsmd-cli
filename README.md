@@ -10,11 +10,11 @@ Author, version, measure, and improve repository instructions from real agent tr
 [![Go](https://img.shields.io/github/go-mod/go-version/rudrakshkarpe/agentsmd-cli?style=for-the-badge&logo=go)](go.mod)
 [![License](https://img.shields.io/github/license/rudrakshkarpe/agentsmd-cli?style=for-the-badge)](LICENSE)
 
-[Install](#install) · [Quick start](#quick-start) · [How it works](#how-it-works) · [CLI](#cli) · [Go library](#go-library) · [Roadmap](#roadmap)
+[Install](#install) · [Quick start](#quick-start) · [Learning example](#a-real-learning-example) · [Evidence](#benchmark-method) · [CLI](#cli) · [Go library](#go-library) · [Roadmap](#roadmap)
 
 </div>
 
-> **Active development.** Project detection, cross-CLI lifecycle capture, automatic reflection queues, command-based evaluation gates, opt-in automatic promotion, and macOS/Linux releases work today. Held-out evaluation and offline optimization are still being built for the AgentCon Japan demo.
+> **Active development.** Project detection, cross-CLI lifecycle capture, automatic reflection queues, command-based evaluation gates, opt-in automatic promotion, and macOS/Linux releases work today. One reproducible held-out study is now included; a broad multi-task benchmark and offline optimization remain in development.
 
 ## Why agentsmd?
 
@@ -158,6 +158,32 @@ agentsmd pending
 agentsmd promote <proposal-id>
 ```
 
+## A real learning example
+
+The repository includes a six-session study around a concrete Go configuration bug. The starting `AGENTS.md` says only to make small changes, run focused tests, run the full suite, and format Go code.
+
+```text
+3 baseline sessions
+  ├─ all solve the bug and pass the hidden tests
+  ├─ all discover the Go cache is outside the sandbox only after testing
+  └─ one explores a compatibility-only file outside the production call path
+            ↓ reflect once per recorded run
+2 targeted rules with run + task provenance
+            ↓ evaluate in fresh workspaces
+3 learned-guidance sessions pass the same hidden tests
+```
+
+The accepted rules tell the agent where the executed configuration path begins and how to keep the Go build cache inside the workspace. Compared with the baseline, the learned condition kept a 3/3 pass rate while median reported tokens moved from 90,724 to 54,274, median commands from 5 to 3, and median duration from 27.9 to 23.1 seconds.
+
+This is evidence for one task and one two-rule bundle, not a general performance claim. Read the [task, raw trajectories, reflections, verifier, and limitations](benchmarks/config-precedence/README.md), or reproduce it with:
+
+```bash
+agentsmd benchmark \
+  --spec benchmarks/config-precedence/spec.json \
+  --trials 3 \
+  --output benchmarks/config-precedence/results/my-run
+```
+
 ## How it works
 
 ### 1. Rules are structured data
@@ -182,6 +208,14 @@ The fourth verdict is deliberate: sometimes the correct improvement is no new in
 ### 4. Suggestions are not trusted automatically
 
 Learned changes enter `.agentsmd/pending/`. Promotion is a separate operation so humans or evaluation gates can reject weak, duplicated, overfitted, or costly rules.
+
+## Benchmark method
+
+The included runner treats instruction changes as an ablation: the prompt, fixture, agent configuration, number of trials, and verifier stay fixed; only `AGENTS.md` changes. Every trial starts in a fresh Git workspace. Held-out tests are copied in after the agent exits, preventing the agent from optimizing directly against the grader.
+
+The case structure follows ideas from [Terminal-Bench](https://github.com/harbor-framework/terminal-bench) and [SWE-bench](https://github.com/SWE-bench/SWE-bench): a task, isolated environment, executable verifier, and auditable oracle. The learning side follows the reflective, incremental direction of [GEPA](https://arxiv.org/abs/2507.19457) and [ACE](https://arxiv.org/abs/2510.04618), while agentsmd adds a pending queue and explicit promotion gate around the resulting rules.
+
+Each run preserves the raw event stream, normalized trajectory, solved workspace, verifier output, token usage, commands, and duration. Reports include the model and trial count. Broader claims will wait for multiple tasks, models, agents, repeated seeds, and single-rule ablations.
 
 ## Automatic reflection
 
@@ -231,6 +265,7 @@ All connectors capture start/end lifecycle events into a provider-neutral trajec
 | Inspect measured sessions | `agentsmd sessions`, `agentsmd sessions show RUN` |
 | Review the improvement queue | `agentsmd pending`, `agentsmd promote ID`, `agentsmd reject ID` |
 | Propose a targeted rule | `agentsmd learn ...` |
+| Compare static and learned guidance | `agentsmd benchmark --spec PATH` |
 
 Legacy authoring, versioning, and measurement commands remain compatible but are hidden from the primary help while their UX is consolidated.
 
@@ -270,6 +305,7 @@ The CLI is one consumer of reusable packages:
 | `automation` | Durable reflection jobs, evaluation records, and gated promotion |
 | `reflect` | Reflection verdict contract and command provider |
 | `learning` | Propose, review, promote, reject, prune, and measure workflow |
+| `benchmark` | Isolated before/after trials, held-out verification, artifacts, and reports |
 | `cli` | Embeddable Cobra command tree |
 
 `SPEC.md` is normative; Go packages should remain compatible with its schemas.
@@ -291,7 +327,8 @@ The CLI is one consumer of reusable packages:
 - [x] Pending-rule review and deterministic demo path
 - [x] Claude Code trajectory normalization
 - [x] Provider-neutral task-boundary reflector
-- [ ] Validation gate with held-out regression checks
+- [x] Reproducible single-task held-out evaluation runner and evidence bundle
+- [ ] Multi-task held-out benchmark with single-rule ablations
 - [x] Codex, Claude Code, Cursor, and goose lifecycle connectors
 - [ ] Rich transcript normalization beyond Claude Code
 - [ ] Logical-task identity across related sessions
@@ -303,7 +340,7 @@ The CLI is one consumer of reusable packages:
 - [ ] Logical-task correlation and before/after progress comparisons
 - [ ] Watch daemon with session staleness detection
 - [ ] Offline GEPA optimization bridge
-- [ ] Reproducible benchmark report and token-savings evidence
+- [x] Reproducible benchmark report and token-usage evidence
 - [x] Checksummed macOS and Linux release archives with a shell installer
 - [ ] Signed releases and Homebrew installation
 
