@@ -6,15 +6,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
+	"github.com/rudrakshkarpe/agentsmd-cli/automation"
 	"github.com/rudrakshkarpe/agentsmd-cli/capture/claude"
 	"github.com/rudrakshkarpe/agentsmd-cli/integration"
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
+	"github.com/rudrakshkarpe/agentsmd-cli/session"
 	"github.com/spf13/cobra"
 )
 
@@ -52,11 +54,62 @@ func (a *app) hookCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return captureHook(a.root, strings.ToLower(args[0]), data)
+			return receiveHook(a.root, strings.ToLower(args[0]), data)
 		},
 	}
 	command.SetIn(os.Stdin)
 	return command
+}
+
+func (a *app) ingestCommand() *cobra.Command {
+	var provider, eventPath string
+	command := &cobra.Command{
+		Use:    "ingest",
+		Short:  "Normalize a queued lifecycle event",
+		Hidden: true,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			data, err := os.ReadFile(eventPath)
+			if err != nil {
+				return err
+			}
+			return captureHook(a.root, provider, data)
+		},
+	}
+	command.Flags().StringVar(&provider, "provider", "", "hook provider")
+	command.Flags().StringVar(&eventPath, "event", "", "queued event path")
+	_ = command.MarkFlagRequired("provider")
+	_ = command.MarkFlagRequired("event")
+	return command
+}
+
+func receiveHook(root, provider string, data []byte) error {
+	if !contains(integration.Supported, provider) {
+		return fmt.Errorf("unsupported hook provider %q", provider)
+	}
+	var event map[string]any
+	if err := json.Unmarshal(data, &event); err != nil {
+		return fmt.Errorf("decode %s hook event: %w", provider, err)
+	}
+	start := root
+	if cwd, ok := event["cwd"].(string); ok && cwd != "" {
+		start = cwd
+	}
+	p, err := project.Require(start)
+	if err != nil {
+		return err
+	}
+	if session.IsStart(event) {
+		return captureHook(root, provider, data)
+	}
+	sessionID := firstString(event, "session_id", "conversation_id", "generation_id")
+	if sessionID == "" {
+		sessionID = fmt.Sprintf("%s-%d", provider, time.Now().UTC().UnixNano())
+	}
+	eventPath := filepath.Join(p.InboxDir(), provider+"-"+session.SafeName(sessionID)+".json")
+	if err := project.AtomicWrite(eventPath, append(data, '\n'), 0o600); err != nil {
+		return err
+	}
+	return launchDetached(p, "--root", p.Root, "ingest", "--provider", provider, "--event", eventPath)
 }
 
 func captureHook(root, provider string, data []byte) error {
@@ -79,9 +132,13 @@ func captureHook(root, provider string, data []byte) error {
 	if sessionID == "" {
 		sessionID = fmt.Sprintf("%s-%d", provider, time.Now().UTC().UnixNano())
 	}
+	if session.IsStart(event) {
+		return session.Start(p, provider, sessionID, time.Now().UTC())
+	}
 	trajectory := &schema.Trajectory{
 		SessionID: sessionID,
 		Tool:      provider,
+		Task:      firstString(event, "task", "task_id"),
 		Steps:     []schema.Step{}, ToolCalls: []schema.ToolCall{}, Files: []schema.FileTouch{}, Commands: []schema.Command{},
 		Metadata: map[string]string{"hook_event": firstString(event, "hook_event_name", "event")},
 	}
@@ -96,21 +153,61 @@ func captureHook(root, provider string, data []byte) error {
 			}
 		}
 	}
+	if trajectory.Metadata == nil {
+		trajectory.Metadata = map[string]string{}
+	}
+	trajectory.Metadata["hook_event"] = firstString(event, "hook_event_name", "event")
+	if model := firstString(event, "model"); model != "" {
+		trajectory.Metadata["model"] = model
+	}
+	if status := firstString(event, "status", "reason"); status != "" {
+		trajectory.Metadata["provider_status"] = status
+	}
+	if err := session.Complete(p, trajectory, provider, time.Now().UTC()); err != nil {
+		return err
+	}
 	output, err := json.MarshalIndent(trajectory, "", "  ")
 	if err != nil {
 		return err
 	}
-	name := safeName(sessionID)
-	if name == "" {
-		name = fmt.Sprintf("%s-%d", provider, time.Now().UTC().UnixNano())
+	path := session.RunPath(p, provider, sessionID)
+	if err := project.AtomicWrite(path, append(output, '\n'), 0o644); err != nil {
+		return err
 	}
-	return project.AtomicWrite(filepath.Join(p.RunsDir(), name+".json"), append(output, '\n'), 0o644)
+	config, err := automation.Load(p)
+	if err != nil || len(config.ReflectCommand) == 0 {
+		return err
+	}
+	jobPath, err := automation.Enqueue(p, path)
+	if err != nil {
+		return err
+	}
+	return launchProcessor(p, jobPath)
 }
 
-var unsafeFilename = regexp.MustCompile(`[^a-zA-Z0-9._-]+`)
+func launchProcessor(p *project.Project, jobPath string) error {
+	return launchDetached(p, "--root", p.Root, "process", "--job", jobPath)
+}
 
-func safeName(value string) string {
-	return strings.Trim(unsafeFilename.ReplaceAllString(value, "-"), "-.")
+func launchDetached(p *project.Project, args ...string) error {
+	executable, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	log, err := os.OpenFile(filepath.Join(p.StateDir(), "automation.log"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
+	if err != nil {
+		return err
+	}
+	command := exec.Command(executable, args...)
+	configureDetached(command)
+	command.Stdin = nil
+	command.Stdout, command.Stderr = log, log
+	if err := command.Start(); err != nil {
+		log.Close()
+		return err
+	}
+	log.Close()
+	return command.Process.Release()
 }
 
 func firstString(value map[string]any, keys ...string) string {

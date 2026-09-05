@@ -26,13 +26,14 @@ func Connect(p *project.Project, provider string) (Record, error) {
 	switch provider {
 	case "codex":
 		path = filepath.Join(p.Root, ".codex", "hooks.json")
-		value = hookSettings("SessionEnd", "agentsmd hook codex", 3)
+		value = lifecycleHookSettings("agentsmd hook codex", 3)
 	case "claude":
 		path = filepath.Join(p.Root, ".claude", "settings.local.json")
-		value = hookSettings("SessionEnd", "agentsmd hook claude", 10)
+		value = lifecycleHookSettings("agentsmd hook claude", 10)
 	case "cursor":
 		path = filepath.Join(p.Root, ".cursor", "hooks.json")
-		value = map[string]any{"version": 1, "hooks": map[string]any{"sessionEnd": []any{map[string]any{"command": "agentsmd hook cursor", "timeout": 10}}}}
+		handler := func() []any { return []any{map[string]any{"command": "agentsmd hook cursor", "timeout": 10}} }
+		value = map[string]any{"version": 1, "hooks": map[string]any{"sessionStart": handler(), "sessionEnd": handler()}}
 	case "goose":
 		return connectGoose(p)
 	default:
@@ -50,10 +51,17 @@ func hookSettings(event, command string, timeout int) map[string]any {
 	return map[string]any{"hooks": map[string]any{event: []any{map[string]any{"hooks": []any{handler}}}}}
 }
 
+func lifecycleHookSettings(command string, timeout int) map[string]any {
+	start := hookSettings("SessionStart", command, timeout)
+	end := hookSettings("SessionEnd", command, timeout)
+	mergeMap(start, end)
+	return start
+}
+
 func connectGoose(p *project.Project) (Record, error) {
 	dir := filepath.Join(p.Root, ".agents", "plugins", "agentsmd")
 	manifest := map[string]any{"name": "agentsmd", "version": "1.0.0", "description": "Capture goose sessions for AGENTS.md improvement"}
-	hooks := hookSettings("SessionEnd", "agentsmd hook goose", 10)
+	hooks := lifecycleHookSettings("agentsmd hook goose", 10)
 	if err := writeJSON(filepath.Join(dir, "plugin.json"), manifest); err != nil {
 		return Record{}, err
 	}

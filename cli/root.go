@@ -38,8 +38,12 @@ func New() *cobra.Command {
 	root.AddCommand(
 		state.initCommand(),
 		state.connectCommand(),
+		state.automateCommand(),
 		state.hookCommand(),
+		state.ingestCommand(),
+		state.processCommand(),
 		state.doctorCommand(),
+		state.sessionsCommand(),
 		state.templateCommand(),
 		state.editCommand(),
 		state.renderCommand(),
@@ -89,6 +93,7 @@ func printWelcome(cmd *cobra.Command) {
 	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd init                 detect this project and create AGENTS.md")
 	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd templates            browse reusable starting points")
 	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd connect <cli>        connect codex, claude, goose, or cursor")
+	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd automate             configure reflection and evaluation gates")
 	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd doctor               check your project and installed CLIs")
 	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd --help               show all primary commands")
 }
