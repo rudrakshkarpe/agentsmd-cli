@@ -1,0 +1,8 @@
+diff --git a/internal/config/loader.go b/internal/config/loader.go
+--- a/internal/config/loader.go
++++ b/internal/config/loader.go
+@@
+-	if region, _ := lookup("APP_REGION"); region != "" {
++	if region, ok := lookup("APP_REGION"); ok {
+ 		values.Region = region
+ 	}

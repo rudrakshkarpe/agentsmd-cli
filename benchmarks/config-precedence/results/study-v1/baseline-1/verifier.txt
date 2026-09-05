@@ -1,0 +1,2 @@
+?   	example.com/envmerge/cmd/envmerge	[no test files]
+ok  	example.com/envmerge/internal/config	0.483s

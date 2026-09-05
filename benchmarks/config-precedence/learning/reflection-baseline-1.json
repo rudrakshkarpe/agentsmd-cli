@@ -1,0 +1,10 @@
+{
+  "verdict": "missing_rule",
+  "rule": "In a restricted workspace, create .cache/go-build and run Go tests with GOCACHE=$PWD/.cache/go-build; the default user cache may be outside the sandbox.",
+  "confidence": 0.98,
+  "origin": {
+    "run": "baseline-1",
+    "task": "empty-environment-override"
+  },
+  "rationale": "The first full-suite command failed because Go attempted to write outside the workspace. The agent then created a temporary cache and repeated the suite successfully. A repository-local cache removes that avoidable failure and retry."
+}

@@ -1,0 +1,14 @@
+{
+  "name": "config-precedence",
+  "task": "empty-environment-override",
+  "description": "Fix a production configuration precedence bug without being diverted by a legacy implementation.",
+  "prompt": "Operators report that setting APP_REGION to an explicit empty value does not clear the region loaded from config.json. Fix the bug while preserving the behavior when APP_REGION is unset. Add a regression test and run the relevant tests. Do not change the command-line interface.",
+  "fixture": "fixture",
+  "baseline_agents_md": "guidance/baseline.md",
+  "learned_agents_md": "guidance/learned.md",
+  "held_out": ".held-out",
+  "verify": ["go", "test", "./..."],
+  "agent": "codex",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "low"
+}
