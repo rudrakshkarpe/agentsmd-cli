@@ -18,7 +18,7 @@ The deterministic verifier is `go test ./...`. The expected minimal fix is also 
 
 ## What the loop learned
 
-The baseline traces exposed two repeatable sources of waste: Go tried to use a cache outside the sandbox, and one run inspected a compatibility-only implementation outside the executable call path. The [learning record](learning/README.md) connects each proposed rule to its source trajectory and explains the validation decision.
+The baseline traces exposed two sources of waste: Go tried to use a cache outside the sandbox, and one run inspected a compatibility-only implementation outside the executable call path. The [learning record](learning/README.md) connects each proposed rule to its source trajectory, preserves the actual promoted ledger and `AGENTS.md`, and explains the validation decision.
 
 ## Recorded result
 

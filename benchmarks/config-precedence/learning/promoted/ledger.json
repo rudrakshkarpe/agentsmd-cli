@@ -1,0 +1,25 @@
+{
+  "rules": [
+    {
+      "id": "r000",
+      "text": "In a restricted workspace, create .cache/go-build and run Go tests with GOCACHE=$PWD/.cache/go-build; the default user cache may be outside the sandbox.",
+      "origin": {
+        "run": "baseline-1",
+        "task": "empty-environment-override"
+      },
+      "cited": 0,
+      "born": "2026-09-05"
+    },
+    {
+      "id": "r001",
+      "text": "For envmerge configuration bugs, begin with internal/config/loader.go and loader_test.go; do not inspect or modify legacy.go unless the production call graph reaches it.",
+      "origin": {
+        "run": "baseline-2",
+        "task": "empty-environment-override"
+      },
+      "cited": 0,
+      "born": "2026-09-05"
+    }
+  ],
+  "runs": {}
+}

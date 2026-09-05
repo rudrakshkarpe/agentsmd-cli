@@ -1,0 +1,3 @@
+{"id":"v0000","parent":null,"ts":"2026-09-05T11:12:07.592016Z","reason":"manual","message":"init","meta":{}}
+{"id":"v0001","parent":"v0000","ts":"2026-09-05T11:12:07.635891Z","reason":"learned","message":"learned: In a restricted workspace, create .cache/go-build and run Go tests with GOCACHE=$PWD/.cache/go-build; the default user cache may be outside the sandbox.","meta":{"run":"baseline-1","task":"empty-environment-override"}}
+{"id":"v0002","parent":"v0001","ts":"2026-09-05T11:12:07.674972Z","reason":"learned","message":"learned: For envmerge configuration bugs, begin with internal/config/loader.go and loader_test.go; do not inspect or modify legacy.go unless the production call graph reaches it.","meta":{"run":"baseline-2","task":"empty-environment-override"}}
