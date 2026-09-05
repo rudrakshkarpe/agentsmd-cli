@@ -111,7 +111,7 @@ func commandIcon(name string) string {
 func printHelp(cmd *cobra.Command) {
 	ui := uiFor(cmd)
 	out := cmd.OutOrStdout()
-	fmt.Fprintln(out, ui.icon("🌱")+ui.brand("agentsmd CLI"))
+	fmt.Fprintln(out, ui.brand("agentsmd-cli"))
 	description := "Project-aware instructions that learn from agent sessions."
 	if cmd.Parent() != nil && cmd.Short != "" {
 		description = cmd.Short
