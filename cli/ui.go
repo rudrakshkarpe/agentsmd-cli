@@ -97,6 +97,7 @@ func commandIcon(name string) string {
 		"connect":   "🔌",
 		"automate":  "🧠",
 		"doctor":    "🩺",
+		"update":    "🔄",
 		"sessions":  "📡",
 		"learn":     "✨",
 		"pending":   "⏳",
@@ -111,7 +112,14 @@ func printHelp(cmd *cobra.Command) {
 	ui := uiFor(cmd)
 	out := cmd.OutOrStdout()
 	fmt.Fprintln(out, ui.icon("🌱")+ui.brand("agentsmd CLI"))
-	fmt.Fprintln(out, ui.muted("Project-aware instructions that learn from agent sessions."))
+	description := "Project-aware instructions that learn from agent sessions."
+	if cmd.Parent() != nil && cmd.Short != "" {
+		description = cmd.Short
+	}
+	fmt.Fprintln(out, ui.muted(description))
+	if len(cmd.Aliases) > 0 {
+		fmt.Fprintln(out, ui.muted("Aliases: agentsmd "+strings.Join(cmd.Aliases, ", agentsmd ")))
+	}
 	fmt.Fprintln(out)
 	fmt.Fprintln(out, ui.brand("Usage"))
 	fmt.Fprintf(out, "  %s\n", ui.accent(cmd.UseLine()))
@@ -125,7 +133,7 @@ func printHelp(cmd *cobra.Command) {
 	if len(children) > 0 {
 		order := map[string]int{
 			"init": 0, "templates": 1, "connect": 2, "automate": 3, "doctor": 4,
-			"sessions": 5, "learn": 6, "pending": 7, "promote": 8, "reject": 9,
+			"update": 5, "sessions": 6, "learn": 7, "pending": 8, "promote": 9, "reject": 10,
 		}
 		sort.SliceStable(children, func(i, j int) bool {
 			left, leftOK := order[children[i].Name()]
