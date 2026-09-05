@@ -29,7 +29,7 @@ func TestHelpIdentifiesAgentsmdCLIWithoutANSIWhenPiped(t *testing.T) {
 	if err := command.Execute(); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(output.String(), "agentsmd CLI") {
+	if !strings.Contains(output.String(), "agentsmd-cli") {
 		t.Fatalf("help=%q", output.String())
 	}
 	if strings.Contains(output.String(), "\033[") {

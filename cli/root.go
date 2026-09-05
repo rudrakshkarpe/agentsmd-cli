@@ -77,26 +77,22 @@ func New() *cobra.Command {
 	return root
 }
 
-const dotBanner = `·●●· ●●●● ●●●● ●··● ●●●● ●●●● ●···● ●●●·
-●··● ●··· ●··· ●●·● ··●· ●··· ●●·●● ●··●
-●●●● ●·●● ●●●· ●·●● ··●· ●●●● ●·●·● ●··●
-●··● ●··● ●··· ●··● ··●· ···● ●···● ●··●
-●··● ●●●● ●●●● ●··● ··●· ●●●● ●···● ●●●·`
+const solidBanner = ` ███   ████ █████ █   █ █████  ████ █   █ ████         ████ █     █████
+█   █ █     █     ██  █   █   █     ██ ██ █   █       █     █       █
+█████ █  ██ ████  █ █ █   █    ███  █ █ █ █   █ █████ █     █       █
+█   █ █   █ █     █  ██   █       █ █   █ █   █       █     █       █
+█   █  ███  █████ █   █   █   ████  █   █ ████         ████ █████ █████`
 
 func printWelcome(cmd *cobra.Command) {
 	ui := uiFor(cmd)
 	out := cmd.OutOrStdout()
-	fmt.Fprintln(out, ui.icon("🌱")+ui.brand("agentsmd CLI"))
-	fmt.Fprintf(out, "%s\n\n", ui.accent(dotBanner))
-	fmt.Fprintln(out, ui.soft("Build project-aware AGENTS.md guidance and improve it from agent sessions."))
+	fmt.Fprintf(out, "%s\n\n", ui.brand(solidBanner))
+	fmt.Fprintln(out, ui.soft("Repository instructions that improve with every coding-agent session."))
 	fmt.Fprintln(out)
-	fmt.Fprintln(out, ui.brand("Quick start"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🌱"), ui.accent("agentsmd init"), ui.muted("detect this project and create AGENTS.md"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("📚"), ui.accent("agentsmd templates"), ui.muted("browse reusable starting points"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🔌"), ui.accent("agentsmd connect <cli>"), ui.muted("connect Codex, Claude, goose or Cursor"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🧠"), ui.accent("agentsmd automate"), ui.muted("configure reflection and evaluation gates"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🩺"), ui.accent("agentsmd doctor"), ui.muted("check the project and installed CLIs"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🔄"), ui.accent("agentsmd update"), ui.muted("install the latest verified release"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("📡"), ui.accent("agentsmd sessions"), ui.muted("inspect captured coding sessions"))
-	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("❓"), ui.accent("agentsmd --help"), ui.muted("show every primary command"))
+	fmt.Fprintln(out, ui.brand("Get started"))
+	fmt.Fprintf(out, "  %s%s\n", ui.accent(fmt.Sprintf("%-26s", "agentsmd init")), ui.muted("create project-aware AGENTS.md"))
+	fmt.Fprintf(out, "  %s%s\n", ui.accent(fmt.Sprintf("%-26s", "agentsmd connect <cli>")), ui.muted("connect your coding agent"))
+	fmt.Fprintf(out, "  %s%s\n", ui.accent(fmt.Sprintf("%-26s", "agentsmd doctor")), ui.muted("verify the setup"))
+	fmt.Fprintln(out)
+	fmt.Fprintf(out, "  %s%s\n", ui.accent(fmt.Sprintf("%-26s", "agentsmd --help")), ui.muted("all commands and options"))
 }

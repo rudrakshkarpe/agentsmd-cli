@@ -25,7 +25,7 @@ func execute(t *testing.T, args ...string) string {
 
 func TestPrimaryCLIExperience(t *testing.T) {
 	welcome := execute(t)
-	if !strings.Contains(welcome, "●●●") || !strings.Contains(welcome, "agentsmd doctor") {
+	if !strings.Contains(welcome, "█████") || !strings.Contains(welcome, "agentsmd doctor") || strings.Contains(welcome, "●") {
 		t.Fatalf("welcome output=%q", welcome)
 	}
 	templates := execute(t, "templates")
