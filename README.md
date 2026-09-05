@@ -73,6 +73,14 @@ curl -fsSL https://rudrakshkarpe.com/install.sh | \
   AGENTSMD_INSTALL_DIR=/usr/local/bin sh
 ```
 
+Once installed from the shell release, update in place with the same checksum verification:
+
+```bash
+agentsmd update
+```
+
+Use `agentsmd update --check` to check without installing. `agentsmd upgrade` is an alias. Package-manager symlinks are deliberately not overwritten; update those installations through their package manager.
+
 If GitHub's release CDN is slow on your route and Go is already installed, bypass the binary download:
 
 ```bash
@@ -214,6 +222,7 @@ All connectors capture start/end lifecycle events into a provider-neutral trajec
 
 | Goal | Command |
 |---|---|
+| Check for or install the latest release | `agentsmd update --check`, `agentsmd update` |
 | Detect the project and create `AGENTS.md` | `agentsmd init` |
 | Browse or apply reusable baselines | `agentsmd templates`, `agentsmd templates use NAME` |
 | Connect a coding tool | `agentsmd connect codex\|claude\|cursor\|goose` |
