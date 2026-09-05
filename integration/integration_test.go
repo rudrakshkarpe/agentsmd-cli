@@ -79,4 +79,7 @@ func TestConnectIsIdempotent(t *testing.T) {
 	if len(settings.Hooks["SessionEnd"]) != 1 {
 		t.Fatalf("duplicate hooks: %s", data)
 	}
+	if len(settings.Hooks["SessionStart"]) != 1 {
+		t.Fatalf("missing lifecycle start hook: %s", data)
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
@@ -19,7 +20,7 @@ func TestCaptureHookStoresNormalizedTrajectory(t *testing.T) {
 	if err := captureHook(p.Root, "codex", event); err != nil {
 		t.Fatal(err)
 	}
-	data, err := os.ReadFile(filepath.Join(p.RunsDir(), "session-one.json"))
+	data, err := os.ReadFile(filepath.Join(p.RunsDir(), "codex-session-one.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,5 +30,16 @@ func TestCaptureHookStoresNormalizedTrajectory(t *testing.T) {
 	}
 	if trajectory.SessionID != "session/one" || trajectory.Tool != "codex" || trajectory.Metadata["hook_event"] != "SessionEnd" {
 		t.Fatalf("trajectory=%+v", trajectory)
+	}
+	command := New()
+	var output strings.Builder
+	command.SetOut(&output)
+	command.SetErr(&output)
+	command.SetArgs([]string{"--root", p.Root, "sessions"})
+	if err := command.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(output.String(), "codex-session-one") {
+		t.Fatalf("sessions=%q", output.String())
 	}
 }

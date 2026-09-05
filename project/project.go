@@ -61,9 +61,14 @@ func (p *Project) VersionsDir() string     { return filepath.Join(p.StateDir(), 
 func (p *Project) PendingDir() string      { return filepath.Join(p.StateDir(), "pending") }
 func (p *Project) RunsDir() string         { return filepath.Join(p.StateDir(), "runs") }
 func (p *Project) ConnectionsPath() string { return filepath.Join(p.StateDir(), "connections.json") }
+func (p *Project) SessionsDir() string     { return filepath.Join(p.StateDir(), "sessions") }
+func (p *Project) QueueDir() string        { return filepath.Join(p.StateDir(), "queue") }
+func (p *Project) EvaluationsDir() string  { return filepath.Join(p.StateDir(), "evaluations") }
+func (p *Project) InboxDir() string        { return filepath.Join(p.StateDir(), "inbox") }
+func (p *Project) AutomationPath() string  { return filepath.Join(p.StateDir(), "automation.json") }
 
 func (p *Project) Scaffold() error {
-	for _, path := range []string{p.StateDir(), p.VersionsDir(), p.PendingDir(), p.RunsDir()} {
+	for _, path := range []string{p.StateDir(), p.VersionsDir(), p.PendingDir(), p.RunsDir(), p.SessionsDir(), p.QueueDir(), p.EvaluationsDir(), p.InboxDir()} {
 		if err := os.MkdirAll(path, 0o755); err != nil {
 			return err
 		}

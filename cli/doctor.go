@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/rudrakshkarpe/agentsmd-cli/automation"
 	"github.com/rudrakshkarpe/agentsmd-cli/integration"
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 	"github.com/spf13/cobra"
@@ -49,6 +50,19 @@ func (a *app) diagnose() []check {
 		result = append(result, check{"ok", "AGENTS.md", p.ArtifactPath()})
 	} else {
 		result = append(result, check{"error", "AGENTS.md", "not initialized; run agentsmd init"})
+	}
+	config, configErr := automation.Load(p)
+	switch {
+	case configErr != nil:
+		result = append(result, check{"error", "Automation", configErr.Error()})
+	case len(config.ReflectCommand) == 0:
+		result = append(result, check{"warn", "Automation", "reflection disabled; run agentsmd automate --help"})
+	case len(config.EvaluateCommand) == 0:
+		result = append(result, check{"warn", "Automation", "reflection enabled; no evaluation gate configured"})
+	case config.AutoPromote:
+		result = append(result, check{"ok", "Automation", "reflection and gated auto-promotion enabled"})
+	default:
+		result = append(result, check{"ok", "Automation", "reflection and evaluation enabled; promotion is manual"})
 	}
 	records, _ := integration.Load(p)
 	connected := map[string]bool{}
