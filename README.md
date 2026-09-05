@@ -31,29 +31,33 @@ The active file never changes merely because a model suggested something. Every 
 
 ## CLI showcase
 
-The write target is universal: all four tools read `AGENTS.md`. Capture is implemented separately because every CLI records sessions differently.
+The write target is universal: all five tools support `AGENTS.md`. Capture is implemented separately because every CLI records sessions differently.
 
 <table>
 <tr>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <a href="https://claude.com/product/claude-code"><img src="https://github.com/anthropics.png?size=120" alt="Claude Code" width="48" height="48" /></a><br/>
 <strong>Claude Code</strong><br/>
 <sub>Session hook + JSONL normalization</sub>
 </td>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <a href="https://github.com/openai/codex"><img src="https://github.com/openai.png?size=120" alt="Codex CLI" width="48" height="48" /></a><br/>
 <strong>Codex CLI</strong><br/>
 <sub>Project SessionEnd hook</sub>
 </td>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <a href="https://cursor.com"><picture><source media="(prefers-color-scheme: dark)" srcset="https://svgl.app/library/cursor_dark.svg"><img src="https://svgl.app/library/cursor_light.svg" alt="Cursor" width="48" height="48" /></picture></a><br/>
 <strong>Cursor</strong><br/>
 <sub>Project sessionEnd hook</sub>
 </td>
-<td align="center" width="25%">
+<td align="center" width="20%">
 <a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="goose" width="48" height="48" /></a><br/>
 <strong>goose</strong><br/>
 <sub>Project hook plugin</sub>
+</td>
+<td align="center" width="20%">
+<a href="https://github.com/KlaatAI/klaatcode"><strong>KlaatCode</strong></a><br/>
+<sub>Interactive session lifecycle hooks</sub>
 </td>
 </tr>
 </table>
@@ -121,6 +125,7 @@ agentsmd connect codex
 agentsmd connect claude
 agentsmd connect cursor
 agentsmd connect goose
+agentsmd connect klaatcode
 ```
 
 Configure a reflector and the command that must pass before a proposal is eligible for automatic promotion:
@@ -249,8 +254,33 @@ This contract keeps model providers outside the core. Direct providers and a GEP
 - Claude Code: `.claude/settings.local.json`
 - Cursor: `.cursor/hooks.json`
 - goose: `.agents/plugins/agentsmd/`
+- KlaatCode: `.klaatai/hooks.json`
 
 All connectors capture start/end lifecycle events into a provider-neutral trajectory. The end event is persisted immediately, while Git evidence, transcript parsing, reflection, and evaluation run in a detached local worker. Runs record available start/end times, wall duration, Git revisions, worktree status, changed files, final diff, provider status, evaluation command, test outcome, model, and tokens. Claude Code additionally normalizes its JSONL transcript into assistant steps, tool calls, shell commands, and token usage. Codex transcript internals are intentionally not parsed because their documented format is unstable.
+
+### KlaatCode
+
+Run `agentsmd connect klaatcode`, then start the interactive `klaatai` CLI with
+`agentsmd` on `PATH`. The connector merges `session_start` and `session_end`
+command entries into `.klaatai/hooks.json`, preserving existing hooks and
+avoiding duplicates on reconnect. `agentsmd doctor` checks for the `klaatai`
+executable. Restart an existing session after connecting to capture its start.
+
+KlaatCode already supports `AGENTS.md` and JSON lifecycle payloads with `event`,
+`session_id`, and `project_root`; no upstream patch is required. This integration
+was checked against [KlaatCode source 062c4ac](https://github.com/KlaatAI/klaatcode/tree/062c4ac89a5a6de38f87cb402f3ba63b959e73e8)
+(package version 2.5.0). Use a build containing that lifecycle contract.
+
+KlaatCode chooses the first nonempty rules file in each directory in this order:
+`.klaatai/rules.md`, `AGENTS.md`, `CLAUDE.md`. A `.klaatai/rules.md` therefore
+shadows learned guidance in `AGENTS.md` in the same directory. Consolidate your
+instructions deliberately; the connector does not replace or delete rules.
+
+Capture covers normal **interactive** session starts and exits; headless `-p`
+runs and forced process termination are not covered. The lifecycle payload does
+not include a transcript, model, token usage, or task-success status. Captured
+runs contain available session/Git evidence, not inferred model steps or success.
+Reflection and promotion continue to use the existing review/evaluation gates.
 
 ## CLI
 
@@ -259,7 +289,7 @@ All connectors capture start/end lifecycle events into a provider-neutral trajec
 | Check for or install the latest release | `agentsmd update --check`, `agentsmd update` |
 | Detect the project and create `AGENTS.md` | `agentsmd init` |
 | Browse or apply reusable baselines | `agentsmd templates`, `agentsmd templates use NAME` |
-| Connect a coding tool | `agentsmd connect codex\|claude\|cursor\|goose` |
+| Connect a coding tool | `agentsmd connect codex\|claude\|cursor\|goose\|klaatcode` |
 | Configure automatic reflection and gating | `agentsmd automate` |
 | Diagnose the local setup | `agentsmd doctor` |
 | Inspect measured sessions | `agentsmd sessions`, `agentsmd sessions show RUN` |
@@ -329,7 +359,7 @@ The CLI is one consumer of reusable packages:
 - [x] Provider-neutral task-boundary reflector
 - [x] Reproducible single-task held-out evaluation runner and evidence bundle
 - [ ] Multi-task held-out benchmark with single-rule ablations
-- [x] Codex, Claude Code, Cursor, and goose lifecycle connectors
+- [x] Codex, Claude Code, Cursor, goose, and KlaatCode lifecycle connectors
 - [ ] Rich transcript normalization beyond Claude Code
 - [ ] Logical-task identity across related sessions
 - [x] Provider-qualified session identity and automatic Git/duration evidence capture

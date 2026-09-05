@@ -90,6 +90,7 @@ func (a *app) diagnose() []check {
 		provider string
 		commands []string
 	}{
+		{"klaatcode", []string{"klaatai"}},
 		{"codex", []string{"codex"}}, {"claude", []string{"claude"}}, {"goose", []string{"goose"}}, {"cursor", []string{"agent", "cursor"}},
 	}
 	for _, tool := range tools {
@@ -119,6 +120,9 @@ func (a *app) diagnose() []check {
 }
 
 func displayProvider(value string) string {
+	if value == "klaatcode" {
+		return "KlaatCode"
+	}
 	if value == "claude" {
 		return "Claude Code"
 	}
