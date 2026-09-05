@@ -34,6 +34,8 @@ func New() *cobra.Command {
 	root.CompletionOptions.DisableDefaultCmd = true
 	root.SetOut(state.out)
 	root.SetErr(state.err)
+	root.SetHelpFunc(func(cmd *cobra.Command, _ []string) { printHelp(cmd) })
+	root.SetVersionTemplate("🌱 agentsmd CLI version {{.Version}}\n")
 	root.PersistentFlags().StringVar(&state.root, "root", ".", "project directory")
 	root.AddCommand(
 		state.initCommand(),
@@ -79,21 +81,18 @@ const dotBanner = `·●●· ●●●● ●●●● ●··● ●●●● 
 ●··● ●●●● ●●●● ●··● ··●· ●●●● ●···● ●●●·`
 
 func printWelcome(cmd *cobra.Command) {
-	green, reset := "", ""
-	if os.Getenv("NO_COLOR") == "" {
-		if file, ok := cmd.OutOrStdout().(*os.File); ok {
-			if info, err := file.Stat(); err == nil && info.Mode()&os.ModeCharDevice != 0 {
-				green, reset = "\033[92m", "\033[0m"
-			}
-		}
-	}
-	fmt.Fprintf(cmd.OutOrStdout(), "%s%s%s\n\n", green, dotBanner, reset)
-	fmt.Fprintln(cmd.OutOrStdout(), "Project-aware AGENTS.md setup and a reviewable self-improvement loop.")
-	fmt.Fprintln(cmd.OutOrStdout())
-	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd init                 detect this project and create AGENTS.md")
-	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd templates            browse reusable starting points")
-	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd connect <cli>        connect codex, claude, goose, or cursor")
-	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd automate             configure reflection and evaluation gates")
-	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd doctor               check your project and installed CLIs")
-	fmt.Fprintln(cmd.OutOrStdout(), "  agentsmd --help               show all primary commands")
+	ui := uiFor(cmd)
+	out := cmd.OutOrStdout()
+	fmt.Fprintln(out, ui.icon("🌱")+ui.brand("agentsmd CLI"))
+	fmt.Fprintf(out, "%s\n\n", ui.accent(dotBanner))
+	fmt.Fprintln(out, ui.soft("Build project-aware AGENTS.md guidance and improve it from agent sessions."))
+	fmt.Fprintln(out)
+	fmt.Fprintln(out, ui.brand("Quick start"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🌱"), ui.accent("agentsmd init"), ui.muted("detect this project and create AGENTS.md"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("📚"), ui.accent("agentsmd templates"), ui.muted("browse reusable starting points"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🔌"), ui.accent("agentsmd connect <cli>"), ui.muted("connect Codex, Claude, goose or Cursor"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🧠"), ui.accent("agentsmd automate"), ui.muted("configure reflection and evaluation gates"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("🩺"), ui.accent("agentsmd doctor"), ui.muted("check the project and installed CLIs"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("📡"), ui.accent("agentsmd sessions"), ui.muted("inspect captured coding sessions"))
+	fmt.Fprintf(out, "  %s%-30s %s\n", ui.icon("❓"), ui.accent("agentsmd --help"), ui.muted("show every primary command"))
 }
