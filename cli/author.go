@@ -33,6 +33,7 @@ func (a *app) initCommand() *cobra.Command {
 			content := "# AGENTS.md\n"
 			reason := "manual"
 			meta := map[string]any{}
+			var profile detect.Profile
 			if templateName != "" {
 				content, err = template.Load(templateName)
 				if err != nil {
@@ -41,7 +42,8 @@ func (a *app) initCommand() *cobra.Command {
 				reason = "template"
 				meta["template"] = templateName
 			} else if !scratch {
-				profile, inspectErr := detect.Inspect(p.Root)
+				var inspectErr error
+				profile, inspectErr = detect.Inspect(p.Root)
 				if inspectErr != nil {
 					return inspectErr
 				}
@@ -62,7 +64,14 @@ func (a *app) initCommand() *cobra.Command {
 			}
 			writeSuccess(cmd, fmt.Sprintf("initialized %s (%s)", p.Root, item.ID))
 			if uiFor(cmd).interactive {
-				writeInfo(cmd, "Next: run `agentsmd doctor`, then connect your coding CLI.")
+				if reason == "auto-detected" {
+					stack := "new project"
+					if len(profile.Stacks) > 0 {
+						stack = strings.Join(profile.Stacks, " + ")
+					}
+					writeInfo(cmd, fmt.Sprintf("Detected: %s · %d verified command(s)", stack, len(profile.Commands)))
+				}
+				writeInfo(cmd, "Next: review AGENTS.md, run `agentsmd doctor`, then connect your coding CLI.")
 			}
 			return nil
 		},
