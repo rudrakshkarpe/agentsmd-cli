@@ -22,7 +22,7 @@ import (
 
 func (a *app) connectCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "connect <codex|claude|goose|cursor>",
+		Use:   "connect <codex|claude|goose|cursor|klaatcode>",
 		Short: "Connect a coding CLI to the learning loop",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -96,8 +96,12 @@ func receiveHook(root, provider string, data []byte) error {
 		return fmt.Errorf("decode %s hook event: %w", provider, err)
 	}
 	start := root
-	if cwd, ok := event["cwd"].(string); ok && cwd != "" {
+	if cwd := firstString(event, "cwd"); cwd != "" {
 		start = cwd
+	} else if provider == "klaatcode" {
+		if projectRoot := firstString(event, "project_root"); projectRoot != "" {
+			start = projectRoot
+		}
 	}
 	p, err := project.Require(start)
 	if err != nil {
@@ -126,8 +130,12 @@ func captureHook(root, provider string, data []byte) error {
 		return fmt.Errorf("decode %s hook event: %w", provider, err)
 	}
 	start := root
-	if cwd, ok := event["cwd"].(string); ok && cwd != "" {
+	if cwd := firstString(event, "cwd"); cwd != "" {
 		start = cwd
+	} else if provider == "klaatcode" {
+		if projectRoot := firstString(event, "project_root"); projectRoot != "" {
+			start = projectRoot
+		}
 	}
 	p, err := project.Require(start)
 	if err != nil {

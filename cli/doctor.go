@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -90,7 +91,16 @@ func (a *app) diagnose() []check {
 		provider string
 		commands []string
 	}{
+		{"klaatcode", []string{"klaatai"}},
 		{"codex", []string{"codex"}}, {"claude", []string{"claude"}}, {"goose", []string{"goose"}}, {"cursor", []string{"agent", "cursor"}},
+	}
+	rulesPath := filepath.Join(p.Root, ".klaatai", "rules.md")
+	if content, err := os.ReadFile(rulesPath); err == nil {
+		if strings.TrimSpace(string(content)) != "" {
+			result = append(result, check{"warn", "KlaatCode instructions", rulesPath + "; shadows AGENTS.md in this directory; learned AGENTS.md rules are not active here"})
+		}
+	} else if !os.IsNotExist(err) {
+		result = append(result, check{"warn", "KlaatCode instructions", "cannot inspect " + rulesPath + "; verify whether it shadows AGENTS.md"})
 	}
 	for _, tool := range tools {
 		path := ""
@@ -119,6 +129,9 @@ func (a *app) diagnose() []check {
 }
 
 func displayProvider(value string) string {
+	if value == "klaatcode" {
+		return "KlaatCode"
+	}
 	if value == "claude" {
 		return "Claude Code"
 	}

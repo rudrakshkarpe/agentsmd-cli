@@ -12,7 +12,7 @@ import (
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 )
 
-var Supported = []string{"codex", "claude", "goose", "cursor"}
+var Supported = []string{"codex", "claude", "goose", "cursor", "klaatcode"}
 
 type Record struct {
 	Provider string `json:"provider"`
@@ -34,6 +34,10 @@ func Connect(p *project.Project, provider string) (Record, error) {
 		path = filepath.Join(p.Root, ".cursor", "hooks.json")
 		handler := func() []any { return []any{map[string]any{"command": "agentsmd hook cursor", "timeout": 10}} }
 		value = map[string]any{"version": 1, "hooks": map[string]any{"sessionStart": handler(), "sessionEnd": handler()}}
+	case "klaatcode":
+		path = filepath.Join(p.Root, ".klaatai", "hooks.json")
+		handler := func() []any { return []any{map[string]any{"command": "agentsmd hook klaatcode", "timeout": 10}} }
+		value = map[string]any{"session_start": handler(), "session_end": handler()}
 	case "goose":
 		return connectGoose(p)
 	default:
@@ -163,5 +167,11 @@ func writeJSON(path string, value any) error {
 	if err != nil {
 		return err
 	}
-	return project.AtomicWrite(path, append(data, '\n'), 0o644)
+	mode := os.FileMode(0o644)
+	if info, err := os.Stat(path); err == nil {
+		mode = info.Mode().Perm()
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	return project.AtomicWrite(path, append(data, '\n'), mode)
 }

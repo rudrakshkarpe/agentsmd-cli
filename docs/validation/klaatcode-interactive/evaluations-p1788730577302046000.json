@@ -1,0 +1,12 @@
+{
+  "proposal_id": "p1788730577302046000",
+  "run_id": "2026-09-06T21-36-15-b8c1",
+  "command": [
+    "python3",
+    "evaluate.py"
+  ],
+  "passed": true,
+  "exit_code": 0,
+  "stdout": "fixture passed\n",
+  "time": "2026-09-06T21:36:17.307235Z"
+}

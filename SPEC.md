@@ -12,7 +12,7 @@ Every CLI logs differently; the adapter's only job is to emit this shape.
 ```json
 {
   "session_id": "string",
-  "tool": "claude | codex | cursor | goose",
+  "tool": "claude | codex | cursor | goose | klaatcode",
   "task": "string, optional task id",
   "steps": [{ "role": "assistant|tool", "summary": "string" }],
   "tool_calls": [{ "name": "string", "args": {}, "result": "string" }],
