@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/rudrakshkarpe/agentsmd-cli/integration"
@@ -125,5 +126,39 @@ func TestKlaatCodePreservesHooksAndReconnects(t *testing.T) {
 	}
 	if hooks["session_end"][0].(map[string]any)["command"] != "echo done" || hooks["before_tool"][0].(map[string]any)["matcher"] != "write" {
 		t.Fatalf("existing hooks changed: %s", data)
+	}
+}
+
+func TestConnectPreservesPrivateHookPermissions(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows does not implement POSIX permission bits")
+	}
+	for _, provider := range []string{"klaatcode", "claude", "codex", "cursor"} {
+		t.Run(provider, func(t *testing.T) {
+			p, _ := project.Open(t.TempDir())
+			if err := p.Scaffold(); err != nil {
+				t.Fatal(err)
+			}
+			record, err := integration.Connect(p, provider)
+			if err != nil {
+				t.Fatal(err)
+			}
+			path := filepath.Join(p.Root, record.Path)
+			if err := os.Chmod(path, 0o600); err != nil {
+				t.Fatal(err)
+			}
+			for range 2 {
+				if _, err := integration.Connect(p, provider); err != nil {
+					t.Fatal(err)
+				}
+				info, err := os.Stat(path)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if info.Mode().Perm() != 0o600 {
+					t.Fatalf("hook permissions widened to %o", info.Mode().Perm())
+				}
+			}
+		})
 	}
 }

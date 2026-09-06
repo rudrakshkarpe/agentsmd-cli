@@ -263,7 +263,8 @@ All connectors capture start/end lifecycle events into a provider-neutral trajec
 Run `agentsmd connect klaatcode`, then start the interactive `klaatai` CLI with
 `agentsmd` on `PATH`. The connector merges `session_start` and `session_end`
 command entries into `.klaatai/hooks.json`, preserving existing hooks and
-avoiding duplicates on reconnect. `agentsmd doctor` checks for the `klaatai`
+avoiding duplicates on reconnect. Existing hook-file permission bits are preserved.
+`agentsmd doctor` checks for the `klaatai`
 executable. Restart an existing session after connecting to capture its start.
 
 KlaatCode already supports `AGENTS.md` and JSON lifecycle payloads with `event`,
@@ -273,7 +274,9 @@ was checked against [KlaatCode source 062c4ac](https://github.com/KlaatAI/klaatc
 
 KlaatCode chooses the first nonempty rules file in each directory in this order:
 `.klaatai/rules.md`, `AGENTS.md`, `CLAUDE.md`. A `.klaatai/rules.md` therefore
-shadows learned guidance in `AGENTS.md` in the same directory. Consolidate your
+shadows learned guidance in `AGENTS.md` in the same directory. Doctor warns
+when that file is nonempty (empty files are skipped by KlaatCode), and also warns
+if it cannot inspect the file. Consolidate your
 instructions deliberately; the connector does not replace or delete rules.
 
 Capture covers normal **interactive** session starts and exits; headless `-p`

@@ -167,5 +167,11 @@ func writeJSON(path string, value any) error {
 	if err != nil {
 		return err
 	}
-	return project.AtomicWrite(path, append(data, '\n'), 0o644)
+	mode := os.FileMode(0o644)
+	if info, err := os.Stat(path); err == nil {
+		mode = info.Mode().Perm()
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	return project.AtomicWrite(path, append(data, '\n'), mode)
 }
