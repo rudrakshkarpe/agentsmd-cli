@@ -16,12 +16,14 @@ import (
 )
 
 type State struct {
-	Provider  string    `json:"provider"`
-	SessionID string    `json:"session_id"`
-	StartedAt time.Time `json:"started_at"`
-	GitHead   string    `json:"git_head,omitempty"`
-	GitStatus string    `json:"git_status,omitempty"`
-	GitDiff   string    `json:"git_diff,omitempty"`
+	Provider   string    `json:"provider"`
+	SessionID  string    `json:"session_id"`
+	Task       string    `json:"task,omitempty"`
+	TaskSource string    `json:"task_source,omitempty"`
+	StartedAt  time.Time `json:"started_at"`
+	GitHead    string    `json:"git_head,omitempty"`
+	GitStatus  string    `json:"git_status,omitempty"`
+	GitDiff    string    `json:"git_diff,omitempty"`
 }
 
 func IsStart(event map[string]any) bool {
@@ -30,7 +32,11 @@ func IsStart(event map[string]any) bool {
 }
 
 func Start(p *project.Project, provider, sessionID string, now time.Time) error {
-	state := State{Provider: provider, SessionID: sessionID, StartedAt: now, GitHead: gitOutput(p.Root, "rev-parse", "HEAD"), GitStatus: filterStatus(gitOutput(p.Root, "status", "--porcelain=v1")), GitDiff: gitOutput(p.Root, "diff", "--no-ext-diff", "--no-color", "HEAD")}
+	return StartTask(p, provider, sessionID, "", "", now)
+}
+
+func StartTask(p *project.Project, provider, sessionID, taskID, taskSource string, now time.Time) error {
+	state := State{Provider: provider, SessionID: sessionID, Task: taskID, TaskSource: taskSource, StartedAt: now, GitHead: gitOutput(p.Root, "rev-parse", "HEAD"), GitStatus: filterStatus(gitOutput(p.Root, "status", "--porcelain=v1")), GitDiff: gitOutput(p.Root, "diff", "--no-ext-diff", "--no-color", "HEAD")}
 	data, err := json.MarshalIndent(state, "", "  ")
 	if err != nil {
 		return err
@@ -48,6 +54,12 @@ func Complete(p *project.Project, trajectory *schema.Trajectory, provider string
 	}
 	trajectory.Metadata["ended_at"] = now.Format(time.RFC3339Nano)
 	if err == nil {
+		if trajectory.Task == "" {
+			trajectory.Task = state.Task
+		}
+		if state.TaskSource != "" {
+			trajectory.Metadata["task_source"] = state.TaskSource
+		}
 		trajectory.WallTimeS = now.Sub(state.StartedAt).Seconds()
 		trajectory.Metadata["started_at"] = state.StartedAt.Format(time.RFC3339Nano)
 		trajectory.Metadata["git_before"] = state.GitHead

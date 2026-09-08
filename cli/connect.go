@@ -17,6 +17,7 @@ import (
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
 	"github.com/rudrakshkarpe/agentsmd-cli/session"
+	"github.com/rudrakshkarpe/agentsmd-cli/task"
 	"github.com/spf13/cobra"
 )
 
@@ -138,7 +139,8 @@ func captureHook(root, provider string, data []byte) error {
 		sessionID = fmt.Sprintf("%s-%d", provider, time.Now().UTC().UnixNano())
 	}
 	if session.IsStart(event) {
-		return session.Start(p, provider, sessionID, time.Now().UTC())
+		identity := task.Resolve(p, firstString(event, "task", "task_id"), provider, sessionID)
+		return session.StartTask(p, provider, sessionID, identity.ID, identity.Source, time.Now().UTC())
 	}
 	trajectory := &schema.Trajectory{
 		SessionID: sessionID,
@@ -170,6 +172,11 @@ func captureHook(root, provider string, data []byte) error {
 	}
 	if err := session.Complete(p, trajectory, provider, time.Now().UTC()); err != nil {
 		return err
+	}
+	if trajectory.Task == "" {
+		identity := task.Resolve(p, "", provider, sessionID)
+		trajectory.Task = identity.ID
+		trajectory.Metadata["task_source"] = identity.Source
 	}
 	output, err := json.MarshalIndent(trajectory, "", "  ")
 	if err != nil {

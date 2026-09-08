@@ -45,6 +45,24 @@ func TestLifecycleCapturesGitAndDurationEvidence(t *testing.T) {
 	}
 }
 
+func TestLifecycleCarriesLogicalTaskFromStartToCompletion(t *testing.T) {
+	p, _ := project.Open(t.TempDir())
+	if err := p.Scaffold(); err != nil {
+		t.Fatal(err)
+	}
+	start := time.Date(2026, 9, 9, 1, 0, 0, 0, time.UTC)
+	if err := session.StartTask(p, "claude", "session-1", "task-42", "active-task", start); err != nil {
+		t.Fatal(err)
+	}
+	trajectory := schema.Trajectory{SessionID: "session-1"}
+	if err := session.Complete(p, &trajectory, "claude", start.Add(time.Minute)); err != nil {
+		t.Fatal(err)
+	}
+	if trajectory.Task != "task-42" || trajectory.Metadata["task_source"] != "active-task" {
+		t.Fatalf("trajectory=%+v", trajectory)
+	}
+}
+
 func runGit(t *testing.T, root string, args ...string) {
 	t.Helper()
 	command := exec.Command("git", append([]string{"-C", root}, args...)...)

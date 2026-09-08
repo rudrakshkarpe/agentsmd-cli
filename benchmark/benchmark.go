@@ -142,7 +142,7 @@ func (r *Runner) runOne(ctx context.Context, base string, spec Spec, condition, 
 		return Run{}, err
 	}
 	start := time.Now().UTC()
-	if err := session.Start(p, spec.Agent, id, start); err != nil {
+	if err := session.StartTask(p, spec.Agent, id, spec.Task, "benchmark-spec", start); err != nil {
 		return Run{}, err
 	}
 	runCtx, cancel := context.WithTimeout(ctx, r.Timeout)

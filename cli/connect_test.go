@@ -6,9 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 	"github.com/rudrakshkarpe/agentsmd-cli/schema"
+	"github.com/rudrakshkarpe/agentsmd-cli/session"
+	"github.com/rudrakshkarpe/agentsmd-cli/task"
 )
 
 func TestCaptureHookStoresNormalizedTrajectory(t *testing.T) {
@@ -41,5 +44,36 @@ func TestCaptureHookStoresNormalizedTrajectory(t *testing.T) {
 	}
 	if !strings.Contains(output.String(), "codex-session-one") {
 		t.Fatalf("sessions=%q", output.String())
+	}
+}
+
+func TestCaptureHookCorrelatesSessionsThroughActiveTask(t *testing.T) {
+	p, _ := project.Open(t.TempDir())
+	if err := p.Scaffold(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := task.Start(p, "task-17", "Repair retries", time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	for _, sessionID := range []string{"one", "two"} {
+		start, _ := json.Marshal(map[string]any{"session_id": sessionID, "cwd": p.Root, "hook_event_name": "SessionStart"})
+		if err := captureHook(p.Root, "claude", start); err != nil {
+			t.Fatal(err)
+		}
+		end, _ := json.Marshal(map[string]any{"session_id": sessionID, "cwd": p.Root, "hook_event_name": "SessionEnd"})
+		if err := captureHook(p.Root, "claude", end); err != nil {
+			t.Fatal(err)
+		}
+		data, err := os.ReadFile(session.RunPath(p, "claude", sessionID))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var trajectory schema.Trajectory
+		if err := json.Unmarshal(data, &trajectory); err != nil {
+			t.Fatal(err)
+		}
+		if trajectory.Task != "task-17" || trajectory.Metadata["task_source"] != "active-task" {
+			t.Fatalf("trajectory=%+v", trajectory)
+		}
 	}
 }
