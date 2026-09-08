@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/rudrakshkarpe/agentsmd-cli/project"
 )
@@ -15,10 +16,11 @@ type Config struct {
 	EvaluateCommand []string `json:"evaluate_command"`
 	AutoPromote     bool     `json:"auto_promote"`
 	MinConfidence   float64  `json:"min_confidence"`
+	RedactPatterns  []string `json:"redact_patterns,omitempty"`
 }
 
 func DefaultConfig() Config {
-	return Config{ReflectCommand: []string{}, EvaluateCommand: []string{}, MinConfidence: 0.8}
+	return Config{ReflectCommand: []string{}, EvaluateCommand: []string{}, MinConfidence: 0.8, RedactPatterns: []string{}}
 }
 
 func Load(p *project.Project) (Config, error) {
@@ -56,6 +58,14 @@ func Validate(value Config) error {
 	}
 	if value.AutoPromote && len(value.ReflectCommand) == 0 {
 		return fmt.Errorf("automatic promotion requires a reflection command")
+	}
+	for _, pattern := range value.RedactPatterns {
+		if pattern == "" {
+			return fmt.Errorf("redaction pattern cannot be empty")
+		}
+		if _, err := regexp.Compile(pattern); err != nil {
+			return fmt.Errorf("invalid redaction pattern %q: %w", pattern, err)
+		}
 	}
 	return nil
 }

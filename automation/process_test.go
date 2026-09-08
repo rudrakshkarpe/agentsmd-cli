@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -62,6 +63,46 @@ func TestAutoPromotionRequiresGate(t *testing.T) {
 	}
 }
 
+func TestProcessRedactsOnlyExternalReflectorCopy(t *testing.T) {
+	t.Setenv("GO_WANT_AUTOMATION_HELPER", "1")
+	p, _ := project.Open(t.TempDir())
+	if err := p.Scaffold(); err != nil {
+		t.Fatal(err)
+	}
+	helper := []string{os.Args[0], "-test.run=TestAutomationHelper", "--", "reflect-redacted"}
+	config := automation.DefaultConfig()
+	config.ReflectCommand = helper
+	config.RedactPatterns = []string{`sk-[A-Za-z0-9]+`}
+	if err := automation.Save(p, config); err != nil {
+		t.Fatal(err)
+	}
+	trajectoryPath := filepath.Join(p.RunsDir(), "claude-private.json")
+	data, _ := json.Marshal(schema.Trajectory{SessionID: "private", Tool: "claude", Steps: []schema.Step{{Role: "assistant", Summary: "key sk-secret123"}}})
+	if err := project.AtomicWrite(trajectoryPath, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	result, err := automation.Process(context.Background(), p, trajectoryPath)
+	if err != nil || result.Verdict != "not_an_agentsmd_problem" {
+		t.Fatalf("result=%+v err=%v", result, err)
+	}
+	stored, err := os.ReadFile(trajectoryPath)
+	if err != nil || !strings.Contains(string(stored), "sk-secret123") {
+		t.Fatalf("stored trajectory was redacted: %s err=%v", stored, err)
+	}
+}
+
+func TestConfigRejectsInvalidRedactionPattern(t *testing.T) {
+	config := automation.DefaultConfig()
+	config.RedactPatterns = []string{"["}
+	if err := automation.Validate(config); err == nil {
+		t.Fatal("expected invalid redaction pattern to fail")
+	}
+	config.RedactPatterns = []string{""}
+	if err := automation.Validate(config); err == nil {
+		t.Fatal("expected empty redaction pattern to fail")
+	}
+}
+
 func TestCompletedJobsAreIdempotent(t *testing.T) {
 	p, _ := project.Open(t.TempDir())
 	if err := p.Scaffold(); err != nil {
@@ -100,6 +141,14 @@ func TestAutomationHelper(t *testing.T) {
 		os.Exit(0)
 	case "evaluate":
 		fmt.Print("evaluation passed")
+		os.Exit(0)
+	case "reflect-redacted":
+		input, _ := io.ReadAll(os.Stdin)
+		if strings.Contains(string(input), "sk-secret123") || !strings.Contains(string(input), "[REDACTED]") {
+			fmt.Fprintln(os.Stderr, "trajectory was not redacted")
+			os.Exit(3)
+		}
+		fmt.Print(`{"verdict":"not_an_agentsmd_problem","confidence":0.9}`)
 		os.Exit(0)
 	default:
 		os.Exit(2)
