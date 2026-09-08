@@ -1,0 +1,24 @@
+{
+  "name": "timeout-units",
+  "task": "retry-delay-milliseconds",
+  "description": "Fix an integer-millisecond parsing bug without following a compatibility-only seconds implementation.",
+  "prompt": "Operators configure RETRY_DELAY_MS as an integer number of milliseconds, but the retry policy rejects values such as 250. Fix the production behavior while preserving the two-second default when the variable is unset and errors for invalid or negative values. Add regression tests and do not change the command-line interface.",
+  "fixture": "fixture",
+  "baseline_agents_md": "guidance/baseline.md",
+  "learned_agents_md": "guidance/learned.md",
+  "held_out": ".held-out",
+  "verify": ["go", "test", "./..."],
+  "agent": "codex",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "low",
+  "ablations": [
+    {
+      "id": "production-path",
+      "rule": "- For retry-delay bugs, begin with `internal/retry/policy.go`; `legacy_seconds.go` is compatibility-only unless the production call graph reaches it."
+    },
+    {
+      "id": "workspace-cache",
+      "rule": "- In a restricted workspace, run Go tests with `GOCACHE=$PWD/.cache/go-build` after creating that directory."
+    }
+  ]
+}
