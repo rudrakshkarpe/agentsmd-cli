@@ -32,6 +32,10 @@ The checked-in [`study-v1/report.md`](results/study-v1/report.md) contains six r
 
 “Reported tokens” means input plus output tokens from the agent's JSONL usage event; cached input is retained separately in `report.json`. The result shows that the learned bundle preserved success and used fewer resources on this task. With only one task and three trials per condition, it does not establish a general improvement across repositories or agents.
 
+The current task spec also declares each learned rule as an independent
+ablation. Those additional conditions are part of new runs; they are not
+retroactively represented in the checked-in `study-v1` report.
+
 ## Reproduce it
 
 Build the current CLI, then run the study from the repository root:

@@ -199,6 +199,21 @@ agentsmd benchmark \
   --output benchmarks/config-precedence/results/my-run
 ```
 
+The repository also includes a two-task suite and single-rule ablation runner:
+
+```bash
+agentsmd benchmark \
+  --suite benchmarks/suite.json \
+  --trials 3 \
+  --output benchmarks/results/my-suite
+```
+
+For every task, the suite runs the baseline, the complete learned guidance,
+and one condition with each declared learned rule removed. It writes a suite
+report and fails the CLI regression gate if learned guidance reduces held-out
+task success. The second task and runner are ready for reproducible trials;
+multi-task model results are not checked in yet.
+
 ## How it works
 
 ### 1. Rules are structured data
@@ -226,11 +241,11 @@ Learned changes enter `.agentsmd/pending/`. Promotion is a separate operation so
 
 ## Benchmark method
 
-The included runner treats instruction changes as an ablation: the prompt, fixture, agent configuration, number of trials, and verifier stay fixed; only `AGENTS.md` changes. Every trial starts in a fresh Git workspace. Held-out tests are copied in after the agent exits, preventing the agent from optimizing directly against the grader.
+The included runner treats instruction changes as an ablation: the prompt, fixture, agent configuration, number of trials, and verifier stay fixed; only `AGENTS.md` changes. Every trial starts in a fresh Git workspace. Held-out tests are copied in after the agent exits, preventing the agent from optimizing directly against the grader. Suite specs require at least two distinct tasks, and each declared rule is removed independently from the learned condition to measure its marginal contribution.
 
 The case structure follows ideas from [Terminal-Bench](https://github.com/harbor-framework/terminal-bench) and [SWE-bench](https://github.com/SWE-bench/SWE-bench): a task, isolated environment, executable verifier, and auditable oracle. The learning side follows the reflective, incremental direction of [GEPA](https://arxiv.org/abs/2507.19457) and [ACE](https://arxiv.org/abs/2510.04618), while agentsmd adds a pending queue and explicit promotion gate around the resulting rules.
 
-Each run preserves the raw event stream, normalized trajectory, solved workspace, verifier output, token usage, commands, and duration. Reports include the model and trial count. Broader claims will wait for multiple tasks, models, agents, repeated seeds, and single-rule ablations.
+Each run preserves the raw event stream, normalized trajectory, solved workspace, verifier output, token usage, commands, and duration. Reports include the model and trial count. The suite-level regression gate protects task success, but broader claims still require recorded results across multiple models, agents, and repeated seeds.
 
 ## Automatic reflection
 
@@ -345,7 +360,7 @@ The CLI is one consumer of reusable packages:
 - [x] Claude Code trajectory normalization
 - [x] Provider-neutral task-boundary reflector
 - [x] Reproducible single-task held-out evaluation runner and evidence bundle
-- [ ] Multi-task held-out benchmark with single-rule ablations
+- [x] Multi-task held-out benchmark runner with single-rule ablations
 - [x] Codex, Claude Code, Cursor, and goose lifecycle connectors
 - [ ] Rich transcript normalization beyond Claude Code
 - [x] Logical-task identity across related sessions
