@@ -5,6 +5,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/rudrakshkarpe/agentsmd-cli/automation"
 	"github.com/rudrakshkarpe/agentsmd-cli/integration"
@@ -19,10 +20,22 @@ type check struct {
 }
 
 func (a *app) doctorCommand() *cobra.Command {
-	return &cobra.Command{
+	var repair bool
+	command := &cobra.Command{
 		Use:   "doctor",
 		Short: "Check project setup and supported coding CLIs",
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if repair {
+				p, err := a.requireProject()
+				if err != nil {
+					return err
+				}
+				recovered, err := automation.RecoverQueue(p, time.Now().UTC(), automation.DefaultLockStaleAfter)
+				if err != nil {
+					return err
+				}
+				writeSuccess(cmd, fmt.Sprintf("queue recovery removed %d stale lock(s) and requeued %d job(s)", recovered.LocksRemoved, recovered.JobsRequeued))
+			}
 			checks := a.diagnose()
 			ui := uiFor(cmd)
 			fmt.Fprintln(cmd.OutOrStdout(), ui.icon("🩺")+ui.brand("agentsmd CLI · doctor"))
@@ -50,6 +63,8 @@ func (a *app) doctorCommand() *cobra.Command {
 			return nil
 		},
 	}
+	command.Flags().BoolVar(&repair, "repair", false, "remove stale worker locks and requeue interrupted jobs")
+	return command
 }
 
 func (a *app) diagnose() []check {
@@ -80,6 +95,19 @@ func (a *app) diagnose() []check {
 		result = append(result, check{"ok", "Automation", "reflection and gated auto-promotion enabled"})
 	default:
 		result = append(result, check{"ok", "Automation", "reflection and evaluation enabled; promotion is manual"})
+	}
+	queue, queueErr := automation.InspectQueue(p, time.Now().UTC(), automation.DefaultLockStaleAfter)
+	switch {
+	case queueErr != nil:
+		result = append(result, check{"error", "Queue", queueErr.Error()})
+	case queue.StaleLocks > 0 || queue.OrphanedProcessing > 0:
+		result = append(result, check{"warn", "Queue", fmt.Sprintf("%d stale lock(s), %d interrupted job(s); run agentsmd doctor --repair", queue.StaleLocks, queue.OrphanedProcessing)})
+	case queue.Failed > 0:
+		result = append(result, check{"warn", "Queue", fmt.Sprintf("%d failed reflection job(s); inspect .agentsmd/queue", queue.Failed)})
+	case queue.Queued > 0 || queue.Processing > 0:
+		result = append(result, check{"ok", "Queue", fmt.Sprintf("%d queued, %d processing", queue.Queued, queue.Processing)})
+	default:
+		result = append(result, check{"ok", "Queue", "healthy"})
 	}
 	records, _ := integration.Load(p)
 	connected := map[string]bool{}

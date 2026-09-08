@@ -83,3 +83,24 @@ func TestTaskBoundaryLearningDemo(t *testing.T) {
 		t.Fatalf("blame output=%q", output)
 	}
 }
+
+func TestDoctorRepairsInterruptedReflectionJob(t *testing.T) {
+	root := t.TempDir()
+	execute(t, "--root", root, "init", "--scratch")
+	jobPath := filepath.Join(root, ".agentsmd", "queue", "claude-interrupted.json")
+	job := `{"trajectory":"run.json","status":"processing","updated_at":"2026-09-09T00:00:00Z"}`
+	if err := os.WriteFile(jobPath, []byte(job), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	output := execute(t, "--root", root, "doctor", "--repair")
+	if !strings.Contains(output, "requeued 1 job(s)") || !strings.Contains(output, "Queue") {
+		t.Fatalf("doctor=%q", output)
+	}
+	updated, err := os.ReadFile(jobPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(updated), `"status": "queued"`) {
+		t.Fatalf("job=%s", updated)
+	}
+}
