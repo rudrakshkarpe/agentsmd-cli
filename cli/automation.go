@@ -12,6 +12,8 @@ import (
 
 func (a *app) automateCommand() *cobra.Command {
 	var reflectCommand, evaluateCommand string
+	var redactPatterns []string
+	var clearRedactions bool
 	var autoPromote bool
 	var minConfidence float64
 	command := &cobra.Command{
@@ -19,6 +21,9 @@ func (a *app) automateCommand() *cobra.Command {
 		Short: "Configure automatic reflection and evaluation",
 		Long:  "Configure processing after a captured session. Reflection creates a pending proposal. Automatic promotion is opt-in and requires a successful evaluation command.",
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if cmd.Flags().Changed("redact") && clearRedactions {
+				return fmt.Errorf("--redact and --clear-redactions cannot be used together")
+			}
 			p, err := a.requireProject()
 			if err != nil {
 				return err
@@ -40,6 +45,12 @@ func (a *app) automateCommand() *cobra.Command {
 			if cmd.Flags().Changed("min-confidence") {
 				config.MinConfidence, changed = minConfidence, true
 			}
+			if cmd.Flags().Changed("redact") {
+				config.RedactPatterns, changed = append([]string{}, redactPatterns...), true
+			}
+			if clearRedactions {
+				config.RedactPatterns, changed = []string{}, true
+			}
 			if changed {
 				if err := automation.Save(p, config); err != nil {
 					return err
@@ -52,9 +63,10 @@ func (a *app) automateCommand() *cobra.Command {
 				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Evaluation "), ui.muted(displayCommand(config.EvaluateCommand)))
 				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Promotion  "), ui.muted(map[bool]string{true: "automatic", false: "manual"}[config.AutoPromote]))
 				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Confidence "), ui.muted(fmt.Sprintf("%.2f", config.MinConfidence)))
+				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", ui.accent("Redaction  "), ui.muted(fmt.Sprintf("%d pattern(s)", len(config.RedactPatterns))))
 				return nil
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "reflection: %s\nevaluation: %s\nauto-promote: %t\nminimum confidence: %.2f\n", displayCommand(config.ReflectCommand), displayCommand(config.EvaluateCommand), config.AutoPromote, config.MinConfidence)
+			fmt.Fprintf(cmd.OutOrStdout(), "reflection: %s\nevaluation: %s\nauto-promote: %t\nminimum confidence: %.2f\nredaction patterns: %d\n", displayCommand(config.ReflectCommand), displayCommand(config.EvaluateCommand), config.AutoPromote, config.MinConfidence, len(config.RedactPatterns))
 			return nil
 		},
 	}
@@ -62,6 +74,8 @@ func (a *app) automateCommand() *cobra.Command {
 	command.Flags().StringVar(&evaluateCommand, "evaluate-command", "", "command that must exit successfully before automatic promotion")
 	command.Flags().BoolVar(&autoPromote, "auto-promote", false, "promote proposals that pass evaluation and confidence policy")
 	command.Flags().Float64Var(&minConfidence, "min-confidence", 0.8, "minimum reflection confidence for automatic promotion")
+	command.Flags().StringArrayVar(&redactPatterns, "redact", nil, "RE2 pattern removed from the external reflector copy (repeatable)")
+	command.Flags().BoolVar(&clearRedactions, "clear-redactions", false, "remove all configured redaction patterns")
 	return command
 }
 

@@ -41,8 +41,8 @@ func TestPrimaryCLIExperience(t *testing.T) {
 	if !strings.Contains(string(data), "Detected stack: Go") || !strings.Contains(string(data), "go test ./...") || !strings.Contains(string(data), "## Agent working agreement") {
 		t.Fatalf("auto-generated AGENTS.md:\n%s", data)
 	}
-	automationOutput := execute(t, "--root", root, "automate", "--reflect-command", "reflector --json", "--evaluate-command", "go test ./...", "--auto-promote")
-	if !strings.Contains(automationOutput, "auto-promote: true") {
+	automationOutput := execute(t, "--root", root, "automate", "--reflect-command", "reflector --json", "--evaluate-command", "go test ./...", "--auto-promote", "--redact", "sk-[A-Za-z0-9]+")
+	if !strings.Contains(automationOutput, "auto-promote: true") || !strings.Contains(automationOutput, "redaction patterns: 1") {
 		t.Fatalf("automate output=%q", automationOutput)
 	}
 	output := execute(t, "--root", root, "connect", "codex")

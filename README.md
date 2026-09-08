@@ -139,6 +139,20 @@ agentsmd automate --auto-promote --min-confidence 0.90
 
 `--auto-promote` is rejected unless both reflection and evaluation commands are configured. The evaluation command receives `AGENTSMD_PROPOSAL_ID`, `AGENTSMD_RULE`, and `AGENTSMD_RUN_ID` in its environment.
 
+Raw trajectories remain in the local `.agentsmd` store. When the reflector is
+an external program or service, configure repeatable RE2 patterns to scrub only
+the copy sent to it:
+
+```bash
+agentsmd automate \
+  --redact 'sk-[A-Za-z0-9_-]+' \
+  --redact '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+'
+```
+
+Redaction covers session and task identifiers, messages, tool arguments and
+results, paths, diffs, commands, and metadata. It does not modify the locally
+stored evidence. Use `--clear-redactions` to remove the configured patterns.
+
 Captured sessions land in `.agentsmd/runs/`. Inspect their provider, outcome, duration, changed files, and test summary with:
 
 ```bash
@@ -345,6 +359,7 @@ The CLI is one consumer of reusable packages:
 ## Safety and trust model
 
 - Local-first storage; no transcript upload is required by the core.
+- Configurable RE2 redaction scrubs the copy passed to an external reflector while preserving local evidence.
 - Learned rules never bypass the pending-review gate.
 - Automatic promotion is disabled by default and cannot be enabled without an evaluation command.
 - Whole-file reflective rewrites are avoided; learning produces targeted deltas.
