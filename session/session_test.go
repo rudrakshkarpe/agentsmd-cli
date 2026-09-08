@@ -63,6 +63,24 @@ func TestLifecycleCarriesLogicalTaskFromStartToCompletion(t *testing.T) {
 	}
 }
 
+func TestProviderTaskAtCompletionOverridesStartedTask(t *testing.T) {
+	p, _ := project.Open(t.TempDir())
+	if err := p.Scaffold(); err != nil {
+		t.Fatal(err)
+	}
+	start := time.Date(2026, 9, 9, 1, 0, 0, 0, time.UTC)
+	if err := session.StartTask(p, "cursor", "session-2", "branch:feature/a", "git-branch", start); err != nil {
+		t.Fatal(err)
+	}
+	trajectory := schema.Trajectory{SessionID: "session-2", Task: "provider-task"}
+	if err := session.Complete(p, &trajectory, "cursor", start.Add(time.Minute)); err != nil {
+		t.Fatal(err)
+	}
+	if trajectory.Task != "provider-task" || trajectory.Metadata["task_source"] != "" {
+		t.Fatalf("trajectory=%+v", trajectory)
+	}
+}
+
 func runGit(t *testing.T, root string, args ...string) {
 	t.Helper()
 	command := exec.Command("git", append([]string{"-C", root}, args...)...)

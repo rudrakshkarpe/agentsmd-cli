@@ -56,9 +56,9 @@ func Complete(p *project.Project, trajectory *schema.Trajectory, provider string
 	if err == nil {
 		if trajectory.Task == "" {
 			trajectory.Task = state.Task
-		}
-		if state.TaskSource != "" {
-			trajectory.Metadata["task_source"] = state.TaskSource
+			if state.TaskSource != "" {
+				trajectory.Metadata["task_source"] = state.TaskSource
+			}
 		}
 		trajectory.WallTimeS = now.Sub(state.StartedAt).Seconds()
 		trajectory.Metadata["started_at"] = state.StartedAt.Format(time.RFC3339Nano)

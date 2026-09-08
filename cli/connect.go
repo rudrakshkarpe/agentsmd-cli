@@ -177,6 +177,8 @@ func captureHook(root, provider string, data []byte) error {
 		identity := task.Resolve(p, "", provider, sessionID)
 		trajectory.Task = identity.ID
 		trajectory.Metadata["task_source"] = identity.Source
+	} else if trajectory.Metadata["task_source"] == "" {
+		trajectory.Metadata["task_source"] = "provider"
 	}
 	output, err := json.MarshalIndent(trajectory, "", "  ")
 	if err != nil {
