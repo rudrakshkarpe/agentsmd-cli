@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Let AGENTS.md Write Itself | AGNTCon + MCPCon Japan</title>
+  <style>
+    :root {
+      --bg: #000;
+      --grid: #141414;
+      --card: #0a0a0a;
+      --edge: #2a2a2a;
+      --blue: #3b7dff;
+      --cyan: #6bcfcf;
+      --lime: #a8cd3e;
+      --pink: #e85bb8;
+      --amber: #f6b84a;
+      --violet: #9b7bff;
+      --green: #4fd19c;
+      --fg: #fff;
+      --muted: #9a9a9a;
+      --dim: #6a6a6a;
+      --code: #0d1117;
+      --surface: #070707;
+      --w: min(96vw, calc(96vh * 16 / 9));
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .stage {
+      position: relative;
+      width: var(--w);
+      aspect-ratio: 16 / 9;
+      margin: 2vh auto;
+      overflow: hidden;
+      background-color: var(--bg);
+      background-image:
+        repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 24px),
+        repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 24px);
+    }
+
+    .brand {
+      position: absolute;
+      top: 2.1%;
+      left: 3%;
+      height: 6.4%;
+      z-index: 4;
+    }
+
+    .footer {
+      position: absolute;
+      left: 3%;
+      right: 3%;
+      bottom: 2.2%;
+      display: flex;
+      justify-content: space-between;
+      color: var(--dim);
+      font: 600 11px/1 Consolas, ui-monospace, monospace;
+      letter-spacing: .06em;
+      z-index: 4;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 10.5% 4% 7%;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(16px);
+      transition: opacity .4s ease, transform .4s ease;
+    }
+    .slide.on {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .title-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .title-slide .title-group {
+      transform: translateY(-2%);
+    }
+    .title-slide .subtitle {
+      margin-top: 16px;
+    }
+    .title-slide .speakers {
+      margin-top: 34px;
+      color: var(--fg);
+      font-size: clamp(15px, 1.45vw, 19px);
+      font-weight: 700;
+    }
+    .speaker-slide h2 { margin: 0 auto; text-align: center; }
+    .speaker-grid {
+      width: min(74%, 900px);
+      margin: 28px auto 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+    .speaker-card {
+      display: flex;
+      min-height: 330px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .speaker-photo {
+      width: min(15vw, 190px);
+      aspect-ratio: 1;
+      margin-bottom: 18px;
+      border: 1px solid var(--edge);
+      object-fit: cover;
+    }
+    .principles-layout {
+      display: grid;
+      grid-template-columns: 1.18fr .82fr;
+      gap: 24px;
+      margin-top: 24px;
+      align-items: stretch;
+    }
+    .numbered-points {
+      display: grid;
+      gap: 13px;
+      list-style: none;
+      counter-reset: principles;
+    }
+    .numbered-points li {
+      position: relative;
+      min-height: 82px;
+      padding: 14px 12px 14px 68px;
+      color: var(--fg);
+      font-size: clamp(14px, 1.25vw, 17px);
+      font-weight: 600;
+      line-height: 1.4;
+      counter-increment: principles;
+    }
+    .numbered-points li::before {
+      content: "0" counter(principles);
+      position: absolute;
+      left: 18px;
+      top: 20px;
+      color: var(--blue);
+      font: 700 13px Consolas, ui-monospace, monospace;
+    }
+    .principles-image {
+      width: 100%;
+      height: 100%;
+      min-height: 296px;
+      border: 1px solid var(--edge);
+      background: #eee;
+      object-fit: contain;
+    }
+    .takeaway-box {
+      margin-top: 18px;
+      padding: 10px 20px;
+      color: var(--fg);
+      text-align: center;
+      font-size: clamp(15px, 1.4vw, 19px);
+      font-weight: 700;
+    }
+
+    .slide-meta, .slide-notes {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+      clip: rect(0 0 0 0) !important;
+      white-space: nowrap !important;
+    }
+
+    h1 {
+      font-size: clamp(36px, 4.7vw, 58px);
+      line-height: 1.06;
+      letter-spacing: -.035em;
+    }
+    h2 {
+      max-width: 1040px;
+      font-size: clamp(28px, 3.2vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -.025em;
+    }
+    h3 { font-size: clamp(17px, 1.75vw, 23px); line-height: 1.15; }
+    p { line-height: 1.4; }
+    code, .mono { font-family: Consolas, ui-monospace, monospace; }
+    .accent { color: var(--blue); }
+    .muted { color: var(--muted); }
+    .dim { color: var(--dim); }
+    .eyebrow {
+      margin-bottom: 10px;
+      color: var(--blue);
+      font: 700 12px/1 Consolas, ui-monospace, monospace;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(15px, 1.55vw, 20px);
+    }
+    .bottom-line {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 8.2%;
+      font-size: clamp(15px, 1.45vw, 19px);
+      font-weight: 700;
+    }
+
+    .row { display: flex; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+    .card {
+      border: 1px solid var(--edge);
+      background: var(--card);
+      padding: 20px;
+      animation: rise .5s ease both;
+    }
+    .slide.on .card:nth-child(1) { animation-delay: .04s; }
+    .slide.on .card:nth-child(2) { animation-delay: .10s; }
+    .slide.on .card:nth-child(3) { animation-delay: .16s; }
+    .slide.on .card:nth-child(4) { animation-delay: .22s; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+    .card p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: clamp(12px, 1.15vw, 15px);
+    }
+    .label {
+      margin-bottom: 10px;
+      color: var(--blue);
+      font: 700 11px/1 Consolas, ui-monospace, monospace;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .node {
+      flex: 1;
+      min-height: 82px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--edge);
+      background: var(--surface);
+      padding: 12px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .arrow { color: var(--blue); font: 700 22px Consolas, monospace; }
+    .feedback {
+      margin: 12px auto 0;
+      width: 74%;
+      border-top: 2px solid var(--blue);
+      color: var(--blue);
+      padding-top: 7px;
+      text-align: center;
+      font: 700 12px Consolas, monospace;
+    }
+
+    .placeholder {
+      min-height: 120px;
+      display: grid;
+      place-items: center;
+      border: 1px dashed #444;
+      background: rgba(5, 5, 5, .78);
+      color: var(--dim);
+      padding: 18px;
+      text-align: center;
+      font: 700 11px/1.35 Consolas, ui-monospace, monospace;
+      letter-spacing: .04em;
+    }
+
+    .tree, .terminal {
+      background: var(--code);
+      border: 1px solid var(--edge);
+      color: #d7dde7;
+      padding: 18px 20px;
+      font: 14px/1.55 Consolas, ui-monospace, monospace;
+      white-space: pre;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .milestone {
+      min-height: 104px;
+      border: 1px solid var(--edge);
+      background: var(--card);
+      padding: 16px;
+    }
+    .timeline-gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 22px;
+    }
+    .timeline-shot {
+      width: 100%;
+      height: 235px;
+      border: 1px solid var(--edge);
+      background: #fff;
+      object-fit: contain;
+    }
+    .timeline-track {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 26px;
+      padding-top: 26px;
+    }
+    .timeline-track::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 16.66%;
+      right: 16.66%;
+      height: 2px;
+      background: var(--blue);
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    .timeline-slide.on .timeline-track::before {
+      animation: drawTimeline 1.1s .18s ease-out forwards;
+    }
+    @keyframes drawTimeline { to { transform: scaleX(1); } }
+    .timeline-event {
+      position: relative;
+      text-align: center;
+    }
+    .timeline-event::before {
+      content: "";
+      position: absolute;
+      top: -26px;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 5px #000;
+      transform: translateX(-50%) scale(0);
+    }
+    .timeline-slide.on .timeline-event::before {
+      animation: showMilestone .25s ease-out forwards;
+    }
+    .timeline-slide.on .timeline-event:nth-child(2)::before { animation-delay: .7s; }
+    .timeline-slide.on .timeline-event:nth-child(3)::before { animation-delay: 1.15s; }
+    @keyframes showMilestone {
+      to { transform: translateX(-50%) scale(1); }
+    }
+    .timeline-event strong {
+      display: block;
+      font-size: clamp(15px, 1.35vw, 18px);
+    }
+    .timeline-event span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font: 11px/1.3 Consolas, ui-monospace, monospace;
+    }
+    .authoring-bullets {
+      width: min(70%, 820px);
+      margin: 44px 0 0;
+    }
+    .authoring-bullets li {
+      padding-top: 9px;
+      padding-bottom: 9px;
+      font-size: clamp(20px, 2vw, 27px);
+      font-weight: 600;
+    }
+    .authoring-statement {
+      max-width: 900px;
+      margin: 42px auto 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: clamp(17px, 1.65vw, 22px);
+      line-height: 1.4;
+    }
+    .feedback-intro {
+      max-width: 900px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: clamp(14px, 1.35vw, 18px);
+    }
+    .feedback-layout {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 30px;
+      margin-top: 22px;
+      align-items: center;
+    }
+    .problem-list {
+      display: grid;
+      gap: 12px;
+    }
+    .problem-item {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+    }
+    .problem-number {
+      padding-top: 3px;
+      color: var(--blue);
+      font: 700 12px/1 Consolas, ui-monospace, monospace;
+    }
+    .problem-copy strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: clamp(15px, 1.25vw, 18px);
+    }
+    .problem-copy p {
+      color: var(--muted);
+      font-size: clamp(11px, 1.05vw, 14px);
+    }
+    .feedback-image {
+      width: 100%;
+      max-height: 360px;
+      object-fit: contain;
+    }
+    .feedback-question {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 8.2%;
+      text-align: center;
+      font-size: clamp(15px, 1.4vw, 19px);
+      font-weight: 700;
+    }
+    .discipline-intro {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(15px, 1.4vw, 19px);
+    }
+    .discipline-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 24px;
+      align-items: center;
+    }
+    .discipline-principles {
+      display: grid;
+      gap: 22px;
+    }
+    .discipline-rule {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+    }
+    .discipline-rule > span {
+      padding-top: 4px;
+      color: var(--blue);
+      font: 700 12px/1 Consolas, ui-monospace, monospace;
+    }
+    .discipline-rule strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: clamp(17px, 1.45vw, 20px);
+    }
+    .discipline-rule p {
+      color: var(--muted);
+      font-size: clamp(12px, 1.05vw, 14px);
+    }
+    .discipline-image {
+      width: 100%;
+      border: 1px solid var(--edge);
+      object-fit: contain;
+    }
+    .discipline-conclusion {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 7.8%;
+      text-align: center;
+      font-size: clamp(14px, 1.2vw, 17px);
+      font-weight: 700;
+    }
+    .experience-slide h2,
+    .experience-slide > .subtitle {
+      text-align: left;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .experience-slide > .subtitle { max-width: 900px; }
+    .signal-map {
+      position: relative;
+      width: 100%;
+      height: 390px;
+      margin-top: 10px;
+    }
+    .signal-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    .signal-path {
+      fill: none;
+      stroke: var(--signal-color, var(--blue));
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1400;
+      stroke-dashoffset: 1400;
+      opacity: .9;
+    }
+    .experience-slide.on .signal-path {
+      animation: drawSignal 1.2s ease-in-out forwards;
+      animation-delay: var(--path-delay, .15s);
+    }
+    @keyframes drawSignal { to { stroke-dashoffset: 0; } }
+    .signal-node {
+      --tone: var(--blue);
+      position: absolute;
+      max-width: 220px;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .experience-slide.on .signal-node {
+      animation: revealSignal .38s ease-out forwards;
+      animation-delay: var(--delay, .2s);
+    }
+    @keyframes revealSignal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .signal-node::before {
+      content: "";
+      display: block;
+      width: 9px;
+      height: 9px;
+      margin-bottom: 7px;
+      border-radius: 50%;
+      background: var(--tone);
+      box-shadow: 0 0 0 4px #000;
+    }
+    .signal-node strong {
+      display: block;
+      color: var(--tone);
+      font-size: clamp(14px, 1.25vw, 18px);
+      line-height: 1.1;
+      letter-spacing: -.01em;
+    }
+    .signal-node span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font: 10px/1.3 Consolas, ui-monospace, monospace;
+    }
+    .signal-decision::before {
+      width: 14px;
+      height: 14px;
+      background: #000;
+      border: 2px solid var(--tone);
+    }
+    .signal-decision {
+      max-width: 190px;
+    }
+    .signal-decision span {
+      max-width: 185px;
+      line-height: 1.45;
+    }
+    .signal-suggestion {
+      max-width: 145px;
+    }
+    .signal-gate {
+      padding-left: 14px;
+      border-left: 3px solid var(--tone);
+    }
+    .signal-gate::before { display: none; }
+    .signal-memory-final strong { color: var(--blue); }
+    .signal-evidence::before {
+      position: absolute;
+      top: 42px;
+      left: 0;
+      margin: 0;
+    }
+    .signal-midpoint::before {
+      position: absolute;
+      top: 42px;
+      left: 0;
+      margin: 0;
+    }
+    .tone-memory { --tone: var(--blue); }
+    .tone-agent { --tone: var(--cyan); }
+    .tone-mistake { --tone: var(--pink); }
+    .tone-discovery { --tone: var(--lime); }
+    .tone-decision { --tone: var(--amber); }
+    .tone-rule { --tone: var(--violet); }
+    .tone-validate { --tone: var(--green); }
+    .signal-node.has-logo::before { display: none; }
+    .signal-icon,
+    .signal-brand-logo {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 8px;
+      object-fit: contain;
+    }
+    .signal-icon {
+      color: var(--tone);
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .signal-brand-stack {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .signal-brand-stack .signal-brand-logo {
+      width: 22px;
+      height: 22px;
+      margin: 0;
+    }
+    .logo-invert { filter: invert(1); }
+    .experience-flow {
+      width: min(74%, 860px);
+      margin: 14px auto 0;
+      text-align: center;
+    }
+    .experience-node {
+      min-height: 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--edge);
+      background: var(--card);
+      padding: 6px 14px;
+      font-size: clamp(12px, 1.15vw, 15px);
+      font-weight: 700;
+    }
+    .experience-node span {
+      margin-top: 2px;
+      color: var(--muted);
+      font: 9px/1.2 Consolas, ui-monospace, monospace;
+    }
+    .experience-arrow {
+      height: 17px;
+      color: var(--blue);
+      font: 700 16px/17px Consolas, ui-monospace, monospace;
+    }
+    .experience-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .experience-gate {
+      border-color: var(--blue);
+    }
+    .experience-final {
+      display: grid;
+      grid-template-columns: 1fr 28px 1fr 28px 1fr;
+      align-items: center;
+    }
+    .experience-final .experience-arrow {
+      height: auto;
+      line-height: 1;
+    }
+    .experience-punchline {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 7.8%;
+      text-align: center;
+      font-size: clamp(15px, 1.35vw, 19px);
+      font-weight: 700;
+    }
+    .milestone strong {
+      display: block;
+      color: var(--blue);
+      font: 700 17px Consolas, monospace;
+      margin-bottom: 10px;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border: 1px solid var(--edge);
+      background: var(--card);
+      padding: 8px 11px;
+      color: var(--muted);
+      font: 12px Consolas, ui-monospace, monospace;
+    }
+
+    .cli-intro-slide h2 { margin-bottom: 8px; }
+    .cli-summary {
+      max-width: 940px;
+      color: var(--muted);
+      font-size: clamp(14px, 1.3vw, 17px);
+      line-height: 1.45;
+    }
+    .cli-intro-layout {
+      display: grid;
+      grid-template-columns: 42% 1fr;
+      align-items: center;
+      gap: 48px;
+      margin-top: 16px;
+    }
+    .cli-product-image {
+      display: block;
+      width: 100%;
+      border-radius: 8px;
+    }
+    .cli-loop {
+      display: grid;
+      justify-items: center;
+      gap: 3px;
+    }
+    .cli-loop-step {
+      min-width: 250px;
+      padding: 5px 16px;
+      border: 1px solid var(--edge);
+      background: rgba(10, 10, 10, .82);
+      color: var(--white);
+      text-align: center;
+      font: 700 12px Consolas, ui-monospace, monospace;
+      animation: rise .4s ease both;
+    }
+    .cli-loop-step:first-child,
+    .cli-loop-step:last-child {
+      border-color: #20f0ab;
+      color: #20f0ab;
+    }
+    .cli-loop-arrow {
+      color: #20f0ab;
+      font: 700 12px Consolas, ui-monospace, monospace;
+      line-height: 1;
+    }
+    .cli-positioning {
+      margin-top: 13px;
+      color: var(--white);
+      font-size: clamp(15px, 1.45vw, 19px);
+      font-weight: 700;
+      text-align: center;
+    }
+    .cli-features-layout {
+      display: grid;
+      grid-template-columns: 52% 48%;
+      align-items: center;
+      gap: 36px;
+      margin-top: 20px;
+    }
+    .cli-features {
+      display: grid;
+      gap: 8px;
+    }
+    .cli-feature {
+      display: grid;
+      grid-template-columns: 104px 1fr;
+      align-items: baseline;
+      gap: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--edge);
+    }
+    .cli-feature strong {
+      color: #20f0ab;
+      font: 700 13px Consolas, ui-monospace, monospace;
+    }
+    .cli-feature span {
+      color: var(--muted);
+      font-size: clamp(13px, 1.12vw, 15px);
+      line-height: 1.35;
+    }
+    .cli-commands-image {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--edge);
+      border-radius: 8px;
+    }
+    .qna-slide .qna-title {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      color: var(--white);
+      font-size: clamp(42px, 6vw, 76px);
+      letter-spacing: -.04em;
+      text-align: center;
+    }
+    .demo-kicker {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: clamp(14px, 1.25vw, 17px);
+    }
+    .demo-runbook {
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 34px;
+      margin-top: 24px;
+      align-items: start;
+    }
+    .demo-steps {
+      display: grid;
+      gap: 13px;
+    }
+    .demo-step {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .demo-step > span {
+      color: #20f0ab;
+      font: 700 12px/1.4 Consolas, ui-monospace, monospace;
+    }
+    .demo-step strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: clamp(15px, 1.35vw, 18px);
+    }
+    .demo-step code {
+      color: var(--muted);
+      font-size: clamp(10px, .95vw, 13px);
+    }
+    .demo-proof {
+      border-left: 2px solid var(--blue);
+      padding: 8px 0 8px 24px;
+    }
+    .demo-proof h3 {
+      margin-bottom: 16px;
+      color: var(--blue);
+    }
+    .demo-proof p {
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-size: clamp(12px, 1.08vw, 15px);
+    }
+    .demo-proof strong { color: var(--fg); }
+    .benchmark-summary {
+      max-width: 900px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: clamp(13px, 1.18vw, 16px);
+    }
+    .benchmark-layout {
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 38px;
+      margin-top: 22px;
+      align-items: stretch;
+    }
+    .benchmark-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px 24px;
+      align-content: center;
+    }
+    .benchmark-metric {
+      border-top: 2px solid var(--blue);
+      padding-top: 10px;
+    }
+    .benchmark-metric strong {
+      display: block;
+      color: #20f0ab;
+      font: 700 clamp(24px, 2.8vw, 38px)/1 Consolas, ui-monospace, monospace;
+    }
+    .benchmark-metric span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: clamp(11px, 1vw, 14px);
+    }
+    .benchmark-rules {
+      display: grid;
+      gap: 16px;
+      align-content: center;
+    }
+    .benchmark-rule {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+    }
+    .benchmark-rule > span {
+      color: var(--blue);
+      font: 700 12px/1.4 Consolas, ui-monospace, monospace;
+    }
+    .benchmark-rule strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: clamp(14px, 1.22vw, 17px);
+    }
+    .benchmark-rule p {
+      color: var(--muted);
+      font-size: clamp(11px, 1vw, 14px);
+    }
+    .benchmark-caveat {
+      position: absolute;
+      left: 4%;
+      right: 4%;
+      bottom: 7.8%;
+      color: var(--muted);
+      text-align: center;
+      font: 11px/1.35 Consolas, ui-monospace, monospace;
+    }
+    .repo-qr-slide {
+      text-align: center;
+    }
+    .repo-qr-slide h2 {
+      max-width: none;
+      text-align: center;
+    }
+    .repo-qr {
+      display: block;
+      width: min(29vh, 250px);
+      aspect-ratio: 1;
+      margin: 22px auto 14px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+    }
+    .repo-url {
+      color: #20f0ab;
+      font: 700 clamp(12px, 1.15vw, 15px) Consolas, ui-monospace, monospace;
+      text-decoration: none;
+    }
+    .repo-cta {
+      margin-top: 22px;
+      color: var(--white);
+      font-size: clamp(18px, 1.8vw, 24px);
+      font-weight: 700;
+    }
+
+    .loop {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .loop .node { border-top: 2px solid var(--blue); }
+    .again {
+      margin: 14px auto 0;
+      width: 80%;
+      border: 1px solid var(--blue);
+      color: var(--blue);
+      padding: 10px;
+      text-align: center;
+      font: 700 13px Consolas, monospace;
+    }
+
+    .not-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .not-list div {
+      border: 1px solid var(--edge);
+      padding: 12px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .metric {
+      min-height: 140px;
+      border: 1px solid var(--edge);
+      background: var(--card);
+      padding: 18px;
+    }
+    .metric p { margin-top: 8px; color: var(--muted); font-size: 14px; }
+
+    .maturity {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 26px;
+    }
+    .maturity .node { min-height: 72px; font-size: 14px; }
+    .today { border-color: var(--blue); }
+    .direction { border-color: var(--cyan); }
+
+    nav {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 7px;
+      z-index: 8;
+    }
+    nav button {
+      width: 8px;
+      height: 8px;
+      border: 0;
+      border-radius: 50%;
+      background: #333;
+      cursor: pointer;
+    }
+    nav button.on { background: var(--blue); }
+    .hint {
+      position: fixed;
+      top: 14px;
+      right: 18px;
+      color: #444;
+      font: 11px Consolas, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="hint">← →  space  ·  F fullscreen</div>
+  <main class="stage" id="stage">
+    <img class="brand" src="assets/agnt_mcpcon_japan26_bug_white.svg" alt="AGNTCon + MCPCon Japan" />
+    <footer class="footer">
+      <span>AGNTCON + MCPCON  ·  JAPAN 2026  ·  HALL C</span>
+      <span id="count">1 / 13</span>
+    </footer>
+
+    <section class="slide on title-slide" id="slide-01" data-title="Let AGENTS.md Write Itself" data-duration="0.5 minute">
+      <span class="slide-meta">Slide 1 | Let AGENTS.md Write Itself | 0.5 minute</span>
+      <div class="title-group">
+        <h1>Let AGENTS.md <span class="accent">Write Itself</span></h1>
+        <p class="subtitle">Self-Improving Coding Agents, No RL Required</p>
+        <p class="speakers">Rudraksh Karpe, Simplismart&nbsp;&nbsp;&nbsp;·&nbsp;&nbsp;&nbsp;Satyam Soni, NitroStack</p>
+      </div>
+      <aside class="slide-notes">Open with the question: What if the instructions we give coding agents could improve from the way agents actually work? The model is not retrained. This talk is about an instruction artifact that evolves from evaluated experience. Transition: First, who are we?</aside>
+    </section>
+
+    <section class="slide speaker-slide" id="slide-02" data-title="Who We Are" data-duration="0.5 minute">
+      <span class="slide-meta">Slide 2 | Who We Are | 0.5 minute</span>
+      <h2>Who We Are</h2>
+      <div class="speaker-grid">
+        <article class="card speaker-card">
+          <img class="speaker-photo" src="assets/rudraksh-karpe.png" alt="Rudraksh Karpe" />
+          <h3>Rudraksh Karpe</h3>
+          <p>FDE - Simplismart</p>
+        </article>
+        <article class="card speaker-card">
+          <img class="speaker-photo" src="assets/satyam-soni.png" alt="Satyam Soni" />
+          <h3>Satyam Soni</h3>
+          <p>Developer Advocate - NitroStack</p>
+        </article>
+      </div>
+      <aside class="slide-notes">Keep this short. Introduce names and organizations only. Avoid biographies. The shared connection is infrastructure around developers and agent systems. Transition: Start from first principles.</aside>
+    </section>
+
+    <section class="slide principles-slide" id="slide-03" data-title="What Is AGENTS.md?" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 3 | What Is AGENTS.md? | 1.5 minutes</span>
+      <h2>What Is AGENTS.md?</h2>
+      <div class="principles-layout">
+        <ol class="numbered-points">
+          <li>AGENTS.md is a repository-local instruction file for AI coding agents.</li>
+          <li>Agents can see the code, but they don't automatically know the project's conventions, workflows, boundaries, or validation requirements.</li>
+          <li>The agent discovers AGENTS.md, loads its instructions into context, and uses them while planning, editing, testing, and reviewing code.</li>
+        </ol>
+        <img class="principles-image" src="assets/agentsmd-ecosystem.png" alt="AGENTS.md ecosystem and supported coding agents" />
+      </div>
+      <div class="takeaway-box">Think of it as: README.md for humans → AGENTS.md for coding agents</div>
+      <aside class="slide-notes">Explain that agents can inspect code, but they do not automatically know repository-specific decisions. AGENTS.md gives them a predictable place for those instructions. The applicable file can be nested, and the closest file wins. Transition: This convention is now bigger than one tool.</aside>
+    </section>
+
+    <section class="slide timeline-slide" id="slide-04" data-title="From Codex Convention to Open Standard" data-duration="1 minute">
+      <span class="slide-meta">Slide 4 | From Codex Convention to Open Standard | 1 minute</span>
+      <h2>From Codex Convention to Open Standard</h2>
+      <div class="timeline-gallery">
+        <img class="timeline-shot" src="assets/agentsmd-codex-introduction.png" alt="Codex AGENTS.md introduction" />
+        <img class="timeline-shot" src="assets/agentsmd-aaif-donation.png" alt="OpenAI Agentic AI Foundation announcement" />
+        <img class="timeline-shot" src="assets/agentsmd-github-adoption.png" alt="AGENTS.md GitHub repository" />
+      </div>
+      <div class="timeline-track">
+        <div class="timeline-event">
+          <strong>Introduced with Codex</strong>
+          <span>Repository instructions for coding agents</span>
+        </div>
+        <div class="timeline-event">
+          <strong>Donated to AAIF</strong>
+          <span>Neutral stewardship under the Linux Foundation</span>
+        </div>
+        <div class="timeline-event">
+          <strong>Widely adopted standard</strong>
+          <span>24k+ GitHub stars</span>
+        </div>
+      </div>
+      <aside class="slide-notes">OpenAI released AGENTS.md in August 2025 and contributed it to the Agentic AI Foundation on December 9, 2025. OpenAI reported more than 60,000 open-source projects and agent frameworks at that time. The point is interoperability and neutral stewardship, not control by one vendor. Transition: But how are teams creating these files today?</aside>
+    </section>
+
+    <section class="slide authoring-slide" id="slide-05" data-title="How teams write AGENTS.md today" data-duration="1 minute">
+      <span class="slide-meta">Slide 5 | How teams write AGENTS.md today | 1 minute</span>
+      <h2>How teams write AGENTS.md today</h2>
+      <ul class="authoring-bullets">
+        <li>Human writes it</li>
+        <li>Agent generates it</li>
+        <li>Community templates with best practices</li>
+        <li>Teams maintain it manually</li>
+      </ul>
+      <p class="authoring-statement">As the repository changes, someone is expected to keep the instructions synchronized.</p>
+      <aside class="slide-notes">These authoring methods are useful. The limitation is that they are authoring workflows, not feedback loops. A generated starting point does not automatically incorporate what later sessions discover. Transition: The instructions do not experience the work.</aside>
+    </section>
+
+    <section class="slide feedback-problem-slide" id="slide-06" data-title="The missing feedback loop" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 6 | The missing feedback loop | 1.5 minutes</span>
+      <h2>The missing feedback loop</h2>
+      <p class="feedback-intro">AGENTS.md gives agents persistent repository context. But how does that context improve as agents actually work?</p>
+      <div class="feedback-layout">
+        <div class="problem-list">
+          <div class="problem-item">
+            <span class="problem-number">01</span>
+            <div class="problem-copy">
+              <strong>Repository changes</strong>
+              <p>Commands, paths, architecture, and workflows evolve.</p>
+            </div>
+          </div>
+          <div class="problem-item">
+            <span class="problem-number">02</span>
+            <div class="problem-copy">
+              <strong>Instructions drift</strong>
+              <p>A rule that was correct six months ago may now be wrong.</p>
+            </div>
+          </div>
+          <div class="problem-item">
+            <span class="problem-number">03</span>
+            <div class="problem-copy">
+              <strong>Agents repeat mistakes</strong>
+              <p>The same failed exploration can happen again because nothing records the lesson.</p>
+            </div>
+          </div>
+          <div class="problem-item">
+            <span class="problem-number">04</span>
+            <div class="problem-copy">
+              <strong>More rules can make things worse</strong>
+              <p>Teams respond by adding more instructions, increasing context and creating conflicting or stale guidance.</p>
+            </div>
+          </div>
+        </div>
+        <img class="feedback-image" src="assets/addy-osmani-agentsmd-feedback.png" alt="Addy Osmani on maintaining useful AGENTS.md instructions" />
+      </div>
+      <p class="feedback-question">The question is how we continuously improve what belongs inside it.</p>
+      <aside class="slide-notes">Do not say every AGENTS.md becomes bad. The production lesson from vLLM is to keep instructions lean, prune stale content, avoid reactive accumulation, avoid hardcoded paths, remove duplication, and test whether a rule is needed. Transition: Instead of predicting every rule, learn from the trajectory.</aside>
+    </section>
+
+    <section class="slide discipline-slide" id="slide-07" data-title="AGENTS.md needs an evidence bar" data-duration="1 minute">
+      <span class="slide-meta">Slide 7 | AGENTS.md needs an evidence bar | 1 minute</span>
+      <h2>AGENTS.md needs an evidence bar</h2>
+      <p class="discipline-intro">Maintaining agent instructions is already an engineering discipline.</p>
+      <div class="discipline-layout">
+        <div class="discipline-principles">
+          <div class="discipline-rule">
+            <span>01</span>
+            <div>
+              <strong>Keep it lean</strong>
+              <p>AGENTS.md &lt; 200 lines</p>
+            </div>
+          </div>
+          <div class="discipline-rule">
+            <span>02</span>
+            <div>
+              <strong>Don't blindly add rules</strong>
+              <p>Test whether the rule is actually needed.</p>
+            </div>
+          </div>
+          <div class="discipline-rule">
+            <span>03</span>
+            <div>
+              <strong>Learn from repeated mistakes</strong>
+              <p>Good domain guides contain fixes for repeated mistakes.</p>
+            </div>
+          </div>
+        </div>
+        <img class="discipline-image" src="assets/vllm-agent-instructions.png" alt="vLLM guidance for editing agent instructions" />
+      </div>
+      <p class="discipline-conclusion">This is already how mature projects think about agent instructions. Our question is: can we make part of this maintenance loop systematic?</p>
+      <aside class="slide-notes">The vLLM guidance treats agent instructions as an engineered artifact with token budgets, scope, anti-patterns, and a change checklist. The important lesson is not to add more text. It is to preserve only specific, non-obvious, tested guidance. Transition: Can trajectory evidence make part of this discipline systematic?</aside>
+    </section>
+
+    <section class="slide experience-slide" id="slide-08" data-title="The agent trajectory becomes evidence" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 8 | The agent trajectory becomes evidence | 1.5 minutes</span>
+      <h2>The agent trajectory becomes evidence</h2>
+      <p class="subtitle">The agent's own trajectories contain the evidence needed to improve its repository context.</p>
+      <div class="signal-map">
+        <svg class="signal-svg" viewBox="0 0 1200 390" aria-hidden="true">
+          <defs>
+            <marker id="signal-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b7dff"></path>
+            </marker>
+          </defs>
+          <path class="signal-path" style="--path-delay:.3s;--signal-color:var(--cyan)" d="M100 55 L310 55 L510 55" marker-end="url(#signal-arrow)"></path>
+          <path class="signal-path" style="--path-delay:1.3s;--signal-color:var(--pink)" d="M510 55 C510 115 485 135 485 178" marker-end="url(#signal-arrow)"></path>
+          <path class="signal-path" style="--path-delay:1.8s;--signal-color:var(--lime)" d="M510 55 C540 110 645 135 650 178" marker-end="url(#signal-arrow)"></path>
+          <path class="signal-path" style="--path-delay:2.8s;--signal-color:var(--amber)" d="M485 178 C560 178 620 210 680 210"></path>
+          <path class="signal-path" style="--path-delay:2.8s;--signal-color:var(--amber)" d="M650 178 C660 178 670 200 680 210" marker-end="url(#signal-arrow)"></path>
+          <path class="signal-path" style="--path-delay:3.8s;--signal-color:var(--violet)" d="M735 210 L920 210 L920 286" marker-end="url(#signal-arrow)"></path>
+          <path class="signal-path" style="--path-delay:4.9s;--signal-color:var(--green)" d="M920 286 L630 286" marker-end="url(#signal-arrow)"></path>
+          <path class="signal-path" style="--path-delay:6s;--signal-color:var(--blue)" d="M630 286 C405 360 115 340 100 82" marker-end="url(#signal-arrow)"></path>
+        </svg>
+        <div class="signal-node has-logo tone-memory" style="left:4%;top:5%;--delay:.2s">
+          <img class="signal-brand-logo" src="assets/agentsmd-mark.png" alt="" />
+          <strong>AGENTS.md</strong>
+          <span>Repository memory · Instructions</span>
+        </div>
+        <div class="signal-node has-logo tone-agent" style="left:24%;top:5%;--delay:.85s">
+          <div class="signal-brand-stack" aria-label="Claude, Codex, and goose">
+            <img class="signal-brand-logo" src="assets/claude-logo.svg" alt="Claude" />
+            <img class="signal-brand-logo logo-invert" src="assets/codex-logo.svg" alt="Codex" />
+            <img class="signal-brand-logo logo-invert" src="assets/goose-logo.svg" alt="goose" />
+          </div>
+          <strong>Agent</strong>
+        </div>
+        <div class="signal-node has-logo tone-agent" style="left:42%;top:5%;--delay:1.35s">
+          <svg class="signal-icon" data-icon="trajectory" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18c4-8 7 2 11-7"></path><path d="m13 8 4 2-2 4"></path><circle cx="4" cy="18" r="2"></circle></svg>
+          <strong>Agent Work / Trajectory</strong>
+          <span>Experience</span>
+        </div>
+        <div class="signal-node has-logo signal-evidence tone-mistake" style="left:40%;top:31%;--delay:2.15s">
+          <svg class="signal-icon" data-icon="mistake" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 20h18.4L12 3Z"></path><path d="M12 9v5"></path><path d="M12 17h.01"></path></svg>
+          <strong>Mistakes</strong>
+        </div>
+        <div class="signal-node has-logo signal-evidence tone-discovery" style="left:55%;top:31%;--delay:2.55s">
+          <svg class="signal-icon" data-icon="discovery" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3Z"></path><path d="m19 15 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z"></path></svg>
+          <strong>Discoveries</strong>
+        </div>
+        <div class="signal-node has-logo signal-midpoint signal-decision tone-decision" style="left:58%;top:38%;--delay:3.45s">
+          <svg class="signal-icon" data-icon="repeat" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"></path><path d="M3 11V9a3 3 0 0 1 3-3h15"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v2a3 3 0 0 1-3 3H3"></path></svg>
+          <strong>Repeated pattern?</strong>
+          <span>repeated · useful · repository-specific · worth remembering</span>
+        </div>
+        <div class="signal-node has-logo signal-midpoint signal-suggestion tone-rule" style="left:76%;top:38%;--delay:4.35s">
+          <svg class="signal-icon" data-icon="rule" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5"></path><path d="M9 14h6"></path><path d="M12 11v6"></path></svg>
+          <strong>Suggestion</strong>
+        </div>
+        <div class="signal-node has-logo signal-gate tone-validate" style="left:76%;top:68%;--delay:5.35s">
+          <svg class="signal-icon" data-icon="validate" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg>
+          <strong>Validate</strong>
+          <span>Required gate</span>
+        </div>
+        <div class="signal-node has-logo signal-memory-final tone-memory" style="left:52%;top:68%;--delay:6.35s">
+          <img class="signal-brand-logo" src="assets/agentsmd-mark.png" alt="" />
+          <strong>AGENTS.md</strong>
+          <span>Repository memory ↺</span>
+        </div>
+      </div>
+      <p class="experience-punchline">The agent's work contains the evidence for what it should remember.</p>
+      <aside class="slide-notes">AGENTS.md is repository memory. Trajectories are experience. A single mistake is not enough. Look for repeated, useful, repository-specific knowledge, create a suggestion, and require validation before it enters memory. Transition: This is learning at the instruction layer, not model training.</aside>
+    </section>
+
+    <section class="slide cli-intro-slide" id="slide-09" data-title="Introducing agentsmd-cli" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 9 | Introducing agentsmd-cli | 1.5 minutes</span>
+      <div class="eyebrow">Introducing agentsmd-cli</div>
+      <h2>A feedback layer for AGENTS.md</h2>
+      <p class="cli-summary">agentsmd-cli captures what happens during real coding-agent work, extracts potential lessons, and gives those lessons a path to become validated repository instructions.</p>
+      <div class="cli-intro-layout">
+        <img class="cli-product-image" src="assets/agentsmd-cli.jpg" alt="agentsmd-cli" />
+        <div class="cli-loop" aria-label="agentsmd-cli feedback loop">
+          <div class="cli-loop-step">AGENTS.md</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">Coding Agent</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">Task Trajectory</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">Reflect</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">Candidate Rule</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">Evaluate</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">Promote</div><div class="cli-loop-arrow">↓</div>
+          <div class="cli-loop-step">AGENTS.md v1</div>
+        </div>
+      </div>
+      <p class="cli-positioning">Turn ephemeral agent experience into validated, durable repository knowledge.</p>
+      <aside class="slide-notes">Position agentsmd-cli as a feedback layer for repository instructions. It captures real coding-agent trajectories, reflects on potential lessons, evaluates candidate rules, and promotes validated knowledge back into AGENTS.md. The loop turns temporary experience into durable repository context. Transition: Watch the loop operate in the demo.</aside>
+    </section>
+
+    <section class="slide demo-slide" id="slide-10" data-title="Five-minute live loop" data-duration="5 minutes">
+      <span class="slide-meta">Slide 10 | Five-minute live loop | 5 minutes</span>
+      <div class="eyebrow">Live demo</div>
+      <h2>One task, one reflection, one gated update</h2>
+      <p class="demo-kicker">The configuration fixture and all six recorded runs ship in this repository.</p>
+      <div class="demo-runbook">
+        <div class="demo-steps">
+          <div class="demo-step"><span>01</span><div><strong>Start with static guidance</strong><code>guidance/baseline.md</code></div></div>
+          <div class="demo-step"><span>02</span><div><strong>Inspect captured failures and detours</strong><code>learning/reflection-baseline-*.json</code></div></div>
+          <div class="demo-step"><span>03</span><div><strong>Review the pending rules</strong><code>agentsmd pending</code></div></div>
+          <div class="demo-step"><span>04</span><div><strong>Promote only after evaluation</strong><code>agentsmd promote &lt;proposal-id&gt;</code></div></div>
+          <div class="demo-step"><span>05</span><div><strong>Compare fresh held-out trials</strong><code>agentsmd benchmark --spec ...</code></div></div>
+        </div>
+        <div class="demo-proof">
+          <h3>What the audience sees</h3>
+          <p><strong>Provenance:</strong> each rule links back to its task and session.</p>
+          <p><strong>Safety:</strong> reflection writes to a pending queue, not directly to AGENTS.md.</p>
+          <p><strong>Fallback:</strong> the checked-in report works without venue networking.</p>
+        </div>
+      </div>
+      <aside class="slide-notes">Switch to the terminal after establishing the five steps. Use benchmarks/config-precedence. Show the baseline file, both reflection records, the targeted two-line learned delta, and the checked-in report. If connectivity is reliable, run one fresh trial. Never depend on a fresh model run to finish the demo.</aside>
+    </section>
+
+    <section class="slide benchmarks-slide" id="slide-11" data-title="Recorded held-out result" data-duration="2 minutes">
+      <span class="slide-meta">Slide 11 | Recorded held-out result | 2 minutes</span>
+      <h2>Recorded held-out result</h2>
+      <p class="benchmark-summary">Six real runs on the same Go configuration task, graded with hidden tests after each agent exits.</p>
+      <div class="benchmark-layout">
+        <div class="benchmark-metrics">
+          <div class="benchmark-metric"><strong>3/3</strong><span>baseline passes</span></div>
+          <div class="benchmark-metric"><strong>3/3</strong><span>learned-guidance passes</span></div>
+          <div class="benchmark-metric"><strong>−40.2%</strong><span>median reported tokens</span></div>
+          <div class="benchmark-metric"><strong>−17.0%</strong><span>median wall time</span></div>
+        </div>
+        <div class="benchmark-rules">
+          <div class="benchmark-rule"><span>01</span><div><strong>Stay on the executable path</strong><p>Start with the active loader and tests. Ignore the compatibility file unless the production call graph reaches it.</p></div></div>
+          <div class="benchmark-rule"><span>02</span><div><strong>Keep Go's cache inside the workspace</strong><p>Use a repository-local GOCACHE when the sandbox blocks writes to the user cache.</p></div></div>
+        </div>
+      </div>
+      <p class="benchmark-caveat">One task, one model, three trials per condition. This demonstrates the mechanism, not a universal performance claim.</p>
+      <aside class="slide-notes">Report the narrow result exactly. The model was gpt-5.6-luna at low reasoning effort. Baseline median was 90,724 reported tokens, 5 commands, and 27.9 seconds. Learned median was 54,274 tokens, 3 commands, and 23.1 seconds. All trials passed the same held-out verifier. The current suite runner supports multiple tasks and single-rule ablations, but those new results have not been recorded yet.</aside>
+    </section>
+
+    <section class="slide repo-qr-slide" id="slide-12" data-title="Scan to use agentsmd-cli" data-duration="0.5 minute">
+      <span class="slide-meta">Slide 12 | Scan to use agentsmd-cli | 0.5 minute</span>
+      <h2>Scan to use agentsmd-cli</h2>
+      <img class="repo-qr" src="assets/agentsmd-cli-qr.png" alt="QR code for the agentsmd-cli GitHub repository" />
+      <a class="repo-url" href="https://github.com/rudrakshkarpe/agentsmd-cli">github.com/rudrakshkarpe/agentsmd-cli</a>
+      <p class="repo-cta">Scan to use it, contribute to it, and share your feedback.</p>
+      <aside class="slide-notes">Invite the audience to scan the QR code, try agentsmd-cli, contribute to the repository, and share feedback.</aside>
+    </section>
+
+    <section class="slide qna-slide" id="slide-13" data-title="Q&amp;A" data-duration="4 minutes">
+      <span class="slide-meta">Slide 13 | Q&amp;A | 4 minutes</span>
+      <h2 class="qna-title">Q&amp;A</h2>
+      <aside class="slide-notes">Open the floor for audience questions.</aside>
+    </section>
+  </main>
+
+  <nav id="dots" aria-label="Slide navigation"></nav>
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const dots = document.getElementById("dots");
+    const count = document.getElementById("count");
+    let current = 0;
+
+    slides.forEach((slide, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.setAttribute("aria-label", `Go to slide ${index + 1}`);
+      button.addEventListener("click", () => go(index));
+      dots.appendChild(button);
+    });
+
+    function go(next) {
+      current = (next + slides.length) % slides.length;
+      slides.forEach((slide, index) => slide.classList.toggle("on", index === current));
+      [...dots.children].forEach((dot, index) => dot.classList.toggle("on", index === current));
+      count.textContent = `${current + 1} / ${slides.length}`;
+    }
+
+    go(0);
+    window.addEventListener("keydown", event => {
+      if (["ArrowRight", " ", "PageDown"].includes(event.key)) {
+        event.preventDefault();
+        go(current + 1);
+      }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) {
+        event.preventDefault();
+        go(current - 1);
+      }
+      if (event.key === "Home") go(0);
+      if (event.key === "End") go(slides.length - 1);
+      if (event.key.toLowerCase() === "f") document.documentElement.requestFullscreen?.();
+    });
+  </script>
+</body>
+</html>

@@ -403,7 +403,7 @@ The CLI is one consumer of reusable packages:
 - [x] Checksummed macOS and Linux release archives with a shell installer
 - [ ] Signed releases and Homebrew installation
 
-See the [development roadmap](ROADMAP.md), [120-slice commit plan](docs/COMMIT-ROADMAP.md), and [AgentCon demo plan](docs/AGENTCON-DEMO.md).
+See the [development roadmap](ROADMAP.md), [120-slice commit plan](docs/COMMIT-ROADMAP.md), [AgentCon demo plan](docs/AGENTCON-DEMO.md), and [presentation deck](presentation/README.md).
 
 ## AgentCon Japan
 
