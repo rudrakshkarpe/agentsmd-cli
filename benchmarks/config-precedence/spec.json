@@ -10,5 +10,15 @@
   "verify": ["go", "test", "./..."],
   "agent": "codex",
   "model": "gpt-5.6-luna",
-  "reasoning_effort": "low"
+  "reasoning_effort": "low",
+  "ablations": [
+    {
+      "id": "production-path",
+      "rule": "- For `envmerge` configuration bugs, begin with `internal/config/loader.go` and `loader_test.go`; do not inspect or modify `legacy.go` unless the production call graph reaches it."
+    },
+    {
+      "id": "workspace-cache",
+      "rule": "- In a restricted workspace, create `.cache/go-build` and run Go tests with `GOCACHE=$PWD/.cache/go-build`; the default user cache may be outside the sandbox."
+    }
+  ]
 }

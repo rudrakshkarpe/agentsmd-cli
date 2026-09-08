@@ -1,0 +1,7 @@
+{
+  "name": "agentsmd-held-out-v1",
+  "specs": [
+    "config-precedence/spec.json",
+    "timeout-units/spec.json"
+  ]
+}

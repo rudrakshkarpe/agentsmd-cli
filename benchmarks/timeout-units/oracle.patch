@@ -1,0 +1,29 @@
+diff --git a/internal/retry/policy.go b/internal/retry/policy.go
+--- a/internal/retry/policy.go
++++ b/internal/retry/policy.go
+@@ -3,21 +3,23 @@
+ import (
+ 	"fmt"
+ 	"os"
++	"strconv"
+ 	"time"
+ )
+ 
+ const defaultDelay = 2 * time.Second
+ 
+ func Delay() (time.Duration, error) {
+ 	raw, ok := os.LookupEnv("RETRY_DELAY_MS")
+ 	if !ok {
+ 		return defaultDelay, nil
+ 	}
+-	delay, err := time.ParseDuration(raw)
++	milliseconds, err := strconv.ParseInt(raw, 10, 64)
+ 	if err != nil {
+ 		return 0, fmt.Errorf("parse RETRY_DELAY_MS: %w", err)
+ 	}
++	delay := time.Duration(milliseconds) * time.Millisecond
+ 	if delay < 0 {
+ 		return 0, fmt.Errorf("RETRY_DELAY_MS must not be negative")
+ 	}
+ 	return delay, nil
+ }

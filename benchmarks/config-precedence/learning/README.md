@@ -35,4 +35,4 @@ same task, fresh workspace, hidden verifier
 promote only after the gate passes
 ```
 
-The benchmark compares the two-rule bundle, so it cannot assign the measured token or duration change to either rule individually. A larger claim requires single-rule ablations, more tasks, models, and trials.
+The checked-in `study-v1` result compares the two-rule bundle, so that historical result cannot assign its token or duration change to either rule individually. The current spec now declares both rules for the suite runner, which creates one condition per omitted rule. A larger claim still requires recording those ablations across more tasks, models, and trials.

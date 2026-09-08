@@ -22,18 +22,24 @@ import (
 )
 
 type Spec struct {
-	Name        string   `json:"name"`
-	Task        string   `json:"task"`
-	Prompt      string   `json:"prompt"`
-	Fixture     string   `json:"fixture"`
-	Baseline    string   `json:"baseline_agents_md"`
-	Learned     string   `json:"learned_agents_md"`
-	HeldOut     string   `json:"held_out"`
-	Verify      []string `json:"verify"`
-	Agent       string   `json:"agent"`
-	Model       string   `json:"model"`
-	Reasoning   string   `json:"reasoning_effort,omitempty"`
-	Description string   `json:"description,omitempty"`
+	Name        string     `json:"name"`
+	Task        string     `json:"task"`
+	Prompt      string     `json:"prompt"`
+	Fixture     string     `json:"fixture"`
+	Baseline    string     `json:"baseline_agents_md"`
+	Learned     string     `json:"learned_agents_md"`
+	HeldOut     string     `json:"held_out"`
+	Verify      []string   `json:"verify"`
+	Agent       string     `json:"agent"`
+	Model       string     `json:"model"`
+	Reasoning   string     `json:"reasoning_effort,omitempty"`
+	Description string     `json:"description,omitempty"`
+	Ablations   []Ablation `json:"ablations,omitempty"`
+}
+
+type Ablation struct {
+	ID   string `json:"id"`
+	Rule string `json:"rule"`
 }
 
 type Runner struct {
@@ -45,6 +51,7 @@ type Runner struct {
 
 type Run struct {
 	ID             string   `json:"id"`
+	Task           string   `json:"task"`
 	Condition      string   `json:"condition"`
 	Trial          int      `json:"trial"`
 	Passed         bool     `json:"passed"`
@@ -83,6 +90,23 @@ func LoadSpec(path string) (Spec, error) {
 	if spec.Agent == "" {
 		spec.Agent = "agent"
 	}
+	learned, err := os.ReadFile(filepath.Join(filepath.Dir(path), spec.Learned))
+	if err != nil {
+		return Spec{}, fmt.Errorf("read learned AGENTS.md: %w", err)
+	}
+	seen := map[string]bool{}
+	for _, ablation := range spec.Ablations {
+		if ablation.ID == "" || session.SafeName(ablation.ID) != ablation.ID || ablation.Rule == "" {
+			return Spec{}, fmt.Errorf("ablation requires a filesystem-safe id and exact rule line")
+		}
+		if seen[ablation.ID] {
+			return Spec{}, fmt.Errorf("duplicate ablation id %q", ablation.ID)
+		}
+		seen[ablation.ID] = true
+		if countRuleLines(learned, ablation.Rule) != 1 {
+			return Spec{}, fmt.Errorf("ablation %q rule must occur exactly once in learned AGENTS.md", ablation.ID)
+		}
+	}
 	return spec, nil
 }
 
@@ -104,10 +128,10 @@ func (r *Runner) Run(ctx context.Context, specPath string, spec Spec) (Report, e
 		return Report{}, err
 	}
 	report := Report{SchemaVersion: 1, Spec: spec, GeneratedAt: time.Now().UTC(), Runs: []Run{}}
-	conditions := []struct{ name, guide string }{{"baseline", spec.Baseline}, {"learned", spec.Learned}}
+	conditions := benchmarkConditions(spec)
 	for _, condition := range conditions {
 		for trial := 1; trial <= r.Seeds; trial++ {
-			result, err := r.runOne(ctx, base, spec, condition.name, condition.guide, trial)
+			result, err := r.runOne(ctx, base, spec, condition, trial)
 			if err != nil {
 				return report, err
 			}
@@ -120,16 +144,33 @@ func (r *Runner) Run(ctx context.Context, specPath string, spec Spec) (Report, e
 	return report, saveReport(r.OutputDir, report)
 }
 
-func (r *Runner) runOne(ctx context.Context, base string, spec Spec, condition, guide string, trial int) (Run, error) {
-	id := condition + "-" + strconv.Itoa(trial)
+type benchmarkCondition struct {
+	Name       string
+	Guide      string
+	RemoveRule string
+}
+
+func benchmarkConditions(spec Spec) []benchmarkCondition {
+	result := []benchmarkCondition{{Name: "baseline", Guide: spec.Baseline}, {Name: "learned", Guide: spec.Learned}}
+	for _, ablation := range spec.Ablations {
+		result = append(result, benchmarkCondition{Name: "without-" + ablation.ID, Guide: spec.Learned, RemoveRule: ablation.Rule})
+	}
+	return result
+}
+
+func (r *Runner) runOne(ctx context.Context, base string, spec Spec, condition benchmarkCondition, trial int) (Run, error) {
+	id := condition.Name + "-" + strconv.Itoa(trial)
 	artifactDir := filepath.Join(r.OutputDir, id)
 	workspace := filepath.Join(artifactDir, "workspace")
 	if err := copyTree(filepath.Join(base, spec.Fixture), workspace); err != nil {
 		return Run{}, err
 	}
-	guideData, err := os.ReadFile(filepath.Join(base, guide))
+	guideData, err := os.ReadFile(filepath.Join(base, condition.Guide))
 	if err != nil {
 		return Run{}, err
+	}
+	if condition.RemoveRule != "" {
+		guideData = removeRuleLine(guideData, condition.RemoveRule)
 	}
 	if err := os.WriteFile(filepath.Join(workspace, "AGENTS.md"), guideData, 0o644); err != nil {
 		return Run{}, err
@@ -150,7 +191,7 @@ func (r *Runner) runOne(ctx context.Context, base string, spec Spec, condition, 
 	command := exec.CommandContext(runCtx, r.AgentCommand[0], r.AgentCommand[1:]...)
 	command.Dir = workspace
 	command.Stdin = strings.NewReader(spec.Prompt + "\n")
-	command.Env = append(os.Environ(), "AGENTSMDBENCH_TRIAL="+strconv.Itoa(trial), "AGENTSMDBENCH_CONDITION="+condition)
+	command.Env = append(os.Environ(), "AGENTSMDBENCH_TRIAL="+strconv.Itoa(trial), "AGENTSMDBENCH_CONDITION="+condition.Name, "AGENTSMDBENCH_TASK="+spec.Task)
 	var stdout, stderr bytes.Buffer
 	command.Stdout, command.Stderr = &stdout, &stderr
 	agentErr := command.Run()
@@ -163,7 +204,7 @@ func (r *Runner) runOne(ctx context.Context, base string, spec Spec, condition, 
 	}
 	trajectory := parseJSONL(stdout.Bytes())
 	trajectory.SessionID, trajectory.Tool, trajectory.Task = id, spec.Agent, spec.Task
-	trajectory.Metadata = map[string]string{"condition": condition, "trial": strconv.Itoa(trial), "model": spec.Model}
+	trajectory.Metadata = map[string]string{"condition": condition.Name, "trial": strconv.Itoa(trial), "model": spec.Model}
 	if err := session.Complete(p, &trajectory, spec.Agent, ended); err != nil {
 		return Run{}, err
 	}
@@ -211,7 +252,30 @@ func (r *Runner) runOne(ctx context.Context, base string, spec Spec, condition, 
 	if err := os.RemoveAll(filepath.Join(workspace, project.DirName)); err != nil {
 		return Run{}, err
 	}
-	return Run{ID: id, Condition: condition, Trial: trial, Passed: passed, AgentExitCode: exitCode(agentErr), VerifyExitCode: exitCode(verifyErr), InputTokens: trajectory.Tokens.Input, CachedTokens: trajectory.Tokens.Cached, OutputTokens: trajectory.Tokens.Output, Commands: len(trajectory.Commands), FilesChanged: files, DurationS: ended.Sub(start).Seconds(), ArtifactDir: id}, nil
+	return Run{ID: id, Task: spec.Task, Condition: condition.Name, Trial: trial, Passed: passed, AgentExitCode: exitCode(agentErr), VerifyExitCode: exitCode(verifyErr), InputTokens: trajectory.Tokens.Input, CachedTokens: trajectory.Tokens.Cached, OutputTokens: trajectory.Tokens.Output, Commands: len(trajectory.Commands), FilesChanged: files, DurationS: ended.Sub(start).Seconds(), ArtifactDir: id}, nil
+}
+
+func countRuleLines(data []byte, rule string) int {
+	wanted := strings.TrimSpace(rule)
+	count := 0
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.TrimSpace(line) == wanted {
+			count++
+		}
+	}
+	return count
+}
+
+func removeRuleLine(data []byte, rule string) []byte {
+	wanted := strings.TrimSpace(rule)
+	lines := strings.Split(string(data), "\n")
+	result := make([]string, 0, len(lines))
+	for _, line := range lines {
+		if strings.TrimSpace(line) != wanted {
+			result = append(result, line)
+		}
+	}
+	return []byte(strings.Join(result, "\n"))
 }
 
 func parseJSONL(data []byte) schema.Trajectory {
@@ -274,7 +338,9 @@ func renderMarkdown(report Report) string {
 	for _, run := range report.Runs {
 		fmt.Fprintf(&out, "| %s | %d | %t | %d | %d | %.1fs |\n", run.Condition, run.Trial, run.Passed, run.TotalTokens(), run.Commands, run.DurationS)
 	}
-	for _, condition := range []string{"baseline", "learned"} {
+	conditions := benchmarkConditions(report.Spec)
+	for _, item := range conditions {
+		condition := item.Name
 		selected := selectRuns(report.Runs, condition)
 		fmt.Fprintf(&out, "\n**%s:** %.0f%% success, median %d tokens, median %d commands, median %.1fs.\n", condition, successRate(selected), medianInts(selected, func(r Run) int { return r.TotalTokens() }), medianInts(selected, func(r Run) int { return r.Commands }), medianDurations(selected))
 	}

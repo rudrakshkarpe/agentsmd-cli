@@ -31,7 +31,7 @@ Phased, not dated. Each phase is independently useful and shippable.
 - [x] Queue reflection outside latency-sensitive hooks with durable job results.
 - [ ] Add explicit recovery for interrupted/stale worker locks.
 - [x] Require an evaluation command and confidence threshold for opt-in automatic promotion.
-- [ ] Compare equivalent tasks before and after a promoted rule using success rate, regressions, tokens, and completion time.
+- [x] Compare equivalent benchmark tasks before and after a promoted rule using success rate, regressions, tokens, and completion time.
 - [ ] Keep raw transcripts local by default and support configurable redaction before any external reflector receives a trajectory.
 
 Definition of done: a Codex, Claude Code, Cursor, or goose task can be traced from capture to proposal, promotion, and a later measured outcome without manual bookkeeping. Promotion remains gated by a human or evaluation policy.
