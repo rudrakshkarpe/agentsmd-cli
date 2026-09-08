@@ -29,7 +29,7 @@ Phased, not dated. Each phase is independently useful and shippable.
 - [x] Provide local `sessions` and `sessions show` inspection.
 - [x] Add task-level `progress` comparisons.
 - [x] Queue reflection outside latency-sensitive hooks with durable job results.
-- [ ] Add explicit recovery for interrupted/stale worker locks.
+- [x] Add explicit recovery for interrupted/stale worker locks.
 - [x] Require an evaluation command and confidence threshold for opt-in automatic promotion.
 - [x] Compare equivalent benchmark tasks before and after a promoted rule using success rate, regressions, tokens, and completion time.
 - [x] Keep raw transcripts local by default and support configurable redaction before any external reflector receives a trajectory.

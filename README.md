@@ -160,6 +160,17 @@ agentsmd sessions
 agentsmd sessions show <run-id>
 ```
 
+`agentsmd doctor` also inspects the durable reflection queue. If a machine or
+worker stopped while a job was marked as processing, recover it safely with:
+
+```bash
+agentsmd doctor --repair
+```
+
+Worker locks record their process, host, and start time. Repair removes only
+locks older than the 15-minute processing window and requeues only processing
+jobs that no longer have a lock. It leaves fresh locks and failed jobs intact.
+
 Sessions on a feature branch are grouped automatically. For work that spans
 branches or happens on `main`, set an explicit logical task and inspect its
 before/after progress:
@@ -360,6 +371,7 @@ The CLI is one consumer of reusable packages:
 
 - Local-first storage; no transcript upload is required by the core.
 - Configurable RE2 redaction scrubs the copy passed to an external reflector while preserving local evidence.
+- Queue recovery never removes a fresh worker lock or silently retries a completed or failed reflection.
 - Learned rules never bypass the pending-review gate.
 - Automatic promotion is disabled by default and cannot be enabled without an evaluation command.
 - Whole-file reflective rewrites are avoided; learning produces targeted deltas.
