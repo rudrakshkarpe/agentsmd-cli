@@ -66,6 +66,7 @@ func (p *Project) QueueDir() string        { return filepath.Join(p.StateDir(), 
 func (p *Project) EvaluationsDir() string  { return filepath.Join(p.StateDir(), "evaluations") }
 func (p *Project) InboxDir() string        { return filepath.Join(p.StateDir(), "inbox") }
 func (p *Project) AutomationPath() string  { return filepath.Join(p.StateDir(), "automation.json") }
+func (p *Project) ActiveTaskPath() string  { return filepath.Join(p.StateDir(), "active-task.json") }
 
 func (p *Project) Scaffold() error {
 	for _, path := range []string{p.StateDir(), p.VersionsDir(), p.PendingDir(), p.RunsDir(), p.SessionsDir(), p.QueueDir(), p.EvaluationsDir(), p.InboxDir()} {
