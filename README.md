@@ -146,6 +146,21 @@ agentsmd sessions
 agentsmd sessions show <run-id>
 ```
 
+Sessions on a feature branch are grouped automatically. For work that spans
+branches or happens on `main`, set an explicit logical task and inspect its
+before/after progress:
+
+```bash
+agentsmd task start "Fix parser regression" --id parser-regression
+# Run one or more connected coding-agent sessions.
+agentsmd progress parser-regression
+agentsmd task end
+```
+
+Task identity precedence is provider task id, `AGENTSMD_TASK_ID`, explicit
+project task, non-default Git branch, then a run-scoped fallback. The fallback
+intentionally avoids combining unrelated sessions on `main`.
+
 A reflector—or a person—can propose one targeted lesson, which stays pending until reviewed:
 
 ```bash
@@ -263,6 +278,8 @@ All connectors capture start/end lifecycle events into a provider-neutral trajec
 | Configure automatic reflection and gating | `agentsmd automate` |
 | Diagnose the local setup | `agentsmd doctor` |
 | Inspect measured sessions | `agentsmd sessions`, `agentsmd sessions show RUN` |
+| Correlate related sessions | `agentsmd task start LABEL`, `agentsmd task end` |
+| Compare task progress | `agentsmd progress [TASK]` |
 | Review the improvement queue | `agentsmd pending`, `agentsmd promote ID`, `agentsmd reject ID` |
 | Propose a targeted rule | `agentsmd learn ...` |
 | Compare static and learned guidance | `agentsmd benchmark --spec PATH` |
@@ -331,13 +348,13 @@ The CLI is one consumer of reusable packages:
 - [ ] Multi-task held-out benchmark with single-rule ablations
 - [x] Codex, Claude Code, Cursor, and goose lifecycle connectors
 - [ ] Rich transcript normalization beyond Claude Code
-- [ ] Logical-task identity across related sessions
+- [x] Logical-task identity across related sessions
 - [x] Provider-qualified session identity and automatic Git/duration evidence capture
 - [x] Configurable command/test outcome capture through the evaluation gate
 - [x] Local session listing and complete run inspection
 - [x] Idempotent background reflection queue
 - [x] Opt-in automatic promotion behind evaluation and confidence gates
-- [ ] Logical-task correlation and before/after progress comparisons
+- [x] Logical-task correlation and before/after progress comparisons
 - [ ] Watch daemon with session staleness detection
 - [ ] Offline GEPA optimization bridge
 - [x] Reproducible benchmark report and token-usage evidence

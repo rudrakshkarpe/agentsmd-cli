@@ -23,11 +23,11 @@ Phased, not dated. Each phase is independently useful and shippable.
 
 ## Phase 4 — cross-CLI session tracking
 - [x] Give every run a provider-qualified ID.
-- [ ] Correlate related runs under a stable logical task ID.
+- [x] Correlate related runs under a stable logical task ID.
 - [x] Capture session-start and session-end lifecycle events without duplicating completed reflection jobs.
 - [x] Record timestamps, working tree revisions, changed files, final diffs, evaluation outcomes, wall time, model, provider, and available tokens.
 - [x] Provide local `sessions` and `sessions show` inspection.
-- [ ] Add task-level `progress` comparisons.
+- [x] Add task-level `progress` comparisons.
 - [x] Queue reflection outside latency-sensitive hooks with durable job results.
 - [ ] Add explicit recovery for interrupted/stale worker locks.
 - [x] Require an evaluation command and confidence threshold for opt-in automatic promotion.

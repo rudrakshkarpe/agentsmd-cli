@@ -99,6 +99,8 @@ func commandIcon(name string) string {
 		"doctor":    "🩺",
 		"update":    "🔄",
 		"sessions":  "📡",
+		"task":      "🎯",
+		"progress":  "📈",
 		"benchmark": "🧪",
 		"learn":     "✨",
 		"pending":   "⏳",
@@ -134,7 +136,7 @@ func printHelp(cmd *cobra.Command) {
 	if len(children) > 0 {
 		order := map[string]int{
 			"init": 0, "templates": 1, "connect": 2, "automate": 3, "doctor": 4,
-			"update": 5, "sessions": 6, "benchmark": 7, "learn": 8, "pending": 9, "promote": 10, "reject": 11,
+			"update": 5, "sessions": 6, "task": 7, "progress": 8, "benchmark": 9, "learn": 10, "pending": 11, "promote": 12, "reject": 13,
 		}
 		sort.SliceStable(children, func(i, j int) bool {
 			left, leftOK := order[children[i].Name()]
