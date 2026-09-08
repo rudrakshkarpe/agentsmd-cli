@@ -53,7 +53,11 @@ func Process(ctx context.Context, p *project.Project, trajectoryPath string) (Re
 	if trajectory.Metadata == nil {
 		trajectory.Metadata = map[string]string{}
 	}
-	proposal, reflected, err := learning.New(p).Learn(ctx, trajectory, reflector.Command{Argv: config.ReflectCommand, Timeout: 2 * time.Minute})
+	var reflection reflector.Reflector = reflector.Command{Argv: config.ReflectCommand, Timeout: 2 * time.Minute}
+	if len(config.RedactPatterns) > 0 {
+		reflection = reflector.Redacting{Next: reflection, Patterns: config.RedactPatterns}
+	}
+	proposal, reflected, err := learning.New(p).Learn(ctx, trajectory, reflection)
 	if err != nil {
 		return Result{}, err
 	}
