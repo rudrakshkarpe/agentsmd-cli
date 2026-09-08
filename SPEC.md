@@ -13,7 +13,7 @@ Every CLI logs differently; the adapter's only job is to emit this shape.
 {
   "session_id": "string",
   "tool": "claude | codex | cursor | goose",
-  "task": "string, optional task id",
+  "task": "string, stable logical task id",
   "steps": [{ "role": "assistant|tool", "summary": "string" }],
   "tool_calls": [{ "name": "string", "args": {}, "result": "string" }],
   "files_touched": [{ "path": "string", "diff": "unified diff" }],
@@ -24,6 +24,12 @@ Every CLI logs differently; the adapter's only job is to emit this shape.
   "final_diff": "unified diff of the artifact under review"
 }
 ```
+
+`task` correlates related sessions without weakening provider-qualified
+`session_id` uniqueness. Implementations should prefer an explicit provider
+task id, then project-owned active-task state, then a non-default Git branch.
+If no trustworthy correlation signal exists, use a run-scoped task id rather
+than grouping unrelated work heuristically.
 
 ## 2. Ledger
 
