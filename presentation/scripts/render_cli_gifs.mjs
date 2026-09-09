@@ -48,8 +48,7 @@ const learning = {
     { command: "agentsmd learn --task config-precedence --run baseline-1 --rule \"Keep GOCACHE inside restricted workspaces.\"", output: [["✓ proposed p1788976929754666000", "ok"]] },
     { command: "agentsmd pending", output: [["⏳ p1788976929754666000  task=config-precedence", "warn"], ["Keep GOCACHE inside restricted workspaces.", "soft"]] },
     { command: "agentsmd promote p1788976929754666000", output: [["✓ promoted r000", "ok"]] },
-    { command: "agentsmd blame", output: [["[r000] run=baseline-1 task=config-precedence cited=0", "dim"], ["Keep GOCACHE inside restricted workspaces.", "rule"]] },
-    { command: "agentsmd progress empty-environment-override", output: [["runs=2  success=2/2  duration=30.0s→20.0s (-33.2%)", "ok"], ["tokens=102024→44132 (-56.7%)", "ok"]] }
+    { command: "agentsmd blame", output: [["[r000] run=baseline-1 task=config-precedence cited=0", "dim"], ["Keep GOCACHE inside restricted workspaces.", "rule"]] }
   ]
 };
 

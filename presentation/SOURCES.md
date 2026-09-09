@@ -2,15 +2,13 @@
 
 Claims in the deck should be traceable to these sources.
 
-## Product and benchmark
+## Product implementation
 
 - The CLI workflow and implemented features come from this repository's
   [`README.md`](../README.md), [`SPEC.md`](../SPEC.md), and
   [`ROADMAP.md`](../ROADMAP.md).
-- The six-run result comes from
-  [`benchmarks/config-precedence/results/study-v1/report.md`](../benchmarks/config-precedence/results/study-v1/report.md).
-- The evidence-to-rule chain comes from
-  [`benchmarks/config-precedence/learning/README.md`](../benchmarks/config-precedence/learning/README.md).
+- The evidence-to-rule chain comes from the repository's learning packages,
+  tests, and [`docs/AGENTCON-DEMO.md`](../docs/AGENTCON-DEMO.md).
 - The stage workflow comes from
   [`docs/AGENTCON-DEMO.md`](../docs/AGENTCON-DEMO.md).
 
@@ -29,16 +27,14 @@ The five community-post screenshots were supplied by the speaker. They retain
 the visible account, date, and engagement context and are presented as opinions,
 not as measured product evidence.
 
-## Benchmark methodology
+## Reflection and evaluation references
 
-- [Terminal-Bench](https://github.com/harbor-framework/terminal-bench)
-- [SWE-bench](https://github.com/SWE-bench/SWE-bench)
 - [GEPA](https://arxiv.org/abs/2507.19457)
 - [ACE](https://arxiv.org/abs/2510.04618)
 
-Terminal-Bench and SWE-bench motivate isolated tasks and executable
-verification. GEPA and ACE motivate reflection and incremental instruction
-updates. The local study is smaller and should be described as such.
+GEPA and ACE motivate reflection and incremental instruction updates. The deck
+uses them as conceptual references; it does not claim to reproduce either
+system end to end.
 
 ## Presentation structure
 

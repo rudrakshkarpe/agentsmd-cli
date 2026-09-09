@@ -857,72 +857,6 @@
       font-size: clamp(12px, 1.08vw, 15px);
     }
     .demo-proof strong { color: var(--fg); }
-    .benchmark-summary {
-      max-width: 900px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: clamp(13px, 1.18vw, 16px);
-    }
-    .benchmark-layout {
-      display: grid;
-      grid-template-columns: .9fr 1.1fr;
-      gap: 38px;
-      margin-top: 22px;
-      align-items: stretch;
-    }
-    .benchmark-metrics {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px 24px;
-      align-content: center;
-    }
-    .benchmark-metric {
-      border-top: 2px solid var(--blue);
-      padding-top: 10px;
-    }
-    .benchmark-metric strong {
-      display: block;
-      color: #20f0ab;
-      font: 700 clamp(24px, 2.8vw, 38px)/1 Consolas, ui-monospace, monospace;
-    }
-    .benchmark-metric span {
-      display: block;
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: clamp(11px, 1vw, 14px);
-    }
-    .benchmark-rules {
-      display: grid;
-      gap: 16px;
-      align-content: center;
-    }
-    .benchmark-rule {
-      display: grid;
-      grid-template-columns: 36px 1fr;
-      gap: 12px;
-    }
-    .benchmark-rule > span {
-      color: var(--blue);
-      font: 700 12px/1.4 Consolas, ui-monospace, monospace;
-    }
-    .benchmark-rule strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: clamp(14px, 1.22vw, 17px);
-    }
-    .benchmark-rule p {
-      color: var(--muted);
-      font-size: clamp(11px, 1vw, 14px);
-    }
-    .benchmark-caveat {
-      position: absolute;
-      left: 4%;
-      right: 4%;
-      bottom: 7.8%;
-      color: var(--muted);
-      text-align: center;
-      font: 11px/1.35 Consolas, ui-monospace, monospace;
-    }
     .repo-qr-slide {
       text-align: center;
     }
@@ -1037,7 +971,7 @@
     .brand { display: none; }
     .slide { padding: 9.2% 5.2% 8%; background: #f4f5f7; color: #111318; }
     .title-slide, .experience-slide, .learning-terminal-slide,
-    .benchmarks-slide, .qna-slide { background: #0b0c0f; color: #fff; }
+    .qna-slide { background: #0b0c0f; color: #fff; }
     .footer { left: 5.2%; right: 5.2%; color: #747b86; }
     .footer span:first-child { letter-spacing: .02em; }
     .hint { color: #8b929c; }
@@ -1047,7 +981,7 @@
     .subtitle, .card p, .cli-summary, .discipline-intro,
     .feedback-intro, .authoring-statement { color: #68707c; }
     .title-slide .subtitle, .experience-slide .subtitle,
-    .learning-terminal-slide .subtitle, .benchmarks-slide .benchmark-summary { color: #aeb5c0; }
+    .learning-terminal-slide .subtitle { color: #aeb5c0; }
     .card { background: transparent; border: 0; border-top: 2px solid #2478e5; padding: 18px 0; }
     .speaker-card { border-top: 0; }
     .eyebrow, .label, .problem-number, .discipline-rule > span { color: #2478e5; }
@@ -1073,16 +1007,6 @@
     .file-pane header { padding: 13px 18px; border-bottom: 1px solid #30343c; color: #9ba2ad; font: 700 12px Consolas, monospace; }
     .file-pane pre { min-height: 300px; margin: 0; padding: 20px; color: #d8dde6; font: 500 clamp(11px,.92vw,15px)/1.55 Consolas, monospace; white-space: pre-wrap; }
     .file-pane .added { display: block; margin: 0 -17px; padding: 0 17px; background: #123525; color: #9be5bc; }
-    .benchmark-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; margin-top: 30px; }
-    .benchmark-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-    .benchmark-metric { border-top: 2px solid #75b6ff; padding-top: 10px; }
-    .benchmark-metric strong { display: block; color: #66d6a3; font: 700 clamp(27px,3vw,42px)/1 Consolas, monospace; }
-    .benchmark-metric span { display: block; margin-top: 8px; color: #aeb5c0; font-size: clamp(10px,.9vw,13px); }
-    .benchmark-bars { display: grid; gap: 22px; align-content: center; }
-    .bar-label { display: flex; justify-content: space-between; margin-bottom: 7px; color: #cbd1da; font: 600 11px Consolas, monospace; }
-    .bar-track { height: 13px; overflow: hidden; border-radius: 8px; background: #242830; }
-    .bar-fill { height: 100%; border-radius: 8px; background: #667180; } .bar-fill.learned { background: #66d6a3; }
-    .benchmark-caveat { position: absolute; left: 5.2%; right: 5.2%; bottom: 7.5%; color: #89909b; text-align: center; font: 500 10px Consolas, monospace; }
 
     /* Interactive stage and motion system, adapted to the agentsmd story. */
     :root { --sans: "Poppins", "Noto Sans JP", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; }
@@ -1124,16 +1048,6 @@
       --success: #16865b;
       --warning: #a96a00;
     }
-    .stage::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 83% 18%, color-mix(in srgb, var(--signal) 9%, transparent), transparent 27%),
-        linear-gradient(115deg, transparent 0 62%, color-mix(in srgb, var(--signal) 3%, transparent) 62% 63%, transparent 63%);
-    }
     .slide {
       z-index: 1;
       padding: 10% 6.2% 9%;
@@ -1160,26 +1074,14 @@
     .card, .file-pane, .clean-terminal { border-color: var(--line); }
     .card { border-top-color: var(--signal); }
     .speaker-photo { border-radius: 18px; border-color: var(--line); box-shadow: 0 18px 44px rgba(0,0,0,.18); }
-    .stage-progress { position: absolute; top: 0; left: 0; z-index: 8; height: 4px; background: var(--signal); transition: width .35s cubic-bezier(.16,1,.3,1); }
     .deck-chrome { position: absolute; inset: 0; z-index: 7; pointer-events: none; }
-    .chrome-top, .chrome-bottom { position: absolute; left: 6.2%; right: 6.2%; display: flex; align-items: center; justify-content: space-between; color: var(--ink-faint); font: 500 clamp(8px,.75vw,13px)/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-    .chrome-top { top: 4.1%; }
-    .chrome-bottom { bottom: 4.1%; }
-    .chrome-mark, .chrome-end { display: flex; align-items: center; gap: 12px; }
-    .chrome-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 14px color-mix(in srgb, var(--signal) 70%, transparent); }
-    .page-pill { padding: 7px 12px; border-radius: 999px; background: color-mix(in srgb, var(--ink-faint) 16%, transparent); color: var(--ink-dim); }
-    .source-trigger { border: 0; background: none; color: var(--ink-faint); cursor: pointer; font: 500 clamp(8px,.75vw,13px)/1 var(--mono); letter-spacing: .08em; pointer-events: auto; text-transform: uppercase; }
-    .theme-toggle { display: flex; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); pointer-events: auto; }
-    .theme-toggle button { border: 0; padding: 6px 11px; background: transparent; color: var(--ink-faint); cursor: pointer; font: 500 clamp(7px,.65vw,11px)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
-    .theme-toggle button.on { background: var(--signal); color: #fff; }
+    .chrome-bottom { position: absolute; right: 4.2%; bottom: 3.4%; display: flex; align-items: center; color: var(--ink-faint); }
+    .chrome-end { display: flex; align-items: center; gap: 12px; }
+    .page-pill { color: var(--ink-faint); font: 500 clamp(8px,.7vw,11px)/1 var(--mono); letter-spacing: .04em; }
     .fragment { opacity: 0; transform: translateY(12px); transition: opacity .38s ease, transform .48s cubic-bezier(.16,1,.3,1); }
     .fragment.shown { opacity: 1; transform: none; }
     .slide.on > .fragment:not(.shown) { opacity: 0 !important; transform: translateY(12px) !important; animation: none !important; }
     .title-group { position: relative; z-index: 1; }
-    .title-group::before, .title-group::after { content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; border: 1px solid color-mix(in srgb, var(--signal) 35%, transparent); border-radius: 50%; transform: translate(-50%,-50%); animation: signal-orbit 9s linear infinite; }
-    .title-group::before { width: 120%; aspect-ratio: 2.6; }
-    .title-group::after { width: 105%; aspect-ratio: 2.9; animation-direction: reverse; animation-duration: 13s; }
-    @keyframes signal-orbit { 50% { transform: translate(-50%,-50%) scale(1.035); opacity: .45; } }
     .architecture-arrow { animation: arrow-pulse 1.8s ease-in-out infinite; }
     @keyframes arrow-pulse { 50% { transform: translateX(6px); color: var(--success); } }
     .architecture-return { position: relative; overflow: hidden; }
@@ -1189,9 +1091,6 @@
     .clean-terminal:hover { transform: translateY(-5px); box-shadow: 0 30px 70px rgba(0,0,0,.34); }
     .file-pane .added { animation: rule-glow 2.2s ease-in-out infinite alternate; }
     @keyframes rule-glow { to { background: #165038; } }
-    .benchmark-metric strong { color: var(--success); }
-    .bar-fill.learned { background: var(--success); animation: bar-grow .85s cubic-bezier(.16,1,.3,1) both; transform-origin: left; }
-    @keyframes bar-grow { from { transform: scaleX(0); } }
     .deck-overlay { position: fixed; inset: 0; z-index: 30; display: none; overflow: auto; padding: 4vw; background: rgba(0,0,0,.96); color: #fafafa; font-family: var(--sans); }
     .deck-overlay.on { display: block; animation: overlay-in .22s ease both; }
     @keyframes overlay-in { from { opacity: 0; } }
@@ -1241,13 +1140,6 @@
     .markdown-output { margin-top: 18px; padding: 12px 18px; border: 1px solid color-mix(in srgb, var(--success) 50%, var(--line)); border-radius: 12px; color: var(--success); font: 500 clamp(10px,.88vw,14px)/1.45 var(--mono); text-align: center; }
 
     /* Light-first visual story, adapted from Inside an Inference Request. */
-    .stage[data-theme="light"]::before {
-      background:
-        radial-gradient(circle at 82% 16%, rgba(24,124,244,.08), transparent 28%),
-        linear-gradient(115deg, transparent 0 62%, rgba(24,124,244,.035) 62% 63%, transparent 63%);
-    }
-    .stage[data-theme="light"] .title-group::before,
-    .stage[data-theme="light"] .title-group::after { border-color: rgba(24,124,244,.22); }
     .evolution-rail, .system-rail {
       display: grid;
       position: relative;
@@ -1397,7 +1289,6 @@
       --warning: #ff9d00;
     }
     .stage.context-active::before { display: none; }
-    .stage.context-active .theme-toggle { visibility: hidden; }
     .context-story-slide h2 { max-width: none; font-size: clamp(36px,4.6vw,62px); }
     .context-story-stage { position: relative; margin-top: 16px; padding-top: 42px; }
     .context-map { display: block; width: 100%; height: 330px; overflow: visible; }
@@ -1476,8 +1367,7 @@
   <main class="stage" id="stage" data-theme="light">
     <div class="stage-progress" id="progress"></div>
     <div class="deck-chrome">
-      <div class="chrome-top"><span class="chrome-mark"><i class="chrome-dot"></i><span>agentsmd self-improvement</span></span><span class="chrome-end"><button class="source-trigger" id="source-trigger" type="button">Sources</button><span id="section">Open</span></span></div>
-      <div class="chrome-bottom"><span>Rudraksh Karpe · Satyam Soni · AgentCon Japan 2026</span><span class="chrome-end"><span class="beat-controls" id="beat-controls"><button type="button" id="beat-replay" aria-label="Replay this slide">↺</button><button type="button" id="beat-play" aria-label="Play or pause this slide">▶</button><input id="beat-scrub" type="range" min="0" max="0" value="0" aria-label="Current animation beat" /><output id="beat-count">0/0</output></span><span class="theme-toggle"><button type="button" data-theme-choice="dark">Dark</button><button type="button" data-theme-choice="light" class="on">Light</button></span><span class="page-pill" id="count">1 / 18</span></span></div>
+      <div class="chrome-bottom"><span class="chrome-end"><span class="beat-controls" id="beat-controls"><button type="button" id="beat-replay" aria-label="Replay this slide">↺</button><button type="button" id="beat-play" aria-label="Play or pause this slide">▶</button><input id="beat-scrub" type="range" min="0" max="0" value="0" aria-label="Current animation beat" /><output id="beat-count">0/0</output></span><span class="page-pill" id="count">1 / 17</span></span></div>
     </div>
     <img class="brand" src="assets/agnt_mcpcon_japan26_bug_white.svg" alt="AGNTCon + MCPCon Japan" />
 
@@ -1604,7 +1494,7 @@
           <p class="tweet-source">Speaker-supplied screenshots. Account, date, and engagement remain visible in each image.</p>
         </div>
       </div>
-      <aside class="slide-notes">The first post is visible on entry. Reveal one additional post per click. Treat these posts as community perspectives, not benchmark evidence. The through-line is practical: discovery has a shared format, while maintenance remains manual and fragmented. The screenshots came from the speaker and retain the original account names and dates. Transition: this debate grew as the convention moved beyond one product.</aside>
+      <aside class="slide-notes">The first post is visible on entry. Reveal one additional post per click. Treat these posts as community perspectives, not measured evidence. The through-line is practical: discovery has a shared format, while maintenance remains manual and fragmented. The screenshots came from the speaker and retain the original account names and dates. Transition: this debate grew as the convention moved beyond one product.</aside>
     </section>
 
     <section class="slide timeline-slide" id="slide-04" data-title="AGENTS.md adoption and stewardship" data-duration="1 minute">
@@ -1853,7 +1743,7 @@
         <div class="command-lane"><h3>Author</h3><code><strong>init</strong> · detect and scaffold</code><code><strong>templates</strong> · curated starts</code><code><strong>render</strong> · rebuild from ledger</code><code><strong>lint</strong> · find stale rules</code></div>
         <div class="command-lane" data-fragment="1"><h3>Integrate</h3><code><strong>doctor</strong> · inspect setup</code><code><strong>connect</strong> · add provider hooks</code><code><strong>automate</strong> · set policy</code><code><strong>update</strong> · upgrade safely</code></div>
         <div class="command-lane" data-fragment="2"><h3>Observe</h3><code><strong>task</strong> · group sessions</code><code><strong>sessions</strong> · inspect trajectories</code><code><strong>progress</strong> · compare outcomes</code><code><strong>capture</strong> · normalize a run</code></div>
-        <div class="command-lane" data-fragment="3"><h3>Improve</h3><code><strong>learn</strong> · propose one rule</code><code><strong>pending</strong> · review queue</code><code><strong>promote / reject</strong></code><code><strong>benchmark</strong> · held-out gate</code></div>
+        <div class="command-lane" data-fragment="3"><h3>Improve</h3><code><strong>learn</strong> · propose one rule</code><code><strong>pending</strong> · review queue</code><code><strong>promote / reject</strong></code><code><strong>blame</strong> · show provenance</code></div>
       </div>
       <p class="command-foot" data-fragment="4">Version and maintenance commands: log · diff · blame · revert · tag · prune · savings</p>
       <aside class="slide-notes">This is the implemented command tree. The public workflow stays small. Advanced history and maintenance commands remain available for auditing and recovery.</aside>
@@ -1880,7 +1770,7 @@
           <div class="workflow-node" data-fragment="3"><small>04</small><strong>Candidate</strong><p>Scope, provenance, confidence, and near-duplicate checks enter the proposal record.</p></div>
         </div>
         <div class="decision-row">
-          <div class="workflow-node" data-fragment="4"><small>05</small><strong>Evidence check</strong><p>Fresh workspace, relevant tests, and the held-out verifier.</p></div>
+          <div class="workflow-node" data-fragment="4"><small>05</small><strong>Evidence check</strong><p>Fresh workspace, relevant tests, and the project verification command.</p></div>
           <div class="decision-gate" data-fragment="5"><strong>Promotion gate</strong><span>Evaluation must pass. Automatic promotion also requires the confidence policy.</span></div>
           <div class="decision-outcomes" data-fragment="6"><span>Pass: promote to ledger</span><span>Review: keep pending</span><span>Fail: reject the proposal</span></div>
         </div>
@@ -1927,29 +1817,8 @@
       <aside class="slide-notes">The original maintainer guidance remains intact. The two recorded rules come from two separate baseline trajectories. The slide shortens their wording for projection.</aside>
     </section>
 
-    <section class="slide benchmarks-slide" id="slide-12" data-title="Recorded held-out result" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 16 | Recorded held-out result | 1.5 minutes</span>
-      <div class="eyebrow">Six real runs</div><h2>Success held while median cost fell</h2>
-      <p class="benchmark-summary">Six real runs on the same Go configuration task, graded with hidden tests after each agent exits.</p>
-      <div class="benchmark-grid">
-        <div class="benchmark-metrics">
-          <div class="benchmark-metric"><strong>3/3</strong><span>baseline passes</span></div>
-          <div class="benchmark-metric"><strong>3/3</strong><span>learned-guidance passes</span></div>
-          <div class="benchmark-metric"><strong>−40.2%</strong><span>median reported tokens</span></div>
-          <div class="benchmark-metric"><strong>−17.0%</strong><span>median wall time</span></div>
-        </div>
-        <div class="benchmark-bars">
-          <div><div class="bar-label"><span>Baseline tokens</span><span>90,724</span></div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
-          <div><div class="bar-label"><span>Learned tokens</span><span>54,274</span></div><div class="bar-track"><div class="bar-fill learned" style="width:59.8%"></div></div></div>
-          <div><div class="bar-label"><span>Median commands</span><span>5 → 3</span></div><div class="bar-track"><div class="bar-fill learned" style="width:60%"></div></div></div>
-        </div>
-      </div>
-      <p class="benchmark-caveat">One task, one model, three trials per condition. This demonstrates the mechanism, not a universal performance claim.</p>
-      <aside class="slide-notes">Report the narrow result exactly. The model was gpt-5.6-luna at low reasoning effort. Baseline median was 90,724 reported tokens, 5 commands, and 27.9 seconds. Learned median was 54,274 tokens, 3 commands, and 23.1 seconds. All trials passed the same held-out verifier. The current suite runner supports multiple tasks and single-rule ablations, but those new results have not been recorded yet.</aside>
-    </section>
-
     <section class="slide repo-qr-slide" id="slide-13" data-title="Scan to use agentsmd-cli" data-duration="0.5 minute">
-      <span class="slide-meta">Slide 17 | Scan to use agentsmd-cli | 0.5 minute</span>
+      <span class="slide-meta">Slide 16 | Scan to use agentsmd-cli | 0.5 minute</span>
       <h2>Scan to use agentsmd-cli</h2>
       <img class="repo-qr" src="assets/agentsmd-cli-qr.png" alt="QR code for the agentsmd-cli GitHub repository" />
       <a class="repo-url" href="https://github.com/rudrakshkarpe/agentsmd-cli">github.com/rudrakshkarpe/agentsmd-cli</a>
@@ -1958,7 +1827,7 @@
     </section>
 
     <section class="slide qna-slide" id="slide-14" data-title="Q&amp;A" data-duration="4 minutes">
-      <span class="slide-meta">Slide 18 | Q&amp;A | 4 minutes</span>
+      <span class="slide-meta">Slide 17 | Q&amp;A | 4 minutes</span>
       <h2 class="qna-title">Q&amp;A</h2>
       <aside class="slide-notes">Open the floor for audience questions.</aside>
     </section>
@@ -1993,9 +1862,9 @@
       <a href="https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation">Linux Foundation AAIF formation announcement</a>
       <a href="https://arxiv.org/abs/2507.19457">GEPA reflective prompt evolution paper</a>
       <a href="https://arxiv.org/abs/2510.04618">ACE evolving context paper</a>
-      <a href="https://github.com/rudrakshkarpe/agentsmd-cli">agentsmd-cli implementation and benchmark evidence</a>
+      <a href="https://github.com/rudrakshkarpe/agentsmd-cli">agentsmd-cli implementation and documentation</a>
     </div>
-    <p class="source-scope">The community posts are speaker-supplied screenshots and represent individual perspectives. Animation timing is illustrative. The recorded benchmark covers one Go task, one model, and three trials per condition.</p>
+    <p class="source-scope">The community posts are speaker-supplied screenshots and represent individual perspectives. Animation timing communicates causal order, not measured latency.</p>
   </section>
 
   <nav id="dots" aria-label="Slide navigation"></nav>
@@ -2004,7 +1873,6 @@
     const dots = document.getElementById("dots");
     const count = document.getElementById("count");
     const progress = document.getElementById("progress");
-    const section = document.getElementById("section");
     const stage = document.getElementById("stage");
     const overlays = {
       overview: document.getElementById("overview"),
@@ -2012,7 +1880,7 @@
       notes: document.getElementById("notes"),
       sources: document.getElementById("sources")
     };
-    const sections = ["Open", "Open", "Context", "Voices", "Evolution", "Today", "Problem", "Method", "Bridge", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Evidence", "Try it", "Close"];
+    const sections = ["Open", "Open", "Context", "Voices", "Evolution", "Today", "Problem", "Method", "Bridge", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Try it", "Close"];
     let current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1) || 1) - 1));
     let step = 0;
     let overlay = null;
@@ -2039,8 +1907,8 @@
         ["prompt", "$ agentsmd pending\n", true], ["warn", "⏳ p0001  task=config-precedence\n"],
         ["dim", "Keep GOCACHE inside restricted workspaces.\n\n"],
         ["prompt", "$ agentsmd promote p0001\n", true], ["ok", "✓ evaluation passed\n✓ promoted r0001\n\n"],
-        ["prompt", "$ agentsmd benchmark --spec ... --trials 3\n", true],
-        ["ok", "✓ baseline 3/3 · learned 3/3\n"], ["ok", "✓ median tokens 90,724 → 54,274 (-40.2%)\n"]
+        ["prompt", "$ agentsmd blame r0001\n", true],
+        ["dim", "run=baseline-1 · task=config-precedence\n"], ["ok", "Keep GOCACHE inside restricted workspaces.\n"]
       ]
     };
     const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -2048,8 +1916,7 @@
     const fragmentGroups = {
       "slide-06": [[".problem-item:nth-child(2)"], [".problem-item:nth-child(3)"], [".problem-item:nth-child(4)"], [".feedback-question"]],
       "slide-07": [[".discipline-rule:nth-child(2)"], [".discipline-rule:nth-child(3)"], [".discipline-conclusion"]],
-      "slide-10": [[".file-pane:nth-child(2)"]],
-      "slide-12": [[".benchmark-metric:nth-child(2)"], [".benchmark-metric:nth-child(3)", ".benchmark-metric:nth-child(4)"], [".benchmark-bars"]]
+      "slide-10": [[".file-pane:nth-child(2)"]]
     };
     Object.entries(fragmentGroups).forEach(([id, groups]) => {
       const slide = document.getElementById(id);
@@ -2196,10 +2063,6 @@
       event.stopPropagation();
       setTheme(button.dataset.themeChoice);
     }));
-    document.getElementById("source-trigger").addEventListener("click", event => {
-      event.stopPropagation();
-      overlay === "sources" ? closeOverlay() : openOverlay("sources");
-    });
 
     function openOverlay(name) {
       closeOverlay();
@@ -2225,7 +2088,6 @@
       [...dots.children].forEach((dot, index) => dot.classList.toggle("on", index === current));
       [...overviewGrid.children].forEach((card, index) => card.classList.toggle("current", index === current));
       count.textContent = `${current + 1} / ${slides.length}`;
-      section.textContent = sections[current];
       applyFragments();
       updateProgress();
       if (updateHash && location.hash !== `#${current + 1}`) history.replaceState(null, "", `#${current + 1}`);

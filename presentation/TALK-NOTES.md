@@ -13,11 +13,8 @@ The strongest story is narrow and auditable:
 3. One task-boundary reflection proposes a targeted rule with provenance.
 4. The proposal remains pending until a human or configured evaluation gate
    accepts it.
-5. Fresh held-out trials test whether the updated guidance preserves success
-   while reducing waste.
-
-Avoid claiming that the current study proves a general improvement across
-repositories. It covers one task, one model, and three trials per condition.
+5. The accepted rule is rendered as a small, traceable addition without
+   rewriting the maintainer-owned instructions.
 
 ## Story beats before the terminal demo
 
@@ -43,53 +40,27 @@ same lifecycle as speaker-controlled workflow fragments.
 
 ```bash
 # 1. Show the static starting instructions.
-sed -n '1,120p' benchmarks/config-precedence/guidance/baseline.md
+sed -n '1,120p' AGENTS.md
 
-# 2. Show the two evidence-linked reflection verdicts.
-cat benchmarks/config-precedence/learning/reflection-baseline-1.json
-cat benchmarks/config-precedence/learning/reflection-baseline-2.json
+# 2. Show a captured session and its evidence.
+agentsmd sessions show baseline-1
 
-# 3. Show the exact targeted change to AGENTS.md.
-diff -u \
-  benchmarks/config-precedence/guidance/baseline.md \
-  benchmarks/config-precedence/guidance/learned.md
+# 3. Show the proposed rule before it changes the file.
+agentsmd pending
 
-# 4. Show the real promoted ledger and typed version history.
-cat benchmarks/config-precedence/learning/promoted/ledger.json
-cat benchmarks/config-precedence/learning/promoted/versions.jsonl
+# 4. Promote the reviewed proposal.
+agentsmd promote p0001
 
-# 5. Show the checked-in result without relying on venue networking.
-cat benchmarks/config-precedence/results/study-v1/report.md
+# 5. Show how the promoted rule points back to the session that produced it.
+agentsmd blame
 ```
-
-If the network is reliable and at least two minutes remain, run one fresh
-trial into a new directory:
-
-```bash
-agentsmd benchmark \
-  --spec benchmarks/config-precedence/spec.json \
-  --trials 1 \
-  --output benchmarks/config-precedence/results/demo-live
-```
-
-## Benchmark language
-
-Use this wording on stage:
-
-> On this configuration task, all six trials passed the same hidden tests. The
-> two learned rules reduced median reported tokens from 90,724 to 54,274,
-> commands from five to three, and wall time from 27.9 to 23.1 seconds. This is
-> a mechanics demonstration, not a universal benchmark claim.
-
-The multi-task suite and single-rule ablation runner are implemented, but no
-new multi-task model results have been checked in yet.
 
 ## Demo recovery
 
 - Keep a compiled `agentsmd` binary on the presentation laptop.
-- Keep the entire `study-v1` directory available locally.
-- Use the recorded report if the fresh model call stalls.
+- Keep the checked-in example trajectory and promoted ledger available locally.
+- Use the recorded CLI animations if the live command stalls.
 - Use `agentsmd doctor --repair` if an interrupted reflection worker leaves a
   stale processing job.
-- Do not modify the checked-in study during rehearsal. Write live output to
-  `demo-live` or another ignored directory.
+- Do not modify the checked-in example during rehearsal. Use a disposable demo
+  repository for live commands.
