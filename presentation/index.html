@@ -1021,15 +1021,73 @@
       color: #444;
       font: 11px Consolas, monospace;
     }
+
+    /* 2026 stage refresh: clean editorial canvas inspired by the reference deck. */
+    html, body { background: #e9ebef; font-family: Inter, "Helvetica Neue", Arial, sans-serif; }
+    .stage {
+      margin: 2vh auto;
+      background: #f4f5f7;
+      background-image: none;
+      box-shadow: 0 24px 80px rgba(21, 28, 38, .22);
+    }
+    .brand { display: none; }
+    .slide { padding: 9.2% 5.2% 8%; background: #f4f5f7; color: #111318; }
+    .title-slide, .experience-slide, .learning-terminal-slide,
+    .benchmarks-slide, .qna-slide { background: #0b0c0f; color: #fff; }
+    .footer { left: 5.2%; right: 5.2%; color: #747b86; }
+    .footer span:first-child { letter-spacing: .02em; }
+    .hint { color: #8b929c; }
+    nav { display: none; }
+    h1 { font-size: clamp(46px, 6.4vw, 80px); }
+    h2 { font-size: clamp(30px, 4vw, 52px); }
+    .subtitle, .card p, .cli-summary, .discipline-intro,
+    .feedback-intro, .authoring-statement { color: #68707c; }
+    .title-slide .subtitle, .experience-slide .subtitle,
+    .learning-terminal-slide .subtitle, .benchmarks-slide .benchmark-summary { color: #aeb5c0; }
+    .card { background: transparent; border: 0; border-top: 2px solid #2478e5; padding: 18px 0; }
+    .speaker-card { border-top: 0; }
+    .eyebrow, .label, .problem-number, .discipline-rule > span { color: #2478e5; }
+    .architecture-flow { display: grid; grid-template-columns: 1fr 42px 1.1fr 42px 1fr; align-items: center; gap: 10px; margin-top: 36px; }
+    .architecture-node { min-height: 235px; padding: 24px 8px; border-top: 3px solid #2478e5; }
+    .architecture-node h3 { font-size: clamp(18px, 1.8vw, 25px); }
+    .architecture-node p { margin-top: 13px; color: #aeb5c0; font-size: clamp(12px, 1.05vw, 15px); line-height: 1.5; }
+    .architecture-node code { display: block; margin-top: 22px; color: #75b6ff; font-size: clamp(10px, .9vw, 13px); }
+    .architecture-arrow { color: #75b6ff; text-align: center; font-size: 34px; }
+    .architecture-return { width: 72%; margin: 10px auto 0; padding-top: 10px; border-top: 2px solid #66d6a3; color: #66d6a3; text-align: center; font: 700 11px Consolas, monospace; }
+    .clean-terminal-layout { display: grid; grid-template-columns: .72fr 1.28fr; gap: 48px; align-items: center; margin-top: 20px; }
+    .clean-terminal { overflow: hidden; border: 1px solid #30343c; border-radius: 10px; background: #111318; box-shadow: 0 24px 60px rgba(0,0,0,.22); }
+    .clean-terminal-head { display: flex; gap: 8px; align-items: center; padding: 12px 15px; background: #1a1d23; border-bottom: 1px solid #30343c; }
+    .clean-terminal-dot { width: 9px; height: 9px; border-radius: 50%; background: #555b64; }
+    .clean-terminal-title { margin-left: 8px; color: #858d98; font: 600 11px Consolas, monospace; }
+    .clean-terminal pre { height: 335px; margin: 0; padding: 20px; color: #d8dde6; font: 500 clamp(9px,.82vw,13px)/1.65 Consolas, monospace; white-space: pre-wrap; }
+    .term-prompt { color: #75b6ff; } .term-ok { color: #66d6a3; } .term-warn { color: #ffc66d; } .term-dim { color: #7f8793; }
+    .terminal-caret { display: inline-block; width: 7px; height: 1em; margin-left: 2px; background: #75b6ff; vertical-align: text-bottom; animation: terminalBlink 1s steps(1) infinite; }
+    @keyframes terminalBlink { 50% { opacity: 0; } }
+    .terminal-replay { float: right; margin: 0 14px 12px; border: 0; background: none; color: #75b6ff; cursor: pointer; font: 700 10px Consolas, monospace; text-transform: uppercase; }
+    .file-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 22px; }
+    .file-pane { overflow: hidden; border: 1px solid #30343c; border-radius: 8px; background: #111318; }
+    .file-pane header { padding: 13px 18px; border-bottom: 1px solid #30343c; color: #9ba2ad; font: 700 12px Consolas, monospace; }
+    .file-pane pre { min-height: 300px; margin: 0; padding: 20px; color: #d8dde6; font: 500 clamp(11px,.92vw,15px)/1.55 Consolas, monospace; white-space: pre-wrap; }
+    .file-pane .added { display: block; margin: 0 -17px; padding: 0 17px; background: #123525; color: #9be5bc; }
+    .benchmark-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; margin-top: 30px; }
+    .benchmark-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .benchmark-metric { border-top: 2px solid #75b6ff; padding-top: 10px; }
+    .benchmark-metric strong { display: block; color: #66d6a3; font: 700 clamp(27px,3vw,42px)/1 Consolas, monospace; }
+    .benchmark-metric span { display: block; margin-top: 8px; color: #aeb5c0; font-size: clamp(10px,.9vw,13px); }
+    .benchmark-bars { display: grid; gap: 22px; align-content: center; }
+    .bar-label { display: flex; justify-content: space-between; margin-bottom: 7px; color: #cbd1da; font: 600 11px Consolas, monospace; }
+    .bar-track { height: 13px; overflow: hidden; border-radius: 8px; background: #242830; }
+    .bar-fill { height: 100%; border-radius: 8px; background: #667180; } .bar-fill.learned { background: #66d6a3; }
+    .benchmark-caveat { position: absolute; left: 5.2%; right: 5.2%; bottom: 7.5%; color: #89909b; text-align: center; font: 500 10px Consolas, monospace; }
   </style>
 </head>
 <body>
-  <div class="hint">← →  space  ·  F fullscreen</div>
+  <div class="hint">← → navigate · R replay · F fullscreen</div>
   <main class="stage" id="stage">
     <img class="brand" src="assets/agnt_mcpcon_japan26_bug_white.svg" alt="AGNTCon + MCPCon Japan" />
     <footer class="footer">
-      <span>AGNTCON + MCPCON  ·  JAPAN 2026  ·  HALL C</span>
-      <span id="count">1 / 13</span>
+      <span>Rudraksh Karpe · Satyam Soni</span>
+      <span id="count">1 / 14</span>
     </footer>
 
     <section class="slide on title-slide" id="slide-01" data-title="Let AGENTS.md Write Itself" data-duration="0.5 minute">
@@ -1188,143 +1246,91 @@
       <aside class="slide-notes">The vLLM guidance treats agent instructions as an engineered artifact with token budgets, scope, anti-patterns, and a change checklist. The important lesson is not to add more text. It is to preserve only specific, non-obvious, tested guidance. Transition: Can trajectory evidence make part of this discipline systematic?</aside>
     </section>
 
-    <section class="slide experience-slide" id="slide-08" data-title="The agent trajectory becomes evidence" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 8 | The agent trajectory becomes evidence | 1.5 minutes</span>
-      <h2>The agent trajectory becomes evidence</h2>
-      <p class="subtitle">The agent's own trajectories contain the evidence needed to improve its repository context.</p>
-      <div class="signal-map">
-        <svg class="signal-svg" viewBox="0 0 1200 390" aria-hidden="true">
-          <defs>
-            <marker id="signal-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b7dff"></path>
-            </marker>
-          </defs>
-          <path class="signal-path" style="--path-delay:.3s;--signal-color:var(--cyan)" d="M100 55 L310 55 L510 55" marker-end="url(#signal-arrow)"></path>
-          <path class="signal-path" style="--path-delay:1.3s;--signal-color:var(--pink)" d="M510 55 C510 115 485 135 485 178" marker-end="url(#signal-arrow)"></path>
-          <path class="signal-path" style="--path-delay:1.8s;--signal-color:var(--lime)" d="M510 55 C540 110 645 135 650 178" marker-end="url(#signal-arrow)"></path>
-          <path class="signal-path" style="--path-delay:2.8s;--signal-color:var(--amber)" d="M485 178 C560 178 620 210 680 210"></path>
-          <path class="signal-path" style="--path-delay:2.8s;--signal-color:var(--amber)" d="M650 178 C660 178 670 200 680 210" marker-end="url(#signal-arrow)"></path>
-          <path class="signal-path" style="--path-delay:3.8s;--signal-color:var(--violet)" d="M735 210 L920 210 L920 286" marker-end="url(#signal-arrow)"></path>
-          <path class="signal-path" style="--path-delay:4.9s;--signal-color:var(--green)" d="M920 286 L630 286" marker-end="url(#signal-arrow)"></path>
-          <path class="signal-path" style="--path-delay:6s;--signal-color:var(--blue)" d="M630 286 C405 360 115 340 100 82" marker-end="url(#signal-arrow)"></path>
-        </svg>
-        <div class="signal-node has-logo tone-memory" style="left:4%;top:5%;--delay:.2s">
-          <img class="signal-brand-logo" src="assets/agentsmd-mark.png" alt="" />
-          <strong>AGENTS.md</strong>
-          <span>Repository memory · Instructions</span>
-        </div>
-        <div class="signal-node has-logo tone-agent" style="left:24%;top:5%;--delay:.85s">
-          <div class="signal-brand-stack" aria-label="Claude, Codex, and goose">
-            <img class="signal-brand-logo" src="assets/claude-logo.svg" alt="Claude" />
-            <img class="signal-brand-logo logo-invert" src="assets/codex-logo.svg" alt="Codex" />
-            <img class="signal-brand-logo logo-invert" src="assets/goose-logo.svg" alt="goose" />
-          </div>
-          <strong>Agent</strong>
-        </div>
-        <div class="signal-node has-logo tone-agent" style="left:42%;top:5%;--delay:1.35s">
-          <svg class="signal-icon" data-icon="trajectory" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18c4-8 7 2 11-7"></path><path d="m13 8 4 2-2 4"></path><circle cx="4" cy="18" r="2"></circle></svg>
-          <strong>Agent Work / Trajectory</strong>
-          <span>Experience</span>
-        </div>
-        <div class="signal-node has-logo signal-evidence tone-mistake" style="left:40%;top:31%;--delay:2.15s">
-          <svg class="signal-icon" data-icon="mistake" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 20h18.4L12 3Z"></path><path d="M12 9v5"></path><path d="M12 17h.01"></path></svg>
-          <strong>Mistakes</strong>
-        </div>
-        <div class="signal-node has-logo signal-evidence tone-discovery" style="left:55%;top:31%;--delay:2.55s">
-          <svg class="signal-icon" data-icon="discovery" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3Z"></path><path d="m19 15 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z"></path></svg>
-          <strong>Discoveries</strong>
-        </div>
-        <div class="signal-node has-logo signal-midpoint signal-decision tone-decision" style="left:58%;top:38%;--delay:3.45s">
-          <svg class="signal-icon" data-icon="repeat" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"></path><path d="M3 11V9a3 3 0 0 1 3-3h15"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v2a3 3 0 0 1-3 3H3"></path></svg>
-          <strong>Repeated pattern?</strong>
-          <span>repeated · useful · repository-specific · worth remembering</span>
-        </div>
-        <div class="signal-node has-logo signal-midpoint signal-suggestion tone-rule" style="left:76%;top:38%;--delay:4.35s">
-          <svg class="signal-icon" data-icon="rule" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5"></path><path d="M9 14h6"></path><path d="M12 11v6"></path></svg>
-          <strong>Suggestion</strong>
-        </div>
-        <div class="signal-node has-logo signal-gate tone-validate" style="left:76%;top:68%;--delay:5.35s">
-          <svg class="signal-icon" data-icon="validate" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V6z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg>
-          <strong>Validate</strong>
-          <span>Required gate</span>
-        </div>
-        <div class="signal-node has-logo signal-memory-final tone-memory" style="left:52%;top:68%;--delay:6.35s">
-          <img class="signal-brand-logo" src="assets/agentsmd-mark.png" alt="" />
-          <strong>AGENTS.md</strong>
-          <span>Repository memory ↺</span>
-        </div>
+    <section class="slide experience-slide" id="slide-08" data-title="One shared loop behind every coding CLI" data-duration="2 minutes">
+      <span class="slide-meta">Slide 8 | agentsmd architecture | 2 minutes</span>
+      <div class="eyebrow">Architecture</div>
+      <h2>One shared loop behind every coding CLI</h2>
+      <div class="architecture-flow">
+        <div class="architecture-node"><h3>Capture adapters</h3><p>Codex, Claude Code, Cursor, and goose emit different lifecycle events.</p><code>provider event</code></div>
+        <div class="architecture-arrow">›</div>
+        <div class="architecture-node"><h3>Normalized trajectory</h3><p>Commands, files, tests, tokens, duration, Git state, and logical task identity share one schema.</p><code>.agentsmd/runs/*.json</code></div>
+        <div class="architecture-arrow">›</div>
+        <div class="architecture-node"><h3>Reflect and evaluate</h3><p>One task-boundary verdict enters the pending queue. A gate decides whether it reaches the ledger.</p><code>pending → ledger → render</code></div>
       </div>
-      <p class="experience-punchline">The agent's work contains the evidence for what it should remember.</p>
-      <aside class="slide-notes">AGENTS.md is repository memory. Trajectories are experience. A single mistake is not enough. Look for repeated, useful, repository-specific knowledge, create a suggestion, and require validation before it enters memory. Transition: This is learning at the instruction layer, not model training.</aside>
+      <div class="architecture-return">validated guidance returns to AGENTS.md for the next session</div>
+      <aside class="slide-notes">Capture differs by provider. Everything after normalization is shared. The ledger is the source of truth, and AGENTS.md is rendered from targeted deltas.</aside>
     </section>
 
-    <section class="slide cli-intro-slide" id="slide-09" data-title="Introducing agentsmd-cli" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 9 | Introducing agentsmd-cli | 1.5 minutes</span>
-      <div class="eyebrow">Introducing agentsmd-cli</div>
-      <h2>A feedback layer for AGENTS.md</h2>
-      <p class="cli-summary">agentsmd-cli captures what happens during real coding-agent work, extracts potential lessons, and gives those lessons a path to become validated repository instructions.</p>
-      <div class="cli-intro-layout">
-        <img class="cli-product-image" src="assets/agentsmd-cli.jpg" alt="agentsmd-cli" />
-        <div class="cli-loop" aria-label="agentsmd-cli feedback loop">
-          <div class="cli-loop-step">AGENTS.md</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">Coding Agent</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">Task Trajectory</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">Reflect</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">Candidate Rule</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">Evaluate</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">Promote</div><div class="cli-loop-arrow">↓</div>
-          <div class="cli-loop-step">AGENTS.md v1</div>
-        </div>
+    <section class="slide cli-intro-slide" id="slide-09" data-title="CLI setup" data-duration="2 minutes">
+      <span class="slide-meta">Slide 9 | CLI setup | 2 minutes</span>
+      <div class="clean-terminal-layout">
+        <div><div class="eyebrow">Live CLI</div><h2>Setup takes three commands</h2><p class="cli-summary" style="margin-top:20px">Initialize repository state, inspect the developer environment, then connect the coding CLI the team already uses.</p></div>
+        <div class="clean-terminal" data-terminal="setup"><div class="clean-terminal-head"><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><span class="clean-terminal-title">agentsmd · project setup</span></div><pre></pre><button class="terminal-replay" type="button">Replay</button></div>
       </div>
-      <p class="cli-positioning">Turn ephemeral agent experience into validated, durable repository knowledge.</p>
-      <aside class="slide-notes">Position agentsmd-cli as a feedback layer for repository instructions. It captures real coding-agent trajectories, reflects on potential lessons, evaluates candidate rules, and promotes validated knowledge back into AGENTS.md. The loop turns temporary experience into durable repository context. Transition: Watch the loop operate in the demo.</aside>
+      <aside class="slide-notes">This terminal uses current command names and condensed real output. Run the same init, doctor, and connect commands during the live demonstration.</aside>
     </section>
 
-    <section class="slide demo-slide" id="slide-10" data-title="Five-minute live loop" data-duration="5 minutes">
-      <span class="slide-meta">Slide 10 | Five-minute live loop | 5 minutes</span>
-      <div class="eyebrow">Live demo</div>
-      <h2>One task, one reflection, one gated update</h2>
-      <p class="demo-kicker">The configuration fixture and all six recorded runs ship in this repository.</p>
-      <div class="demo-runbook">
-        <div class="demo-steps">
-          <div class="demo-step"><span>01</span><div><strong>Start with static guidance</strong><code>guidance/baseline.md</code></div></div>
-          <div class="demo-step"><span>02</span><div><strong>Inspect captured failures and detours</strong><code>learning/reflection-baseline-*.json</code></div></div>
-          <div class="demo-step"><span>03</span><div><strong>Review the pending rules</strong><code>agentsmd pending</code></div></div>
-          <div class="demo-step"><span>04</span><div><strong>Promote only after evaluation</strong><code>agentsmd promote &lt;proposal-id&gt;</code></div></div>
-          <div class="demo-step"><span>05</span><div><strong>Compare fresh held-out trials</strong><code>agentsmd benchmark --spec ...</code></div></div>
-        </div>
-        <div class="demo-proof">
-          <h3>What the audience sees</h3>
-          <p><strong>Provenance:</strong> each rule links back to its task and session.</p>
-          <p><strong>Safety:</strong> reflection writes to a pending queue, not directly to AGENTS.md.</p>
-          <p><strong>Fallback:</strong> the checked-in report works without venue networking.</p>
-        </div>
+    <section class="slide demo-slide" id="slide-10" data-title="The targeted AGENTS.md update" data-duration="2 minutes">
+      <span class="slide-meta">Slide 10 | Before and after AGENTS.md | 2 minutes</span>
+      <div class="eyebrow">Before and after</div><h2>The loop adds two precise rules</h2>
+      <div class="file-diff">
+        <div class="file-pane"><header>BEFORE · STATIC GUIDANCE</header><pre># AGENTS.md
+
+## Project
+- This is a Go command-line application.
+- Keep changes small and preserve behavior.
+
+## Validation
+- Run focused tests, then `go test ./...`.
+- Format Go files with `gofmt`.</pre></div>
+        <div class="file-pane"><header>AFTER · VALIDATED DELTA</header><pre># AGENTS.md
+
+## Project
+- This is a Go command-line application.
+- Keep changes small and preserve behavior.
+
+## Validation
+- Run focused tests, then `go test ./...`.
+- Format Go files with `gofmt`.
+<span class="added">+ ## Learned rules</span>
+<span class="added">+ - Begin config bugs in loader.go and its tests.</span>
+<span class="added">+ - Keep GOCACHE inside restricted workspaces.</span></pre></div>
       </div>
-      <aside class="slide-notes">Switch to the terminal after establishing the five steps. Use benchmarks/config-precedence. Show the baseline file, both reflection records, the targeted two-line learned delta, and the checked-in report. If connectivity is reliable, run one fresh trial. Never depend on a fresh model run to finish the demo.</aside>
+      <aside class="slide-notes">The slide shortens the exact rules for readability. The original maintainer guidance remains intact. Show the complete two-line diff during the terminal demo.</aside>
     </section>
 
-    <section class="slide benchmarks-slide" id="slide-11" data-title="Recorded held-out result" data-duration="2 minutes">
-      <span class="slide-meta">Slide 11 | Recorded held-out result | 2 minutes</span>
-      <h2>Recorded held-out result</h2>
+    <section class="slide learning-terminal-slide" id="slide-11" data-title="The learning loop in the CLI" data-duration="3 minutes">
+      <span class="slide-meta">Slide 11 | The learning loop in the CLI | 3 minutes</span>
+      <div class="clean-terminal-layout">
+        <div><div class="eyebrow">Recorded study</div><h2>Session evidence becomes a reviewable rule</h2><p class="subtitle" style="margin-top:20px">The active file does not change until the proposal passes its gate.</p></div>
+        <div class="clean-terminal" data-terminal="learn"><div class="clean-terminal-head"><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><span class="clean-terminal-title">agentsmd · task config-precedence</span></div><pre></pre><button class="terminal-replay" type="button">Replay</button></div>
+      </div>
+      <aside class="slide-notes">Pause after pending. Each proposal carries the originating task and session. Promotion creates a typed ledger version only after review or configured evaluation.</aside>
+    </section>
+
+    <section class="slide benchmarks-slide" id="slide-12" data-title="Recorded held-out result" data-duration="2 minutes">
+      <span class="slide-meta">Slide 12 | Recorded held-out result | 2 minutes</span>
+      <div class="eyebrow">Six real runs</div><h2>Success held while median cost fell</h2>
       <p class="benchmark-summary">Six real runs on the same Go configuration task, graded with hidden tests after each agent exits.</p>
-      <div class="benchmark-layout">
+      <div class="benchmark-grid">
         <div class="benchmark-metrics">
           <div class="benchmark-metric"><strong>3/3</strong><span>baseline passes</span></div>
           <div class="benchmark-metric"><strong>3/3</strong><span>learned-guidance passes</span></div>
           <div class="benchmark-metric"><strong>−40.2%</strong><span>median reported tokens</span></div>
           <div class="benchmark-metric"><strong>−17.0%</strong><span>median wall time</span></div>
         </div>
-        <div class="benchmark-rules">
-          <div class="benchmark-rule"><span>01</span><div><strong>Stay on the executable path</strong><p>Start with the active loader and tests. Ignore the compatibility file unless the production call graph reaches it.</p></div></div>
-          <div class="benchmark-rule"><span>02</span><div><strong>Keep Go's cache inside the workspace</strong><p>Use a repository-local GOCACHE when the sandbox blocks writes to the user cache.</p></div></div>
+        <div class="benchmark-bars">
+          <div><div class="bar-label"><span>Baseline tokens</span><span>90,724</span></div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div></div>
+          <div><div class="bar-label"><span>Learned tokens</span><span>54,274</span></div><div class="bar-track"><div class="bar-fill learned" style="width:59.8%"></div></div></div>
+          <div><div class="bar-label"><span>Median commands</span><span>5 → 3</span></div><div class="bar-track"><div class="bar-fill learned" style="width:60%"></div></div></div>
         </div>
       </div>
       <p class="benchmark-caveat">One task, one model, three trials per condition. This demonstrates the mechanism, not a universal performance claim.</p>
       <aside class="slide-notes">Report the narrow result exactly. The model was gpt-5.6-luna at low reasoning effort. Baseline median was 90,724 reported tokens, 5 commands, and 27.9 seconds. Learned median was 54,274 tokens, 3 commands, and 23.1 seconds. All trials passed the same held-out verifier. The current suite runner supports multiple tasks and single-rule ablations, but those new results have not been recorded yet.</aside>
     </section>
 
-    <section class="slide repo-qr-slide" id="slide-12" data-title="Scan to use agentsmd-cli" data-duration="0.5 minute">
-      <span class="slide-meta">Slide 12 | Scan to use agentsmd-cli | 0.5 minute</span>
+    <section class="slide repo-qr-slide" id="slide-13" data-title="Scan to use agentsmd-cli" data-duration="0.5 minute">
+      <span class="slide-meta">Slide 13 | Scan to use agentsmd-cli | 0.5 minute</span>
       <h2>Scan to use agentsmd-cli</h2>
       <img class="repo-qr" src="assets/agentsmd-cli-qr.png" alt="QR code for the agentsmd-cli GitHub repository" />
       <a class="repo-url" href="https://github.com/rudrakshkarpe/agentsmd-cli">github.com/rudrakshkarpe/agentsmd-cli</a>
@@ -1332,8 +1338,8 @@
       <aside class="slide-notes">Invite the audience to scan the QR code, try agentsmd-cli, contribute to the repository, and share feedback.</aside>
     </section>
 
-    <section class="slide qna-slide" id="slide-13" data-title="Q&amp;A" data-duration="4 minutes">
-      <span class="slide-meta">Slide 13 | Q&amp;A | 4 minutes</span>
+    <section class="slide qna-slide" id="slide-14" data-title="Q&amp;A" data-duration="4 minutes">
+      <span class="slide-meta">Slide 14 | Q&amp;A | 4 minutes</span>
       <h2 class="qna-title">Q&amp;A</h2>
       <aside class="slide-notes">Open the floor for audience questions.</aside>
     </section>
@@ -1345,6 +1351,58 @@
     const dots = document.getElementById("dots");
     const count = document.getElementById("count");
     let current = 0;
+    let terminalRun = 0;
+    const scripts = {
+      setup: [
+        ["prompt", "$ agentsmd init\n", true], ["ok", "✓ initialized ./demo (v0000)\n\n"],
+        ["prompt", "$ agentsmd doctor\n", true], ["ok", "✓ Git           /usr/bin/git\n"],
+        ["ok", "✓ AGENTS.md     ./demo/AGENTS.md\n"], ["ok", "✓ Queue         healthy\n"],
+        ["warn", "! Automation    reflection disabled\n\n"],
+        ["prompt", "$ agentsmd connect codex\n", true], ["ok", "✓ connected Codex\n"],
+        ["dim", "  .codex/hooks.json\n"]
+      ],
+      learn: [
+        ["prompt", "$ agentsmd task start config-precedence\n", true], ["ok", "✓ active task config-precedence\n\n"],
+        ["prompt", "$ agentsmd sessions show baseline-1\n", true], ["dim", "tool=codex  tests=1/0  duration=30.0s\n"],
+        ["warn", "failed: go test ./...\n"], ["ok", "recovery: GOCACHE=$PWD/.cache/go-build\n\n"],
+        ["prompt", "$ agentsmd pending\n", true], ["warn", "⏳ p0001  task=config-precedence\n"],
+        ["dim", "Keep GOCACHE inside restricted workspaces.\n\n"],
+        ["prompt", "$ agentsmd promote p0001\n", true], ["ok", "✓ evaluation passed\n✓ promoted r0001\n\n"],
+        ["prompt", "$ agentsmd benchmark --spec ... --trials 3\n", true],
+        ["ok", "✓ baseline 3/3 · learned 3/3\n"], ["ok", "✓ median tokens 90,724 → 54,274 (-40.2%)\n"]
+      ]
+    };
+    const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+    async function playTerminal(terminal) {
+      if (!terminal) return;
+      const run = ++terminalRun;
+      const output = terminal.querySelector("pre");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      output.textContent = "";
+      const caret = document.createElement("span");
+      caret.className = "terminal-caret";
+      output.appendChild(caret);
+      for (const [kind, text, typed] of scripts[terminal.dataset.terminal] || []) {
+        if (run !== terminalRun) return;
+        const span = document.createElement("span");
+        span.className = `term-${kind}`;
+        output.insertBefore(span, caret);
+        if (typed && !reduceMotion) {
+          for (const character of text) {
+            if (run !== terminalRun) return;
+            span.textContent += character;
+            await sleep(16 + Math.random() * 24);
+          }
+        } else span.textContent = text;
+        if (!reduceMotion) await sleep(typed ? 170 : 90);
+      }
+    }
+
+    function playActiveTerminal() {
+      const terminal = slides[current].querySelector("[data-terminal]");
+      if (terminal) playTerminal(terminal); else terminalRun++;
+    }
 
     slides.forEach((slide, index) => {
       const button = document.createElement("button");
@@ -1353,26 +1411,28 @@
       button.addEventListener("click", () => go(index));
       dots.appendChild(button);
     });
+    document.querySelectorAll(".terminal-replay").forEach(button => button.addEventListener("click", event => {
+      event.stopPropagation();
+      playTerminal(button.closest("[data-terminal]"));
+    }));
 
     function go(next) {
       current = (next + slides.length) % slides.length;
       slides.forEach((slide, index) => slide.classList.toggle("on", index === current));
       [...dots.children].forEach((dot, index) => dot.classList.toggle("on", index === current));
       count.textContent = `${current + 1} / ${slides.length}`;
+      const active = slides[current];
+      document.getElementById("stage").classList.toggle("dark", ["title-slide", "experience-slide", "learning-terminal-slide", "benchmarks-slide", "qna-slide"].some(name => active.classList.contains(name)));
+      playActiveTerminal();
     }
 
     go(0);
     window.addEventListener("keydown", event => {
-      if (["ArrowRight", " ", "PageDown"].includes(event.key)) {
-        event.preventDefault();
-        go(current + 1);
-      }
-      if (["ArrowLeft", "PageUp"].includes(event.key)) {
-        event.preventDefault();
-        go(current - 1);
-      }
+      if (["ArrowRight", " ", "PageDown"].includes(event.key)) { event.preventDefault(); go(current + 1); }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); go(current - 1); }
       if (event.key === "Home") go(0);
       if (event.key === "End") go(slides.length - 1);
+      if (event.key.toLowerCase() === "r") playActiveTerminal();
       if (event.key.toLowerCase() === "f") document.documentElement.requestFullscreen?.();
     });
   </script>
