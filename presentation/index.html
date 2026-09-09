@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Let AGENTS.md Write Itself | AGNTCon + MCPCon Japan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #000;
@@ -1079,16 +1082,137 @@
     .bar-track { height: 13px; overflow: hidden; border-radius: 8px; background: #242830; }
     .bar-fill { height: 100%; border-radius: 8px; background: #667180; } .bar-fill.learned { background: #66d6a3; }
     .benchmark-caveat { position: absolute; left: 5.2%; right: 5.2%; bottom: 7.5%; color: #89909b; text-align: center; font: 500 10px Consolas, monospace; }
+
+    /* Interactive stage and motion system, adapted to the agentsmd story. */
+    :root { --sans: "Poppins", "Noto Sans JP", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace; }
+    html, body { background: #000; font-family: var(--sans); }
+    body { display: grid; place-items: center; }
+    .hint, nav { display: none; }
+    .stage {
+      --paper: #000;
+      --paper-2: #161616;
+      --ink: #fafafa;
+      --ink-dim: #d0d6de;
+      --ink-faint: #98a2af;
+      --line: #2c2c2c;
+      --line-strong: #444;
+      --signal: #4da3ff;
+      --signal-soft: #12325a;
+      --success: #69d5a3;
+      --warning: #f6be55;
+      --fg: var(--ink);
+      --muted: var(--ink-dim);
+      --dim: var(--ink-faint);
+      --edge: var(--line);
+      width: min(100vw, calc(100vh * 16 / 9));
+      margin: 0;
+      background: var(--paper);
+      box-shadow: none;
+      font-family: var(--sans);
+    }
+    .stage[data-theme="light"] {
+      --paper: #f7f8fa;
+      --paper-2: #fff;
+      --ink: #0a0a0a;
+      --ink-dim: #3f4652;
+      --ink-faint: #647080;
+      --line: #e2e6ec;
+      --line-strong: #c4cad3;
+      --signal: #187cf4;
+      --signal-soft: #d8ebff;
+      --success: #16865b;
+      --warning: #a96a00;
+    }
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 83% 18%, color-mix(in srgb, var(--signal) 9%, transparent), transparent 27%),
+        linear-gradient(115deg, transparent 0 62%, color-mix(in srgb, var(--signal) 3%, transparent) 62% 63%, transparent 63%);
+    }
+    .slide {
+      z-index: 1;
+      padding: 10% 6.2% 9%;
+      background: transparent !important;
+      color: var(--ink) !important;
+      transform: translateY(18px) scale(.997);
+      transition: opacity .42s ease, transform .52s cubic-bezier(.16,1,.3,1);
+    }
+    .slide.on { transform: none; }
+    .slide.on > *:not(.slide-meta):not(.slide-notes) {
+      animation: deck-rise .52s cubic-bezier(.16,1,.3,1) both;
+    }
+    .slide.on > *:nth-child(2) { animation-delay: 70ms; }
+    .slide.on > *:nth-child(3) { animation-delay: 140ms; }
+    .slide.on > *:nth-child(4) { animation-delay: 210ms; }
+    @keyframes deck-rise { from { opacity: 0; transform: translateY(13px); } to { opacity: 1; transform: none; } }
+    h1, h2, h3, p, li { font-family: var(--sans); }
+    code, pre, .mono, .eyebrow, .slide-meta { font-family: var(--mono); }
+    h1 { font-size: clamp(46px, 6.8vw, 94px); font-weight: 600; }
+    h2 { font-size: clamp(34px, 4.6vw, 64px); font-weight: 600; }
+    h3 { font-weight: 600; }
+    .accent, .eyebrow, .label, .problem-number, .discipline-rule > span { color: var(--signal); }
+    .subtitle, .card p, .cli-summary, .discipline-intro, .feedback-intro, .authoring-statement { color: var(--ink-dim); }
+    .card, .file-pane, .clean-terminal { border-color: var(--line); }
+    .card { border-top-color: var(--signal); }
+    .speaker-photo { border-radius: 18px; border-color: var(--line); box-shadow: 0 18px 44px rgba(0,0,0,.18); }
+    .stage-progress { position: absolute; top: 0; left: 0; z-index: 8; height: 4px; background: var(--signal); transition: width .35s cubic-bezier(.16,1,.3,1); }
+    .deck-chrome { position: absolute; inset: 0; z-index: 7; pointer-events: none; }
+    .chrome-top, .chrome-bottom { position: absolute; left: 6.2%; right: 6.2%; display: flex; align-items: center; justify-content: space-between; color: var(--ink-faint); font: 500 clamp(8px,.75vw,13px)/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .chrome-top { top: 4.1%; }
+    .chrome-bottom { bottom: 4.1%; }
+    .chrome-mark, .chrome-end { display: flex; align-items: center; gap: 12px; }
+    .chrome-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 14px color-mix(in srgb, var(--signal) 70%, transparent); }
+    .page-pill { padding: 7px 12px; border-radius: 999px; background: color-mix(in srgb, var(--ink-faint) 16%, transparent); color: var(--ink-dim); }
+    .theme-toggle { display: flex; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); pointer-events: auto; }
+    .theme-toggle button { border: 0; padding: 6px 11px; background: transparent; color: var(--ink-faint); cursor: pointer; font: 500 clamp(7px,.65vw,11px)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+    .theme-toggle button.on { background: var(--signal); color: #fff; }
+    .fragment { opacity: 0; transform: translateY(12px); transition: opacity .38s ease, transform .48s cubic-bezier(.16,1,.3,1); }
+    .fragment.shown { opacity: 1; transform: none; }
+    .slide.on > .fragment:not(.shown) { opacity: 0 !important; transform: translateY(12px) !important; animation: none !important; }
+    .title-group { position: relative; z-index: 1; }
+    .title-group::before, .title-group::after { content: ""; position: absolute; z-index: -1; left: 50%; top: 50%; border: 1px solid color-mix(in srgb, var(--signal) 35%, transparent); border-radius: 50%; transform: translate(-50%,-50%); animation: signal-orbit 9s linear infinite; }
+    .title-group::before { width: 120%; aspect-ratio: 2.6; }
+    .title-group::after { width: 105%; aspect-ratio: 2.9; animation-direction: reverse; animation-duration: 13s; }
+    @keyframes signal-orbit { 50% { transform: translate(-50%,-50%) scale(1.035); opacity: .45; } }
+    .architecture-arrow { animation: arrow-pulse 1.8s ease-in-out infinite; }
+    @keyframes arrow-pulse { 50% { transform: translateX(6px); color: var(--success); } }
+    .architecture-return { position: relative; overflow: hidden; }
+    .architecture-return::after { content: ""; position: absolute; top: -2px; left: -20%; width: 18%; height: 2px; background: #fff; animation: feedback-scan 2.4s linear infinite; }
+    @keyframes feedback-scan { to { left: 110%; } }
+    .clean-terminal { transition: transform .35s ease, box-shadow .35s ease; }
+    .clean-terminal:hover { transform: translateY(-5px); box-shadow: 0 30px 70px rgba(0,0,0,.34); }
+    .file-pane .added { animation: rule-glow 2.2s ease-in-out infinite alternate; }
+    @keyframes rule-glow { to { background: #165038; } }
+    .benchmark-metric strong { color: var(--success); }
+    .bar-fill.learned { background: var(--success); animation: bar-grow .85s cubic-bezier(.16,1,.3,1) both; transform-origin: left; }
+    @keyframes bar-grow { from { transform: scaleX(0); } }
+    .deck-overlay { position: fixed; inset: 0; z-index: 30; display: none; overflow: auto; padding: 4vw; background: rgba(0,0,0,.96); color: #fafafa; font-family: var(--sans); }
+    .deck-overlay.on { display: block; animation: overlay-in .22s ease both; }
+    @keyframes overlay-in { from { opacity: 0; } }
+    .overlay-kicker { color: #4da3ff; font: 500 13px var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+    .overview-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 28px; }
+    .overview-card { min-height: 120px; border: 1px solid #30343c; border-radius: 14px; background: #161616; padding: 18px; color: #fafafa; text-align: left; cursor: pointer; }
+    .overview-card.current { border-color: #4da3ff; box-shadow: 0 0 0 2px rgba(77,163,255,.22); }
+    .overview-card small { display: block; color: #8d98a7; font: 500 11px var(--mono); text-transform: uppercase; }
+    .overview-card strong { display: block; margin-top: 10px; font-size: 17px; line-height: 1.3; }
+    .help-grid { display: grid; grid-template-columns: 160px 1fr; gap: 14px 24px; max-width: 720px; margin-top: 32px; font-size: 20px; }
+    .help-grid dt { color: #4da3ff; font-family: var(--mono); }
+    .notes-body { max-width: 900px; margin-top: 32px; color: #d0d6de; font-size: 28px; line-height: 1.55; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .fragment { opacity: 1; transform: none; } }
   </style>
 </head>
 <body>
-  <div class="hint">← → navigate · R replay · F fullscreen</div>
-  <main class="stage" id="stage">
+  <main class="stage" id="stage" data-theme="dark">
+    <div class="stage-progress" id="progress"></div>
+    <div class="deck-chrome">
+      <div class="chrome-top"><span class="chrome-mark"><i class="chrome-dot"></i><span>agentsmd self-improvement</span></span><span id="section">Open</span></div>
+      <div class="chrome-bottom"><span>Rudraksh Karpe · Satyam Soni · AgentCon Japan 2026</span><span class="chrome-end"><span class="theme-toggle"><button type="button" data-theme-choice="dark" class="on">Dark</button><button type="button" data-theme-choice="light">Light</button></span><span class="page-pill" id="count">1 / 14</span></span></div>
+    </div>
     <img class="brand" src="assets/agnt_mcpcon_japan26_bug_white.svg" alt="AGNTCon + MCPCon Japan" />
-    <footer class="footer">
-      <span>Rudraksh Karpe · Satyam Soni</span>
-      <span id="count">1 / 14</span>
-    </footer>
 
     <section class="slide on title-slide" id="slide-01" data-title="Let AGENTS.md Write Itself" data-duration="0.5 minute">
       <span class="slide-meta">Slide 1 | Let AGENTS.md Write Itself | 0.5 minute</span>
@@ -1345,12 +1469,44 @@
     </section>
   </main>
 
+  <section class="deck-overlay" id="overview" aria-label="Slide overview">
+    <p class="overlay-kicker">Overview · Esc to close</p>
+    <div class="overview-grid" id="overview-grid"></div>
+  </section>
+  <section class="deck-overlay" id="help" aria-label="Keyboard help">
+    <p class="overlay-kicker">Presentation controls · ? to close</p>
+    <dl class="help-grid">
+      <dt>→ · Space</dt><dd>Reveal the next beat, then advance</dd>
+      <dt>←</dt><dd>Hide the previous beat or go back</dd>
+      <dt>Esc</dt><dd>Open the slide overview</dd>
+      <dt>N</dt><dd>Open speaker notes</dd>
+      <dt>T</dt><dd>Switch between dark and light</dd>
+      <dt>R</dt><dd>Replay the active CLI sequence</dd>
+      <dt>F</dt><dd>Enter fullscreen</dd>
+    </dl>
+  </section>
+  <section class="deck-overlay" id="notes" aria-label="Speaker notes">
+    <p class="overlay-kicker" id="notes-title"></p>
+    <p class="notes-body" id="notes-body"></p>
+  </section>
+
   <nav id="dots" aria-label="Slide navigation"></nav>
   <script>
     const slides = [...document.querySelectorAll(".slide")];
     const dots = document.getElementById("dots");
     const count = document.getElementById("count");
-    let current = 0;
+    const progress = document.getElementById("progress");
+    const section = document.getElementById("section");
+    const stage = document.getElementById("stage");
+    const overlays = {
+      overview: document.getElementById("overview"),
+      help: document.getElementById("help"),
+      notes: document.getElementById("notes")
+    };
+    const sections = ["Open", "Open", "Context", "Context", "Problem", "Problem", "Method", "Architecture", "Demo", "Demo", "Learning loop", "Evidence", "Try it", "Close"];
+    let current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1) || 1) - 1));
+    let step = 0;
+    let overlay = null;
     let terminalRun = 0;
     const scripts = {
       setup: [
@@ -1373,6 +1529,38 @@
       ]
     };
     const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+    const fragmentGroups = {
+      "slide-03": [[".numbered-points li:nth-child(2)"], [".numbered-points li:nth-child(3)"], [".principles-image"], [".takeaway-box"]],
+      "slide-04": [[".timeline-shot:nth-child(2)", ".timeline-event:nth-child(2)"], [".timeline-shot:nth-child(3)", ".timeline-event:nth-child(3)"]],
+      "slide-05": [[".authoring-bullets li:nth-child(2)"], [".authoring-bullets li:nth-child(3)"], [".authoring-bullets li:nth-child(4)"], [".authoring-statement"]],
+      "slide-06": [[".problem-item:nth-child(2)"], [".problem-item:nth-child(3)"], [".problem-item:nth-child(4)"], [".feedback-question"]],
+      "slide-07": [[".discipline-rule:nth-child(2)"], [".discipline-rule:nth-child(3)"], [".discipline-conclusion"]],
+      "slide-08": [[".architecture-node:nth-child(3)", ".architecture-arrow:nth-child(2)"], [".architecture-node:nth-child(5)", ".architecture-arrow:nth-child(4)"], [".architecture-return"]],
+      "slide-10": [[".file-pane:nth-child(2)"]],
+      "slide-12": [[".benchmark-metric:nth-child(2)"], [".benchmark-metric:nth-child(3)", ".benchmark-metric:nth-child(4)"], [".benchmark-bars"]]
+    };
+    Object.entries(fragmentGroups).forEach(([id, groups]) => {
+      const slide = document.getElementById(id);
+      groups.forEach((selectors, index) => selectors.forEach(selector => slide.querySelectorAll(selector).forEach(element => {
+        element.classList.add("fragment");
+        element.dataset.fragment = String(index + 1);
+      })));
+    });
+    slides.forEach((slide, index) => slide.dataset.section = sections[index]);
+
+    function maxStep(index = current) {
+      return Math.max(0, ...[...slides[index].querySelectorAll("[data-fragment]")].map(element => Number(element.dataset.fragment)));
+    }
+
+    function applyFragments() {
+      slides[current].querySelectorAll("[data-fragment]").forEach(element => element.classList.toggle("shown", Number(element.dataset.fragment) <= step));
+    }
+
+    function updateProgress() {
+      const fraction = maxStep() ? (step + 1) / (maxStep() + 1) : 1;
+      progress.style.width = `${((current + fraction) / slides.length) * 100}%`;
+    }
 
     async function playTerminal(terminal) {
       if (!terminal) return;
@@ -1411,25 +1599,85 @@
       button.addEventListener("click", () => go(index));
       dots.appendChild(button);
     });
+    const overviewGrid = document.getElementById("overview-grid");
+    slides.forEach((slide, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "overview-card";
+      button.innerHTML = `<small>${String(index + 1).padStart(2, "0")} · ${sections[index]}</small><strong>${slide.dataset.title}</strong>`;
+      button.addEventListener("click", event => { event.stopPropagation(); closeOverlay(); go(index); });
+      overviewGrid.appendChild(button);
+    });
     document.querySelectorAll(".terminal-replay").forEach(button => button.addEventListener("click", event => {
       event.stopPropagation();
       playTerminal(button.closest("[data-terminal]"));
     }));
 
-    function go(next) {
-      current = (next + slides.length) % slides.length;
+    function setTheme(theme) {
+      stage.dataset.theme = theme;
+      localStorage.setItem("agentsmd-deck-theme", theme);
+      document.querySelectorAll("[data-theme-choice]").forEach(button => button.classList.toggle("on", button.dataset.themeChoice === theme));
+    }
+    document.querySelectorAll("[data-theme-choice]").forEach(button => button.addEventListener("click", event => {
+      event.stopPropagation();
+      setTheme(button.dataset.themeChoice);
+    }));
+
+    function openOverlay(name) {
+      closeOverlay();
+      overlay = name;
+      overlays[name].classList.add("on");
+      if (name === "notes") {
+        document.getElementById("notes-title").textContent = `Notes · ${String(current + 1).padStart(2, "0")} · ${slides[current].dataset.title}`;
+        document.getElementById("notes-body").textContent = slides[current].querySelector(".slide-notes")?.textContent || "No notes for this slide.";
+      }
+    }
+    function closeOverlay() {
+      Object.values(overlays).forEach(element => element.classList.remove("on"));
+      overlay = null;
+    }
+    Object.values(overlays).forEach(element => element.addEventListener("click", closeOverlay));
+
+    function go(next, targetStep = 0, updateHash = true) {
+      current = Math.max(0, Math.min(slides.length - 1, next));
+      step = Math.max(0, Math.min(maxStep(current), targetStep));
       slides.forEach((slide, index) => slide.classList.toggle("on", index === current));
       [...dots.children].forEach((dot, index) => dot.classList.toggle("on", index === current));
+      [...overviewGrid.children].forEach((card, index) => card.classList.toggle("current", index === current));
       count.textContent = `${current + 1} / ${slides.length}`;
-      const active = slides[current];
-      document.getElementById("stage").classList.toggle("dark", ["title-slide", "experience-slide", "learning-terminal-slide", "benchmarks-slide", "qna-slide"].some(name => active.classList.contains(name)));
+      section.textContent = sections[current];
+      applyFragments();
+      updateProgress();
+      if (updateHash && location.hash !== `#${current + 1}`) history.replaceState(null, "", `#${current + 1}`);
       playActiveTerminal();
     }
 
-    go(0);
+    function forward() {
+      if (overlay) return;
+      if (step < maxStep()) { step++; applyFragments(); updateProgress(); }
+      else go(current + 1);
+    }
+    function back() {
+      if (overlay) return;
+      if (step > 0) { step--; applyFragments(); updateProgress(); }
+      else if (current > 0) go(current - 1, maxStep(current - 1));
+    }
+
+    setTheme(localStorage.getItem("agentsmd-deck-theme") || "dark");
+    go(current, 0, false);
+    stage.addEventListener("click", event => {
+      if (event.target.closest("button") || overlay) return;
+      if (event.clientX < innerWidth / 3) back(); else forward();
+    });
+    window.addEventListener("hashchange", () => go(Number(location.hash.slice(1) || 1) - 1, 0, false));
     window.addEventListener("keydown", event => {
-      if (["ArrowRight", " ", "PageDown"].includes(event.key)) { event.preventDefault(); go(current + 1); }
-      if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); go(current - 1); }
+      if (event.key === "Escape") { overlay ? closeOverlay() : openOverlay("overview"); return; }
+      if (event.key === "?") { overlay === "help" ? closeOverlay() : openOverlay("help"); return; }
+      if (event.key.toLowerCase() === "n") { overlay === "notes" ? closeOverlay() : openOverlay("notes"); return; }
+      if (event.key.toLowerCase() === "t") { setTheme(stage.dataset.theme === "dark" ? "light" : "dark"); return; }
+      if (overlay) return;
+      if (["ArrowRight", " ", "PageDown", "Enter"].includes(event.key)) { event.preventDefault(); forward(); }
+      if (["ArrowLeft", "PageUp", "Backspace"].includes(event.key)) { event.preventDefault(); back(); }
       if (event.key === "Home") go(0);
       if (event.key === "End") go(slides.length - 1);
       if (event.key.toLowerCase() === "r") playActiveTerminal();
