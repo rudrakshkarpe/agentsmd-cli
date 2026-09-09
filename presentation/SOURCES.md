@@ -43,3 +43,7 @@ updates. The local study is smaller and should be described as such.
 - [`rohitg00/agentmemory/website`](https://github.com/rohitg00/agentmemory/tree/main/website)
   informed the replayable terminal behavior. The terminal scripts use this
   project's commands and checked-in evidence rather than AgentMemory copy.
+- [`get-vix/vix`](https://github.com/get-vix/vix) informed the visual treatment
+  of a declarative, multi-phase agent workflow. The agentsmd diagram does not
+  claim Vix's branching or orchestration features; it renders this project's
+  capture, reflection, evaluation, and rule-promotion lifecycle.
