@@ -16,10 +16,18 @@ Open <http://localhost:8080>.
 
 ## Controls
 
-- Next slide: `Arrow Right`, `Space`, or `Page Down`
-- Previous slide: `Arrow Left` or `Page Up`
+- Next reveal, then slide: `Arrow Right`, `Space`, `Enter`, or `Page Down`
+- Previous reveal, then slide: `Arrow Left`, `Backspace`, or `Page Up`
 - First or last slide: `Home` or `End`
+- Slide overview: `Esc`
+- Speaker notes: `N`
+- Keyboard help: `?`
+- Dark or light theme: `T`
+- Replay the active CLI animation: `R`
 - Full screen: `F`
+
+The URL hash identifies the active slide, so `#8` opens slide 8 directly.
+Click the left third of the stage to move back and the rest to move forward.
 
 ## Session
 
@@ -43,8 +51,10 @@ The original material was copied from
 at commit `544295b9768b65059359cf6e7a762f43a4cad82f`, then updated with the
 implemented agentsmd workflow and the checked-in `study-v1` result.
 
-The refreshed layout takes structural inspiration from
+The refreshed layout and interaction model take structural inspiration from
 [`abhishekpanditofficial/agentcon-japan`](https://github.com/abhishekpanditofficial/agentcon-japan).
+This includes the fixed 16:9 stage, progress rail, presenter chrome, staggered
+reveals, theme switcher, overview, notes, help, and hash navigation.
 The replayable terminal follows the approach used by
 [`rohitg00/agentmemory`](https://github.com/rohitg00/agentmemory/tree/main/website),
 with scripts rewritten around real agentsmd commands and evidence.
