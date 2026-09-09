@@ -37,7 +37,7 @@ for (const viewport of viewports) {
       stageOverflow: document.getElementById("stage").getBoundingClientRect().width > innerWidth + 1,
     };
   });
-  if (result.slides !== 18) failures.push(`${viewport.width}px: expected 18 slides, found ${result.slides}`);
+  if (result.slides !== 17) failures.push(`${viewport.width}px: expected 17 slides, found ${result.slides}`);
   if (result.notes !== result.slides) failures.push(`${viewport.width}px: ${result.slides - result.notes} slides lack notes`);
   if (result.duplicateIds.length) failures.push(`${viewport.width}px: duplicate ids ${result.duplicateIds.join(", ")}`);
   if (result.brokenImages.length) failures.push(`${viewport.width}px: broken images ${result.brokenImages.join(", ")}`);
@@ -61,14 +61,14 @@ await reducedContext.close();
 
 const interactionContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const interactionPage = await interactionContext.newPage();
-await interactionPage.goto(`${baseUrl}/#18`, { waitUntil: "domcontentloaded" });
-if ((await interactionPage.locator("#count").textContent()) !== "18 / 18") failures.push("deep link: #18 did not open the final slide");
+await interactionPage.goto(`${baseUrl}/#17`, { waitUntil: "domcontentloaded" });
+if ((await interactionPage.locator("#count").textContent()) !== "17 / 17") failures.push("deep link: #17 did not open the final slide");
 await interactionPage.goto(`${baseUrl}/#10`, { waitUntil: "domcontentloaded" });
 await interactionPage.keyboard.press("ArrowRight");
 if ((await interactionPage.locator("#beat-count").textContent()) !== "1/5") failures.push("keyboard: ArrowRight did not advance one architecture beat");
 await interactionPage.keyboard.press("r");
 if ((await interactionPage.locator("#beat-count").textContent()) !== "0/5") failures.push("replay: R did not reset the architecture");
-await interactionPage.getByRole("button", { name: "Sources", exact: true }).click();
+await interactionPage.keyboard.press("s");
 if (!(await interactionPage.locator("#sources").evaluate(element => element.classList.contains("on")))) failures.push("sources overlay did not open");
 await interactionPage.keyboard.press("s");
 await interactionPage.goto(`${baseUrl}/#3`, { waitUntil: "domcontentloaded" });
@@ -78,8 +78,8 @@ await interactionPage.keyboard.press("r");
 if ((await interactionPage.locator("#beat-count").textContent()) !== "0/6") failures.push("controlled introduction did not replay from beat zero");
 if (!(await interactionPage.locator("#stage").evaluate(element => element.classList.contains("context-active")))) failures.push("controlled introduction did not enter its dark context theme");
 for (let index = 0; index < 7; index++) await interactionPage.keyboard.press("ArrowRight");
-if ((await interactionPage.locator("#count").textContent()) !== "4 / 18") failures.push("controlled introduction did not advance directly to the community posts");
-if ((await interactionPage.locator("#section").textContent()) !== "Voices") failures.push("slide 4 is not the community-post section");
+if ((await interactionPage.locator("#count").textContent()) !== "4 / 17") failures.push("controlled introduction did not advance directly to the community posts");
+if ((await interactionPage.locator(".slide.on").getAttribute("data-section")) !== "Voices") failures.push("slide 4 is not the community-post section");
 if ((await interactionPage.locator("#stage").getAttribute("data-theme")) !== "light") failures.push("fresh context did not use the light theme");
 await interactionContext.close();
 
@@ -89,4 +89,4 @@ if (failures.length) {
   console.error(failures.map(failure => `ERROR: ${failure}`).join("\n"));
   process.exit(1);
 }
-console.log("deck validation passed: 18 slides, responsive layouts, reduced motion, deep links, controls, sources, and light default");
+console.log("deck validation passed: 17 slides, responsive layouts, reduced motion, deep links, controls, sources, and light default");
