@@ -2,10 +2,9 @@
 
 ## Readiness assessment
 
-The deck has enough material for the 25-minute slot after the benchmark and
-demo sections are grounded in repository evidence. The planned content now
-uses 20.5 minutes, followed by four minutes for questions. That leaves roughly
-30 seconds for transitions, so rehearse the progressive reveals closely.
+The deck has enough material for the 25-minute slot. The planned content uses
+roughly 17 minutes, followed by four minutes for questions. The remaining time
+covers transitions, pauses on the community posts, and one short live command.
 
 The strongest story is narrow and auditable:
 
@@ -20,12 +19,23 @@ The strongest story is narrow and auditable:
 Avoid claiming that the current study proves a general improvement across
 repositories. It covers one task, one model, and three trials per condition.
 
+## Story beats before the terminal demo
+
+- Slide 4 unfolds the August 2025 release, December 2025 AAIF contribution,
+  and the dated adoption snapshot.
+- Slide 5 reveals one community post per click. Describe these as perspectives,
+  not experimental evidence.
+- Slide 6 shows the manual synchronization gap.
+- Slide 9 introduces the agentsmd contribution without implying model training.
+- Slide 10 unfolds the architecture. Use the visible play, replay, and scrub
+  controls or advance one causal beat at a time.
+
 ## Five-minute terminal demo
 
 Run from the `agentsmd-cli` repository root.
 
-Slides 10 and 12 contain looping terminal recordings. Press `R` while either
-slide is active to restart its GIF from the first frame. Slide 11 exposes the
+Slides 12 and 14 contain looping terminal recordings. Press `R` while either
+slide is active to restart its GIF from the first frame. Slide 13 exposes the
 same lifecycle as speaker-controlled workflow fragments.
 
 ```bash

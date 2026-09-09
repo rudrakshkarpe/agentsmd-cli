@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Let AGENTS.md Write Itself | AGNTCon + MCPCon Japan</title>
+  <link rel="icon" href="assets/agentsmd-mark.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1167,6 +1168,7 @@
     .chrome-mark, .chrome-end { display: flex; align-items: center; gap: 12px; }
     .chrome-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 14px color-mix(in srgb, var(--signal) 70%, transparent); }
     .page-pill { padding: 7px 12px; border-radius: 999px; background: color-mix(in srgb, var(--ink-faint) 16%, transparent); color: var(--ink-dim); }
+    .source-trigger { border: 0; background: none; color: var(--ink-faint); cursor: pointer; font: 500 clamp(8px,.75vw,13px)/1 var(--mono); letter-spacing: .08em; pointer-events: auto; text-transform: uppercase; }
     .theme-toggle { display: flex; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); pointer-events: auto; }
     .theme-toggle button { border: 0; padding: 6px 11px; background: transparent; color: var(--ink-faint); cursor: pointer; font: 500 clamp(7px,.65vw,11px)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
     .theme-toggle button.on { background: var(--signal); color: #fff; }
@@ -1202,6 +1204,9 @@
     .help-grid { display: grid; grid-template-columns: 160px 1fr; gap: 14px 24px; max-width: 720px; margin-top: 32px; font-size: 20px; }
     .help-grid dt { color: #4da3ff; font-family: var(--mono); }
     .notes-body { max-width: 900px; margin-top: 32px; color: #d0d6de; font-size: 28px; line-height: 1.55; }
+    .source-list { display: grid; gap: 16px; max-width: 960px; margin-top: 28px; }
+    .source-list a { color: #88c5ff; font-size: 20px; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    .source-scope { max-width: 960px; margin-top: 28px; color: #d0d6de; font-size: 18px; line-height: 1.55; }
     .command-surface { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 34px; }
     .command-lane { min-height: 300px; padding: 22px 20px; border-top: 3px solid var(--signal); background: color-mix(in srgb, var(--paper-2) 84%, transparent); }
     .command-lane h3 { margin-bottom: 18px; font-size: clamp(17px,1.55vw,24px); }
@@ -1234,15 +1239,196 @@
     .decision-outcomes span:nth-child(2) { border-color: var(--warning); }
     .decision-outcomes span:nth-child(3) { border-color: #ef6b73; }
     .markdown-output { margin-top: 18px; padding: 12px 18px; border: 1px solid color-mix(in srgb, var(--success) 50%, var(--line)); border-radius: 12px; color: var(--success); font: 500 clamp(10px,.88vw,14px)/1.45 var(--mono); text-align: center; }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .fragment { opacity: 1; transform: none; } }
+
+    /* Light-first visual story, adapted from Inside an Inference Request. */
+    .stage[data-theme="light"]::before {
+      background:
+        radial-gradient(circle at 82% 16%, rgba(24,124,244,.08), transparent 28%),
+        linear-gradient(115deg, transparent 0 62%, rgba(24,124,244,.035) 62% 63%, transparent 63%);
+    }
+    .stage[data-theme="light"] .title-group::before,
+    .stage[data-theme="light"] .title-group::after { border-color: rgba(24,124,244,.22); }
+    .evolution-rail, .system-rail {
+      display: grid;
+      position: relative;
+      margin-top: 30px;
+      padding-top: 4px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .evolution-rail { grid-template-columns: repeat(3,1fr); }
+    .system-rail { grid-template-columns: repeat(7,1fr); margin-top: 18px; }
+    .evolution-rail span, .system-rail span {
+      position: relative;
+      padding: 0 8px 16px;
+      color: var(--ink-faint);
+      font: 500 clamp(8px,.75vw,12px)/1.25 var(--mono);
+      letter-spacing: .07em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .evolution-rail span::after, .system-rail span::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -5px;
+      width: 9px;
+      height: 9px;
+      border: 2px solid var(--line-strong);
+      border-radius: 50%;
+      background: var(--paper);
+      transform: translateX(-50%);
+    }
+    .evolution-rail span.shown, .system-rail span.shown { color: var(--signal); }
+    .evolution-rail span.shown::after, .system-rail span.shown::after {
+      border-color: var(--signal);
+      background: var(--signal);
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--signal) 14%, transparent);
+    }
+    .evolution-evidence {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 28px;
+      margin-top: 24px;
+    }
+    .evolution-event { position: relative; min-height: 270px; }
+    .evolution-event img {
+      display: block;
+      width: 100%;
+      height: 174px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      object-fit: cover;
+      object-position: top;
+      box-shadow: 0 18px 45px rgba(21,35,54,.12);
+    }
+    .evolution-event time { display: block; margin-top: 14px; color: var(--signal); font: 600 10px var(--mono); }
+    .evolution-event strong { display: block; margin-top: 7px; font-size: clamp(15px,1.25vw,20px); }
+    .evolution-event p { max-width: 96%; margin-top: 7px; color: var(--ink-dim); font-size: clamp(9px,.76vw,12px); line-height: 1.3; }
+
+    .tweet-story { display: grid; grid-template-columns: 1.35fr .65fr; gap: 48px; align-items: center; margin-top: 14px; }
+    .tweet-deck { position: relative; height: 345px; perspective: 1200px; }
+    .tweet-card {
+      position: absolute;
+      left: 5%;
+      top: 0;
+      width: 75%;
+      height: 325px;
+      overflow: hidden;
+      border: 1px solid #252a33;
+      border-radius: 18px;
+      background: #000;
+      box-shadow: 0 28px 70px rgba(25,37,55,.24);
+      transform-origin: 50% 100%;
+    }
+    .tweet-card img { width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .tweet-card:nth-child(1) { z-index: 1; transform: translate(-26px,18px) rotate(-4deg) scale(.93); }
+    .tweet-card:nth-child(2) { z-index: 2; transform: translate(-13px,10px) rotate(-2deg) scale(.96); }
+    .tweet-card:nth-child(3) { z-index: 3; transform: translate(0,4px) rotate(.5deg) scale(.98); }
+    .tweet-card:nth-child(4) { z-index: 4; transform: translate(13px,8px) rotate(2deg) scale(.99); }
+    .tweet-card:nth-child(5) { z-index: 5; transform: translate(25px,14px) rotate(3.5deg); }
+    .tweet-card.fragment { transform: translateY(34px) scale(.88) rotate(-2deg); }
+    .tweet-card.fragment.shown { animation: tweet-pop .55s cubic-bezier(.16,1,.3,1) both; }
+    @keyframes tweet-pop {
+      from { opacity: 0; transform: translateY(70px) scale(.82) rotate(-5deg); }
+      to { opacity: 1; transform: var(--tweet-transform, none); }
+    }
+    .tweet-card:nth-child(1) { --tweet-transform: translate(-26px,18px) rotate(-4deg) scale(.93); }
+    .tweet-card:nth-child(2) { --tweet-transform: translate(-13px,10px) rotate(-2deg) scale(.96); }
+    .tweet-card:nth-child(3) { --tweet-transform: translate(0,4px) rotate(.5deg) scale(.98); }
+    .tweet-card:nth-child(4) { --tweet-transform: translate(13px,8px) rotate(2deg) scale(.99); }
+    .tweet-card:nth-child(5) { --tweet-transform: translate(25px,14px) rotate(3.5deg); }
+    .tweet-caption { min-height: 230px; position: relative; }
+    .tweet-caption article { position: absolute; inset: 0; opacity: 0; transform: translateY(16px); transition: .35s ease; }
+    .tweet-caption article.is-current { opacity: 1; transform: none; }
+    .tweet-caption small { color: var(--signal); font: 600 11px var(--mono); text-transform: uppercase; }
+    .tweet-caption strong { display: block; margin-top: 14px; font-size: clamp(25px,2.45vw,36px); line-height: 1.15; }
+    .tweet-caption p { margin-top: 15px; color: var(--ink-dim); font-size: clamp(12px,1.02vw,16px); }
+    .tweet-source { position: absolute; right: 6.2%; bottom: 8.5%; width: 34%; color: var(--ink-faint); font: 500 9px/1.35 var(--mono); }
+
+    .maintenance-flow {
+      display: grid;
+      grid-template-columns: 1fr 48px 1.1fr 48px 1fr 48px 1fr;
+      align-items: center;
+      margin-top: 58px;
+    }
+    .maintenance-node { min-height: 210px; padding: 22px 18px; border-top: 3px solid var(--signal); }
+    .maintenance-node small { color: var(--signal); font: 600 10px var(--mono); }
+    .maintenance-node strong { display: block; margin-top: 16px; font-size: clamp(18px,1.65vw,25px); }
+    .maintenance-node p { margin-top: 11px; color: var(--ink-dim); font-size: clamp(11px,.92vw,14px); }
+    .maintenance-arrow { color: var(--line-strong); text-align: center; font: 500 26px var(--mono); }
+    .maintenance-gap { border-top-color: var(--warning); }
+    .maintenance-gap strong { color: var(--warning); }
+
+    .rot-visual { position: relative; min-height: 390px; border-left: 1px solid var(--line); padding: 22px 0 0 36px; }
+    .rot-file { width: 86%; min-height: 270px; padding: 24px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--paper-2); box-shadow: 16px 16px 0 color-mix(in srgb, var(--warning) 10%, transparent); }
+    .rot-file header { color: var(--signal); font: 600 12px var(--mono); }
+    .rot-line { height: 8px; margin-top: 16px; border-radius: 5px; background: var(--line-strong); }
+    .rot-line.short { width: 64%; }
+    .rot-line.stale { width: 82%; background: color-mix(in srgb, var(--warning) 55%, var(--line)); }
+    .rot-line.duplicate { width: 72%; box-shadow: 0 15px 0 color-mix(in srgb, var(--warning) 35%, var(--line)); }
+    .rot-label { position: absolute; right: 3%; padding: 8px 11px; border: 1px solid var(--warning); border-radius: 999px; background: var(--paper); color: var(--warning); font: 600 9px var(--mono); text-transform: uppercase; }
+    .rot-label.one { top: 90px; }
+    .rot-label.two { top: 170px; }
+    .rot-label.three { top: 250px; }
+
+    .bridge-visual { display: grid; grid-template-columns: 1fr 100px 1fr; gap: 26px; align-items: center; margin-top: 45px; }
+    .bridge-lane { padding: 26px; border-top: 3px solid var(--line-strong); min-height: 255px; }
+    .bridge-lane.learned { border-color: var(--success); }
+    .bridge-lane small { color: var(--ink-faint); font: 600 10px var(--mono); text-transform: uppercase; }
+    .bridge-lane strong { display: block; margin-top: 14px; font-size: clamp(22px,2vw,30px); }
+    .bridge-lane p { margin-top: 13px; color: var(--ink-dim); font-size: clamp(12px,1vw,16px); }
+    .bridge-lane code { display: block; margin-top: 23px; color: var(--success); font-size: clamp(10px,.85vw,13px); }
+    .bridge-pulse { position: relative; height: 2px; background: var(--line-strong); }
+    .bridge-pulse::after { content: "evidence"; position: absolute; left: 50%; top: -27px; color: var(--signal); font: 600 9px var(--mono); transform: translateX(-50%); }
+    .bridge-pulse::before { content: ""; position: absolute; top: -4px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); animation: bridge-transfer 1.8s ease-in-out infinite; }
+    @keyframes bridge-transfer { 50%,100% { left: calc(100% - 10px); background: var(--success); } }
+
+    .system-stage { position: relative; margin-top: 10px; }
+    .system-map { display: block; width: 100%; height: 390px; overflow: visible; }
+    .system-map .scope { fill: color-mix(in srgb, var(--paper-2) 74%, transparent); stroke: var(--line); stroke-width: 1.5; }
+    .system-map .node-box { fill: var(--paper-2); stroke: var(--line-strong); stroke-width: 1.5; }
+    .system-map .node-box.source { stroke: var(--signal); }
+    .system-map .node-box.control { stroke: var(--warning); }
+    .system-map .node-box.persist { stroke: var(--success); }
+    .system-map text { fill: var(--ink); font-family: var(--mono); }
+    .system-map .node-title { font-size: 18px; font-weight: 600; }
+    .system-map .node-sub { fill: var(--ink-faint); font-size: 11px; }
+    .system-map .edge { fill: none; stroke: var(--line-strong); stroke-width: 2; marker-end: url(#system-arrow); }
+    .system-map .edge.optional { stroke-dasharray: 8 7; }
+    .system-map .packet { fill: var(--signal); opacity: 0; }
+    .system-map .is-current .packet, .system-map .packet.is-current { opacity: 1; animation: system-packet 1.4s ease-in-out infinite; }
+    @keyframes system-packet { 50% { filter: drop-shadow(0 0 7px var(--signal)); transform: translateX(12px); } }
+    .system-caption { position: absolute; z-index: 2; top: 67px; left: 6%; right: 6%; min-height: 30px; text-align: center; }
+    .system-caption span { position: absolute; inset: 0; color: var(--ink-dim); font: 500 clamp(10px,.85vw,13px)/1.4 var(--mono); opacity: 0; }
+    .system-caption span.is-current { opacity: 1; }
+
+    .beat-controls { display: none; align-items: center; gap: 8px; pointer-events: auto; }
+    .beat-controls.active { display: flex; }
+    .beat-controls button { width: 28px; height: 28px; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--paper-2); color: var(--signal); cursor: pointer; font: 600 12px var(--mono); }
+    .beat-controls input { width: 95px; accent-color: var(--signal); cursor: pointer; }
+    .beat-controls output { min-width: 34px; color: var(--ink-faint); font: 500 9px var(--mono); }
+
+    @media (max-width: 700px) {
+      .tweet-story { gap: 20px; }
+      .tweet-card { height: 305px; }
+      .system-map { height: 355px; }
+      .beat-controls input { width: 60px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .fragment, .slide.on .fragment { opacity: 1 !important; transform: none !important; }
+      .tweet-caption article, .system-caption span { opacity: 0 !important; }
+      .tweet-caption article:last-child, .system-caption span:last-child { opacity: 1 !important; transform: none !important; }
+    }
   </style>
 </head>
 <body>
-  <main class="stage" id="stage" data-theme="dark">
+  <main class="stage" id="stage" data-theme="light">
     <div class="stage-progress" id="progress"></div>
     <div class="deck-chrome">
-      <div class="chrome-top"><span class="chrome-mark"><i class="chrome-dot"></i><span>agentsmd self-improvement</span></span><span id="section">Open</span></div>
-      <div class="chrome-bottom"><span>Rudraksh Karpe · Satyam Soni · AgentCon Japan 2026</span><span class="chrome-end"><span class="theme-toggle"><button type="button" data-theme-choice="dark" class="on">Dark</button><button type="button" data-theme-choice="light">Light</button></span><span class="page-pill" id="count">1 / 16</span></span></div>
+      <div class="chrome-top"><span class="chrome-mark"><i class="chrome-dot"></i><span>agentsmd self-improvement</span></span><span class="chrome-end"><button class="source-trigger" id="source-trigger" type="button">Sources</button><span id="section">Open</span></span></div>
+      <div class="chrome-bottom"><span>Rudraksh Karpe · Satyam Soni · AgentCon Japan 2026</span><span class="chrome-end"><span class="beat-controls" id="beat-controls"><button type="button" id="beat-replay" aria-label="Replay this slide">↺</button><button type="button" id="beat-play" aria-label="Play or pause this slide">▶</button><input id="beat-scrub" type="range" min="0" max="0" value="0" aria-label="Current animation beat" /><output id="beat-count">0/0</output></span><span class="theme-toggle"><button type="button" data-theme-choice="dark">Dark</button><button type="button" data-theme-choice="light" class="on">Light</button></span><span class="page-pill" id="count">1 / 18</span></span></div>
     </div>
     <img class="brand" src="assets/agnt_mcpcon_japan26_bug_white.svg" alt="AGNTCon + MCPCon Japan" />
 
@@ -1274,8 +1460,8 @@
       <aside class="slide-notes">Keep this short. Introduce names and organizations only. Avoid biographies. The shared connection is infrastructure around developers and agent systems. Transition: Start from first principles.</aside>
     </section>
 
-    <section class="slide principles-slide" id="slide-03" data-title="What Is AGENTS.md?" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 3 | What Is AGENTS.md? | 1.5 minutes</span>
+    <section class="slide principles-slide" id="slide-03" data-title="What Is AGENTS.md?" data-duration="1 minute">
+      <span class="slide-meta">Slide 3 | What Is AGENTS.md? | 1 minute</span>
       <h2>What Is AGENTS.md?</h2>
       <div class="principles-layout">
         <ol class="numbered-points">
@@ -1285,50 +1471,85 @@
         </ol>
         <img class="principles-image" src="assets/agentsmd-ecosystem.png" alt="AGENTS.md ecosystem and supported coding agents" />
       </div>
-      <div class="takeaway-box">Think of it as: README.md for humans → AGENTS.md for coding agents</div>
+      <div class="takeaway-box">README.md serves people. AGENTS.md guides coding agents.</div>
       <aside class="slide-notes">Explain that agents can inspect code, but they do not automatically know repository-specific decisions. AGENTS.md gives them a predictable place for those instructions. The applicable file can be nested, and the closest file wins. Transition: This convention is now bigger than one tool.</aside>
     </section>
 
-    <section class="slide timeline-slide" id="slide-04" data-title="From Codex Convention to Open Standard" data-duration="1 minute">
-      <span class="slide-meta">Slide 4 | From Codex Convention to Open Standard | 1 minute</span>
-      <h2>From Codex Convention to Open Standard</h2>
-      <div class="timeline-gallery">
-        <img class="timeline-shot" src="assets/agentsmd-codex-introduction.png" alt="Codex AGENTS.md introduction" />
-        <img class="timeline-shot" src="assets/agentsmd-aaif-donation.png" alt="OpenAI Agentic AI Foundation announcement" />
-        <img class="timeline-shot" src="assets/agentsmd-github-adoption.png" alt="AGENTS.md GitHub repository" />
+    <section class="slide timeline-slide" id="slide-04" data-title="AGENTS.md adoption and stewardship" data-duration="1 minute">
+      <span class="slide-meta">Slide 4 | AGENTS.md adoption and stewardship | 1 minute</span>
+      <div class="eyebrow">One convention, wider stewardship</div>
+      <h2>AGENTS.md adoption and stewardship</h2>
+      <div class="evolution-rail" aria-label="AGENTS.md evolution timeline">
+        <span class="shown">August 2025</span>
+        <span data-fragment="1">December 2025</span>
+        <span data-fragment="2">September 2026</span>
       </div>
-      <div class="timeline-track">
-        <div class="timeline-event">
-          <strong>Introduced with Codex</strong>
-          <span>Repository instructions for coding agents</span>
-        </div>
-        <div class="timeline-event">
-          <strong>Donated to AAIF</strong>
-          <span>Neutral stewardship under the Linux Foundation</span>
-        </div>
-        <div class="timeline-event">
-          <strong>Widely adopted standard</strong>
-          <span>24k+ GitHub stars</span>
-        </div>
+      <div class="evolution-evidence">
+        <article class="evolution-event">
+          <img src="assets/agentsmd-codex-introduction.png" alt="OpenAI introduction of AGENTS.md with Codex" />
+          <time>OPENAI</time><strong>Introduced with Codex</strong>
+          <p>A predictable repository file for project-specific instructions.</p>
+        </article>
+        <article class="evolution-event" data-fragment="1">
+          <img src="assets/agentsmd-aaif-donation.png" alt="OpenAI announcement donating AGENTS.md to the Agentic AI Foundation" />
+          <time>LINUX FOUNDATION</time><strong>Donated to the AAIF</strong>
+          <p>AGENTS.md became a founding project under neutral governance.</p>
+        </article>
+        <article class="evolution-event" data-fragment="2">
+          <img src="assets/agentsmd-github-adoption.png" alt="AGENTS.md GitHub repository showing public adoption" />
+          <time>DATED SNAPSHOT</time><strong>24k+ GitHub stars</strong>
+          <p>OpenAI reported adoption across more than 60,000 projects and frameworks at donation time.</p>
+        </article>
       </div>
-      <aside class="slide-notes">OpenAI released AGENTS.md in August 2025 and contributed it to the Agentic AI Foundation on December 9, 2025. OpenAI reported more than 60,000 open-source projects and agent frameworks at that time. The point is interoperability and neutral stewardship, not control by one vendor. Transition: But how are teams creating these files today?</aside>
+      <aside class="slide-notes">Beat 0: OpenAI released AGENTS.md in August 2025 as a predictable place for repository instructions. Beat 1: On December 9, 2025, OpenAI contributed AGENTS.md as a founding project of the Agentic AI Foundation under the Linux Foundation. Beat 2: OpenAI and the Linux Foundation reported adoption by more than 60,000 open-source projects and agent frameworks at that time. The GitHub star figure is a dated September 2026 snapshot. Sources: openai.com/index/agentic-ai-foundation, linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, github.com/agentsmd/agents.md.</aside>
     </section>
 
-    <section class="slide authoring-slide" id="slide-05" data-title="How teams write AGENTS.md today" data-duration="1 minute">
-      <span class="slide-meta">Slide 5 | How teams write AGENTS.md today | 1 minute</span>
-      <h2>How teams write AGENTS.md today</h2>
-      <ul class="authoring-bullets">
-        <li>Human writes it</li>
-        <li>Agent generates it</li>
-        <li>Community templates with best practices</li>
-        <li>Teams maintain it manually</li>
-      </ul>
-      <p class="authoring-statement">As the repository changes, someone is expected to keep the instructions synchronized.</p>
-      <aside class="slide-notes">These authoring methods are useful. The limitation is that they are authoring workflows, not feedback loops. A generated starting point does not automatically incorporate what later sessions discover. Transition: The instructions do not experience the work.</aside>
+    <section class="slide" id="slide-market-voices" data-title="Adoption exposed a maintenance problem" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 5 | Adoption exposed a maintenance problem | 1.5 minutes</span>
+      <div class="eyebrow">Community conversation</div>
+      <h2>Adoption exposed a maintenance problem</h2>
+      <div class="tweet-story">
+        <div class="tweet-deck" aria-label="Stack of community posts about AGENTS.md maintenance">
+          <figure class="tweet-card" data-fragment="1"><img src="assets/tweet-swyx-stale-agentsmd.jpeg" alt="Post from swyx describing stale AGENTS.md instructions blocking a long-running task" /></figure>
+          <figure class="tweet-card" data-fragment="2"><img src="assets/tweet-ryan-dahl-antipattern.jpeg" alt="Post from Ryan Dahl questioning stale agent instruction files" /></figure>
+          <figure class="tweet-card" data-fragment="3"><img src="assets/tweet-matt-lukianski-fragmentation.jpeg" alt="Post from Matt Lukianski describing fragmented instruction surfaces" /></figure>
+          <figure class="tweet-card" data-fragment="4"><img src="assets/tweet-andrej-karpathy-instructions.jpeg" alt="Post from Andrej Karpathy describing agents ignoring AGENTS.md guidance" /></figure>
+          <figure class="tweet-card" data-fragment="5"><img src="assets/tweet-prasenjit-sarkar-coordination.jpeg" alt="Post from Prasenjit Sarkar describing inconsistent context across agents" /></figure>
+        </div>
+        <div>
+          <div class="tweet-caption" aria-live="polite">
+            <article class="is-current" data-beat-caption="0"><small>Before the first click</small><strong>A shared format solved discovery</strong><p>It did not solve maintenance, evidence, or cross-tool consistency.</p></article>
+            <article data-beat-caption="1"><small>Stale guidance</small><strong>Old instructions can keep an agent on the wrong path</strong><p>A file loaded automatically can outlive the decision that created it.</p></article>
+            <article data-beat-caption="2"><small>Reactive skepticism</small><strong>Developers question files that drift without review</strong><p>The concern targets stale and vague guidance, not the need for repository context.</p></article>
+            <article data-beat-caption="3"><small>Fragmented context</small><strong>Teams maintain several instruction surfaces</strong><p>Switching tools becomes harder when each agent reads a different file.</p></article>
+            <article data-beat-caption="4"><small>Weak adherence</small><strong>More instructions do not guarantee better code</strong><p>Rules need specific scope and observable validation.</p></article>
+            <article data-beat-caption="5"><small>Coordination</small><strong>Shared behavior requires an auditable source</strong><p>Teams need to know which agent read which guidance and why it changed.</p></article>
+          </div>
+          <p class="tweet-source">Speaker-supplied screenshots. Account, date, and engagement remain visible in each image.</p>
+        </div>
+      </div>
+      <aside class="slide-notes">Reveal one post per click. Treat these posts as community perspectives, not benchmark evidence. The through-line is practical: discovery has a shared format, while maintenance remains manual and fragmented. The screenshots came from the speaker and retain the original account names and dates. Transition: look at the maintenance workflow teams have today.</aside>
     </section>
 
-    <section class="slide feedback-problem-slide" id="slide-06" data-title="The missing feedback loop" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 6 | The missing feedback loop | 1.5 minutes</span>
+    <section class="slide authoring-slide" id="slide-05" data-title="The current maintenance workflow" data-duration="45 seconds">
+      <span class="slide-meta">Slide 6 | The current maintenance workflow | 45 seconds</span>
+      <div class="eyebrow">Today</div>
+      <h2>The current maintenance workflow</h2>
+      <div class="maintenance-flow">
+        <div class="maintenance-node"><small>01</small><strong>Author</strong><p>A maintainer writes instructions or accepts a generated starting point.</p></div>
+        <div class="maintenance-arrow">›</div>
+        <div class="maintenance-node" data-fragment="1"><small>02</small><strong>AGENTS.md</strong><p>The same file enters every matching coding-agent session.</p></div>
+        <div class="maintenance-arrow fragment" data-fragment="2">›</div>
+        <div class="maintenance-node" data-fragment="2"><small>03</small><strong>Repository changes</strong><p>Commands, architecture, and validation requirements evolve.</p></div>
+        <div class="maintenance-arrow fragment" data-fragment="3">›</div>
+        <div class="maintenance-node maintenance-gap" data-fragment="3"><small>04</small><strong>Manual synchronization</strong><p>Someone must notice the drift, reconstruct the lesson, and edit the file.</p></div>
+      </div>
+      <p class="authoring-statement" data-fragment="4">The coding sessions produce evidence, but that evidence never reaches the instruction file automatically.</p>
+      <aside class="slide-notes">Beat 0: teams author a useful starting file. Beat 1: agents consume it during work. Beat 2: the repository changes and sessions discover new facts. Beat 3: maintainers must manually notice and encode those facts. Beat 4: name the gap. Session evidence and instruction maintenance remain disconnected. Transition: that gap creates predictable failure modes.</aside>
+    </section>
+
+    <section class="slide feedback-problem-slide" id="slide-06" data-title="The missing feedback loop" data-duration="1 minute">
+      <span class="slide-meta">Slide 7 | The missing feedback loop | 1 minute</span>
       <h2>The missing feedback loop</h2>
       <p class="feedback-intro">AGENTS.md gives agents persistent repository context. But how does that context improve as agents actually work?</p>
       <div class="feedback-layout">
@@ -1362,14 +1583,24 @@
             </div>
           </div>
         </div>
-        <img class="feedback-image" src="assets/addy-osmani-agentsmd-feedback.png" alt="Addy Osmani on maintaining useful AGENTS.md instructions" />
+        <div class="rot-visual" aria-label="An AGENTS.md file accumulating stale and duplicate rules">
+          <div class="rot-file">
+            <header>AGENTS.md</header>
+            <div class="rot-line"></div><div class="rot-line short"></div>
+            <div class="rot-line stale"></div><div class="rot-line"></div>
+            <div class="rot-line duplicate"></div><div class="rot-line short"></div>
+          </div>
+          <span class="rot-label one" data-fragment="1">stale path</span>
+          <span class="rot-label two" data-fragment="2">repeated mistake</span>
+          <span class="rot-label three" data-fragment="3">duplicate rule</span>
+        </div>
       </div>
       <p class="feedback-question">The question is how we continuously improve what belongs inside it.</p>
-      <aside class="slide-notes">Do not say every AGENTS.md becomes bad. The production lesson from vLLM is to keep instructions lean, prune stale content, avoid reactive accumulation, avoid hardcoded paths, remove duplication, and test whether a rule is needed. Transition: Instead of predicting every rule, learn from the trajectory.</aside>
+      <aside class="slide-notes">Do not claim that every AGENTS.md degrades. Explain three risks shown in the illustration: repository paths become stale, sessions repeat discoveries that were never recorded, and reactive edits create duplicates. The file illustration is conceptual. Transition: the solution needs an evidence bar rather than automatic rewriting.</aside>
     </section>
 
-    <section class="slide discipline-slide" id="slide-07" data-title="AGENTS.md needs an evidence bar" data-duration="1 minute">
-      <span class="slide-meta">Slide 7 | AGENTS.md needs an evidence bar | 1 minute</span>
+    <section class="slide discipline-slide" id="slide-07" data-title="AGENTS.md needs an evidence bar" data-duration="45 seconds">
+      <span class="slide-meta">Slide 8 | AGENTS.md needs an evidence bar | 45 seconds</span>
       <h2>AGENTS.md needs an evidence bar</h2>
       <p class="discipline-intro">Maintaining agent instructions is already an engineering discipline.</p>
       <div class="discipline-layout">
@@ -1402,23 +1633,100 @@
       <aside class="slide-notes">The vLLM guidance treats agent instructions as an engineered artifact with token budgets, scope, anti-patterns, and a change checklist. The important lesson is not to add more text. It is to preserve only specific, non-obvious, tested guidance. Transition: Can trajectory evidence make part of this discipline systematic?</aside>
     </section>
 
-    <section class="slide experience-slide" id="slide-08" data-title="One shared loop behind every coding CLI" data-duration="2 minutes">
-      <span class="slide-meta">Slide 8 | agentsmd architecture | 2 minutes</span>
-      <div class="eyebrow">Architecture</div>
-      <h2>One shared loop behind every coding CLI</h2>
-      <div class="architecture-flow">
-        <div class="architecture-node"><h3>Capture adapters</h3><p>Codex, Claude Code, Cursor, and goose emit different lifecycle events.</p><code>provider event</code></div>
-        <div class="architecture-arrow">›</div>
-        <div class="architecture-node"><h3>Normalized trajectory</h3><p>Commands, files, tests, tokens, duration, Git state, and logical task identity share one schema.</p><code>.agentsmd/runs/*.json</code></div>
-        <div class="architecture-arrow">›</div>
-        <div class="architecture-node"><h3>Reflect and evaluate</h3><p>One task-boundary verdict enters the pending queue. A gate decides whether it reaches the ledger.</p><code>pending → ledger → render</code></div>
+    <section class="slide" id="slide-feedback-bridge" data-title="Session evidence closes the maintenance gap" data-duration="45 seconds">
+      <span class="slide-meta">Slide 9 | Session evidence closes the maintenance gap | 45 seconds</span>
+      <div class="eyebrow">The agentsmd contribution</div>
+      <h2>Session evidence closes the maintenance gap</h2>
+      <div class="bridge-visual">
+        <div class="bridge-lane">
+          <small>STATIC WORKFLOW</small>
+          <strong>Authored once, consumed repeatedly</strong>
+          <p>Corrections stay inside transcripts, review comments, and developer memory.</p>
+          <code>AGENTS.md@v0000</code>
+        </div>
+        <div class="bridge-pulse" data-fragment="1" aria-label="Session evidence crosses into the maintenance workflow"></div>
+        <div class="bridge-lane learned" data-fragment="2">
+          <small>EVIDENCE WORKFLOW</small>
+          <strong>One evaluated delta at a time</strong>
+          <p>agentsmd records the task, proposes a narrow rule, and keeps it pending until the gate passes.</p>
+          <code>run → pending → ledger → render</code>
+        </div>
       </div>
-      <div class="architecture-return">validated guidance returns to AGENTS.md for the next session</div>
-      <aside class="slide-notes">Capture differs by provider. Everything after normalization is shared. The ledger is the source of truth, and AGENTS.md is rendered from targeted deltas.</aside>
+      <aside class="slide-notes">Beat 0: the static workflow still provides useful repository context. Beat 1: agentsmd captures evidence at the task boundary. Beat 2: the evidence produces at most one narrow candidate. The candidate stays reviewable and only a successful gate can promote it. agentsmd does not retrain the model and it does not rewrite the entire file. Transition: now unfold the system one component at a time.</aside>
     </section>
 
-    <section class="slide" id="slide-cli-surface" data-title="The agentsmd CLI surface" data-duration="1 minute">
-      <span class="slide-meta">Slide 9 | The agentsmd CLI surface | 1 minute</span>
+    <section class="slide experience-slide" id="slide-08" data-title="One shared loop across coding CLIs" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 10 | agentsmd architecture | 1.5 minutes</span>
+      <div class="eyebrow">One task, unfolded</div>
+      <h2>One shared loop across coding CLIs</h2>
+      <div class="system-stage">
+        <div class="system-rail" aria-label="agentsmd lifecycle phases">
+          <span class="shown">Agents</span><span data-fragment="1">Capture</span><span data-fragment="2">Normalize</span><span data-fragment="3">Reflect</span><span data-fragment="4">Gate</span><span data-fragment="5">Ledger</span><span data-fragment="6">Render</span>
+        </div>
+        <svg class="system-map" viewBox="0 0 1160 390" role="img" aria-label="Coding agents emit provider events. agentsmd captures and normalizes them, reflects once at the task boundary, evaluates a candidate rule, stores approved rules in a ledger, and renders a targeted AGENTS.md update.">
+          <defs>
+            <marker id="system-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--signal)"></path></marker>
+          </defs>
+          <rect class="scope" x="305" y="250" width="655" height="108" rx="14"></rect>
+          <text class="node-sub" x="326" y="276">PROJECT-LOCAL .agentsmd/ STATE</text>
+
+          <g>
+            <rect class="node-box source" x="15" y="88" width="135" height="126" rx="12"></rect>
+            <text class="node-title" x="32" y="120">Coding agents</text>
+            <text class="node-sub" x="32" y="151">Codex</text><text class="node-sub" x="32" y="171">Claude Code</text><text class="node-sub" x="32" y="191">Cursor · goose</text>
+          </g>
+          <g data-fragment="1">
+            <path class="edge" d="M150 151 H180"></path><circle class="packet" cx="164" cy="151" r="5"></circle>
+            <rect class="node-box source" x="180" y="102" width="135" height="98" rx="12"></rect>
+            <text class="node-title" x="197" y="135">Adapters</text><text class="node-sub" x="197" y="161">hooks · transcripts</text><text class="node-sub" x="197" y="179">session exports</text>
+          </g>
+          <g data-fragment="2">
+            <path class="edge" d="M315 151 H345"></path><circle class="packet" cx="329" cy="151" r="5"></circle>
+            <rect class="node-box" x="345" y="102" width="145" height="98" rx="12"></rect>
+            <text class="node-title" x="362" y="135">Trajectory</text><text class="node-sub" x="362" y="161">commands · files</text><text class="node-sub" x="362" y="179">tests · cost · Git</text>
+            <path class="edge optional" d="M417 200 V294"></path>
+            <rect class="node-box persist" x="335" y="294" width="165" height="44" rx="8"></rect><text class="node-sub" x="357" y="321">runs/*.json</text>
+          </g>
+          <g data-fragment="3">
+            <path class="edge" d="M490 151 H520"></path><circle class="packet" cx="504" cy="151" r="5"></circle>
+            <rect class="node-box" x="520" y="102" width="140" height="98" rx="12"></rect>
+            <text class="node-title" x="537" y="135">Reflector</text><text class="node-sub" x="537" y="161">one task-boundary</text><text class="node-sub" x="537" y="179">verdict · or no change</text>
+          </g>
+          <g data-fragment="4">
+            <path class="edge" d="M660 151 H690"></path><circle class="packet" cx="674" cy="151" r="5"></circle>
+            <rect class="node-box control" x="690" y="102" width="135" height="98" rx="12"></rect>
+            <text class="node-title" x="707" y="135">Eval gate</text><text class="node-sub" x="707" y="161">tests · confidence</text><text class="node-sub" x="707" y="179">regression check</text>
+            <path class="edge optional" d="M757 200 V294"></path>
+            <rect class="node-box control" x="675" y="294" width="165" height="44" rx="8"></rect><text class="node-sub" x="701" y="321">pending/*.json</text>
+          </g>
+          <g data-fragment="5">
+            <path class="edge" d="M825 151 H855"></path><circle class="packet" cx="839" cy="151" r="5"></circle>
+            <rect class="node-box persist" x="855" y="102" width="135" height="98" rx="12"></rect>
+            <text class="node-title" x="872" y="135">Rule ledger</text><text class="node-sub" x="872" y="161">text · provenance</text><text class="node-sub" x="872" y="179">version · evidence</text>
+            <path class="edge optional" d="M922 200 V294"></path>
+            <rect class="node-box persist" x="855" y="294" width="165" height="44" rx="8"></rect><text class="node-sub" x="884" y="321">ledger.json</text>
+          </g>
+          <g data-fragment="6">
+            <path class="edge" d="M990 151 H1020"></path><circle class="packet" cx="1004" cy="151" r="5"></circle>
+            <rect class="node-box persist" x="1020" y="88" width="125" height="126" rx="12"></rect>
+            <text class="node-title" x="1036" y="121">AGENTS.md</text><text class="node-sub" x="1036" y="151">maintainer text</text><text class="node-sub" x="1036" y="171">+</text><text class="node-sub" x="1036" y="191">validated delta</text>
+          </g>
+        </svg>
+        <div class="system-caption" aria-live="polite">
+          <span class="is-current" data-beat-caption="0">Provider behavior differs. Every agent still reads the same repository instruction surface.</span>
+          <span data-beat-caption="1">Thin adapters capture hooks, transcripts, or exported sessions without changing the downstream loop.</span>
+          <span data-beat-caption="2">Normalization records commands, file changes, tests, cost, duration, and Git state in one trajectory.</span>
+          <span data-beat-caption="3">Reflection runs once at the task boundary and may correctly propose no AGENTS.md change.</span>
+          <span data-beat-caption="4">The candidate stays pending until evaluation and policy checks pass.</span>
+          <span data-beat-caption="5">Approved guidance enters a typed ledger with task and run provenance.</span>
+          <span data-beat-caption="6">Rendering preserves maintainer guidance and adds only the validated rule delta.</span>
+        </div>
+      </div>
+      <aside class="slide-notes">Use the visible controls or click to reveal the system. Beat 0 establishes the coding agents. Beat 1 shows provider-specific capture. Beat 2 normalizes evidence and persists the run. Beat 3 reflects once at the task boundary. Beat 4 keeps the candidate pending while tests and policy run. Beat 5 promotes approved guidance to the ledger with provenance. Beat 6 renders the targeted delta into AGENTS.md. Dashed connectors mean persistence, not mandatory synchronous calls. Capture mechanics vary by provider.</aside>
+    </section>
+
+    <section class="slide" id="slide-cli-surface" data-title="The agentsmd CLI surface" data-duration="45 seconds">
+      <span class="slide-meta">Slide 11 | The agentsmd CLI surface | 45 seconds</span>
       <div class="eyebrow">Product surface</div><h2>The agentsmd CLI surface</h2>
       <div class="command-surface">
         <div class="command-lane"><h3>Author</h3><code><strong>init</strong> · detect and scaffold</code><code><strong>templates</strong> · curated starts</code><code><strong>render</strong> · rebuild from ledger</code><code><strong>lint</strong> · find stale rules</code></div>
@@ -1430,8 +1738,8 @@
       <aside class="slide-notes">This is the implemented command tree. The public workflow stays small. Advanced history and maintenance commands remain available for auditing and recovery.</aside>
     </section>
 
-    <section class="slide cli-intro-slide" id="slide-09" data-title="Repository setup in the CLI" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 10 | Repository setup in the CLI | 1.5 minutes</span>
+    <section class="slide cli-intro-slide" id="slide-09" data-title="Repository setup in the CLI" data-duration="1 minute">
+      <span class="slide-meta">Slide 12 | Repository setup in the CLI | 1 minute</span>
       <div class="gif-demo-layout">
         <div class="gif-copy"><div class="eyebrow">Recorded CLI</div><h2>Project setup</h2><p>The CLI detects Go, writes a structured AGENTS.md, checks the machine, connects the coding agent, and shows the reflection policy.</p><p class="media-caption">13-second loop · press R to restart</p></div>
         <img class="demo-gif" data-gif src="assets/agentsmd-setup.gif" alt="Recorded agentsmd CLI setup with init, doctor, connect, and automate" />
@@ -1439,8 +1747,8 @@
       <aside class="slide-notes">This GIF comes from the current binary's interface and command output. The home path is shortened to ~/work/envmerge for projection. Pause on doctor to explain that provider integrations remain optional.</aside>
     </section>
 
-    <section class="slide" id="slide-learning-workflow" data-title="Session evidence workflow" data-duration="2 minutes">
-      <span class="slide-meta">Slide 11 | Session evidence workflow | 2 minutes</span>
+    <section class="slide" id="slide-learning-workflow" data-title="Session evidence workflow" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 13 | Session evidence workflow | 1.5 minutes</span>
       <div class="eyebrow">Decision workflow</div><h2>Session evidence workflow</h2>
       <div class="workflow-board">
         <div class="provider-strip"><span>Codex</span><span>Claude Code</span><span>Cursor</span><span>goose</span></div>
@@ -1460,8 +1768,8 @@
       <aside class="slide-notes">The reflector is provider-pluggable. GEPA inspires the reflect, mutate, evaluate, select pattern, but agentsmd does not train a model. A no-change verdict is valid and prevents instruction bloat.</aside>
     </section>
 
-    <section class="slide learning-terminal-slide" id="slide-11" data-title="A session becomes a rule" data-duration="2.5 minutes">
-      <span class="slide-meta">Slide 12 | A session becomes a rule | 2.5 minutes</span>
+    <section class="slide learning-terminal-slide" id="slide-11" data-title="A session becomes a rule" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 14 | A session becomes a rule | 1.5 minutes</span>
       <div class="gif-demo-layout">
         <div class="gif-copy"><div class="eyebrow">Recorded study</div><h2>A session becomes a rule</h2><p>A Go configuration task exposes wasted test retries. The proposal stays reviewable until promotion records its task and run provenance.</p><p class="media-caption">19-second loop · press R to restart</p></div>
         <img class="demo-gif" data-gif src="assets/agentsmd-learning.gif" alt="Recorded agentsmd learning workflow from task and sessions to proposal, promotion, blame, and progress" />
@@ -1469,8 +1777,8 @@
       <aside class="slide-notes">Pause after pending. The active file remains unchanged at that point. Promotion writes r000 to the ledger and renders the learned block. The final progress output compares two already-recorded successful sessions.</aside>
     </section>
 
-    <section class="slide demo-slide" id="slide-10" data-title="The targeted AGENTS.md update" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 13 | Before and after AGENTS.md | 1.5 minutes</span>
+    <section class="slide demo-slide" id="slide-10" data-title="The targeted AGENTS.md update" data-duration="1 minute">
+      <span class="slide-meta">Slide 15 | Before and after AGENTS.md | 1 minute</span>
       <div class="eyebrow">Before and after</div><h2>The loop adds two precise rules</h2>
       <div class="file-diff">
         <div class="file-pane"><header>BEFORE · STATIC GUIDANCE</header><pre># AGENTS.md
@@ -1498,8 +1806,8 @@
       <aside class="slide-notes">The original maintainer guidance remains intact. The two recorded rules come from two separate baseline trajectories. The slide shortens their wording for projection.</aside>
     </section>
 
-    <section class="slide benchmarks-slide" id="slide-12" data-title="Recorded held-out result" data-duration="2 minutes">
-      <span class="slide-meta">Slide 14 | Recorded held-out result | 2 minutes</span>
+    <section class="slide benchmarks-slide" id="slide-12" data-title="Recorded held-out result" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 16 | Recorded held-out result | 1.5 minutes</span>
       <div class="eyebrow">Six real runs</div><h2>Success held while median cost fell</h2>
       <p class="benchmark-summary">Six real runs on the same Go configuration task, graded with hidden tests after each agent exits.</p>
       <div class="benchmark-grid">
@@ -1520,7 +1828,7 @@
     </section>
 
     <section class="slide repo-qr-slide" id="slide-13" data-title="Scan to use agentsmd-cli" data-duration="0.5 minute">
-      <span class="slide-meta">Slide 15 | Scan to use agentsmd-cli | 0.5 minute</span>
+      <span class="slide-meta">Slide 17 | Scan to use agentsmd-cli | 0.5 minute</span>
       <h2>Scan to use agentsmd-cli</h2>
       <img class="repo-qr" src="assets/agentsmd-cli-qr.png" alt="QR code for the agentsmd-cli GitHub repository" />
       <a class="repo-url" href="https://github.com/rudrakshkarpe/agentsmd-cli">github.com/rudrakshkarpe/agentsmd-cli</a>
@@ -1529,7 +1837,7 @@
     </section>
 
     <section class="slide qna-slide" id="slide-14" data-title="Q&amp;A" data-duration="4 minutes">
-      <span class="slide-meta">Slide 16 | Q&amp;A | 4 minutes</span>
+      <span class="slide-meta">Slide 18 | Q&amp;A | 4 minutes</span>
       <h2 class="qna-title">Q&amp;A</h2>
       <aside class="slide-notes">Open the floor for audience questions.</aside>
     </section>
@@ -1546,6 +1854,7 @@
       <dt>←</dt><dd>Hide the previous beat or go back</dd>
       <dt>Esc</dt><dd>Open the slide overview</dd>
       <dt>N</dt><dd>Open speaker notes</dd>
+      <dt>S</dt><dd>Open sources and scope</dd>
       <dt>T</dt><dd>Switch between dark and light</dd>
       <dt>R</dt><dd>Replay the active CLI sequence</dd>
       <dt>F</dt><dd>Enter fullscreen</dd>
@@ -1554,6 +1863,18 @@
   <section class="deck-overlay" id="notes" aria-label="Speaker notes">
     <p class="overlay-kicker" id="notes-title"></p>
     <p class="notes-body" id="notes-body"></p>
+  </section>
+  <section class="deck-overlay" id="sources" aria-label="Sources and scope">
+    <p class="overlay-kicker">Sources and scope · S to close</p>
+    <div class="source-list">
+      <a href="https://github.com/agentsmd/agents.md">AGENTS.md open format and repository</a>
+      <a href="https://openai.com/index/agentic-ai-foundation/">OpenAI AAIF and AGENTS.md contribution announcement</a>
+      <a href="https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation">Linux Foundation AAIF formation announcement</a>
+      <a href="https://arxiv.org/abs/2507.19457">GEPA reflective prompt evolution paper</a>
+      <a href="https://arxiv.org/abs/2510.04618">ACE evolving context paper</a>
+      <a href="https://github.com/rudrakshkarpe/agentsmd-cli">agentsmd-cli implementation and benchmark evidence</a>
+    </div>
+    <p class="source-scope">The community posts are speaker-supplied screenshots and represent individual perspectives. Animation timing is illustrative. The recorded benchmark covers one Go task, one model, and three trials per condition.</p>
   </section>
 
   <nav id="dots" aria-label="Slide navigation"></nav>
@@ -1567,13 +1888,20 @@
     const overlays = {
       overview: document.getElementById("overview"),
       help: document.getElementById("help"),
-      notes: document.getElementById("notes")
+      notes: document.getElementById("notes"),
+      sources: document.getElementById("sources")
     };
-    const sections = ["Open", "Open", "Context", "Context", "Problem", "Problem", "Method", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Evidence", "Try it", "Close"];
+    const sections = ["Open", "Open", "Context", "Evolution", "Voices", "Today", "Problem", "Method", "Bridge", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Evidence", "Try it", "Close"];
     let current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1) || 1) - 1));
     let step = 0;
     let overlay = null;
     let terminalRun = 0;
+    let beatTimer = null;
+    const beatControls = document.getElementById("beat-controls");
+    const beatPlay = document.getElementById("beat-play");
+    const beatReplay = document.getElementById("beat-replay");
+    const beatScrub = document.getElementById("beat-scrub");
+    const beatCount = document.getElementById("beat-count");
     const scripts = {
       setup: [
         ["prompt", "$ agentsmd init\n", true], ["ok", "✓ initialized ./demo (v0000)\n\n"],
@@ -1598,11 +1926,8 @@
 
     const fragmentGroups = {
       "slide-03": [[".numbered-points li:nth-child(2)"], [".numbered-points li:nth-child(3)"], [".principles-image"], [".takeaway-box"]],
-      "slide-04": [[".timeline-shot:nth-child(2)", ".timeline-event:nth-child(2)"], [".timeline-shot:nth-child(3)", ".timeline-event:nth-child(3)"]],
-      "slide-05": [[".authoring-bullets li:nth-child(2)"], [".authoring-bullets li:nth-child(3)"], [".authoring-bullets li:nth-child(4)"], [".authoring-statement"]],
       "slide-06": [[".problem-item:nth-child(2)"], [".problem-item:nth-child(3)"], [".problem-item:nth-child(4)"], [".feedback-question"]],
       "slide-07": [[".discipline-rule:nth-child(2)"], [".discipline-rule:nth-child(3)"], [".discipline-conclusion"]],
-      "slide-08": [[".architecture-node:nth-child(3)", ".architecture-arrow:nth-child(2)"], [".architecture-node:nth-child(5)", ".architecture-arrow:nth-child(4)"], [".architecture-return"]],
       "slide-10": [[".file-pane:nth-child(2)"]],
       "slide-12": [[".benchmark-metric:nth-child(2)"], [".benchmark-metric:nth-child(3)", ".benchmark-metric:nth-child(4)"], [".benchmark-bars"]]
     };
@@ -1621,7 +1946,43 @@
     }
 
     function applyFragments() {
-      slides[current].querySelectorAll("[data-fragment]").forEach(element => element.classList.toggle("shown", Number(element.dataset.fragment) <= step));
+      const activeSlide = slides[current];
+      activeSlide.querySelectorAll("[data-fragment]").forEach(element => {
+        const fragmentStep = Number(element.dataset.fragment);
+        element.classList.toggle("shown", fragmentStep <= step);
+        element.classList.toggle("is-current", fragmentStep === step);
+      });
+      activeSlide.querySelectorAll("[data-beat-caption]").forEach(element => element.classList.toggle("is-current", Number(element.dataset.beatCaption) === step));
+      updateBeatControls();
+    }
+
+    function updateBeatControls() {
+      const maximum = maxStep();
+      beatControls.classList.toggle("active", maximum > 0);
+      beatScrub.max = String(maximum);
+      beatScrub.value = String(step);
+      beatCount.value = `${step}/${maximum}`;
+    }
+
+    function stopBeatPlayback() {
+      clearInterval(beatTimer);
+      beatTimer = null;
+      beatPlay.textContent = "▶";
+      beatPlay.setAttribute("aria-label", "Play this slide");
+    }
+
+    function toggleBeatPlayback() {
+      if (beatTimer) { stopBeatPlayback(); return; }
+      if (!maxStep()) return;
+      if (step >= maxStep()) { step = 0; applyFragments(); updateProgress(); }
+      beatPlay.textContent = "Ⅱ";
+      beatPlay.setAttribute("aria-label", "Pause this slide");
+      beatTimer = setInterval(() => {
+        if (step >= maxStep()) { stopBeatPlayback(); return; }
+        step++;
+        applyFragments();
+        updateProgress();
+      }, 1700);
     }
 
     function updateProgress() {
@@ -1662,8 +2023,28 @@
         const source = gif.getAttribute("src");
         gif.setAttribute("src", "");
         requestAnimationFrame(() => gif.setAttribute("src", source));
+      } else if (maxStep()) {
+        step = 0;
+        applyFragments();
+        updateProgress();
       } else terminalRun++;
     }
+
+    beatPlay.addEventListener("click", event => { event.stopPropagation(); toggleBeatPlayback(); });
+    beatReplay.addEventListener("click", event => {
+      event.stopPropagation();
+      stopBeatPlayback();
+      step = 0;
+      applyFragments();
+      updateProgress();
+    });
+    beatScrub.addEventListener("input", event => {
+      event.stopPropagation();
+      stopBeatPlayback();
+      step = Number(beatScrub.value);
+      applyFragments();
+      updateProgress();
+    });
 
     slides.forEach((slide, index) => {
       const button = document.createElement("button");
@@ -1688,13 +2069,17 @@
 
     function setTheme(theme) {
       stage.dataset.theme = theme;
-      localStorage.setItem("agentsmd-deck-theme", theme);
+      localStorage.setItem("agentsmd-deck-theme-v2", theme);
       document.querySelectorAll("[data-theme-choice]").forEach(button => button.classList.toggle("on", button.dataset.themeChoice === theme));
     }
     document.querySelectorAll("[data-theme-choice]").forEach(button => button.addEventListener("click", event => {
       event.stopPropagation();
       setTheme(button.dataset.themeChoice);
     }));
+    document.getElementById("source-trigger").addEventListener("click", event => {
+      event.stopPropagation();
+      overlay === "sources" ? closeOverlay() : openOverlay("sources");
+    });
 
     function openOverlay(name) {
       closeOverlay();
@@ -1712,6 +2097,7 @@
     Object.values(overlays).forEach(element => element.addEventListener("click", closeOverlay));
 
     function go(next, targetStep = 0, updateHash = true) {
+      stopBeatPlayback();
       current = Math.max(0, Math.min(slides.length - 1, next));
       step = Math.max(0, Math.min(maxStep(current), targetStep));
       slides.forEach((slide, index) => slide.classList.toggle("on", index === current));
@@ -1736,10 +2122,10 @@
       else if (current > 0) go(current - 1, maxStep(current - 1));
     }
 
-    setTheme(localStorage.getItem("agentsmd-deck-theme") || "dark");
+    setTheme(localStorage.getItem("agentsmd-deck-theme-v2") || "light");
     go(current, 0, false);
     stage.addEventListener("click", event => {
-      if (event.target.closest("button") || overlay) return;
+      if (event.target.closest("button, input") || overlay) return;
       if (event.clientX < innerWidth / 3) back(); else forward();
     });
     window.addEventListener("hashchange", () => go(Number(location.hash.slice(1) || 1) - 1, 0, false));
@@ -1747,6 +2133,7 @@
       if (event.key === "Escape") { overlay ? closeOverlay() : openOverlay("overview"); return; }
       if (event.key === "?") { overlay === "help" ? closeOverlay() : openOverlay("help"); return; }
       if (event.key.toLowerCase() === "n") { overlay === "notes" ? closeOverlay() : openOverlay("notes"); return; }
+      if (event.key.toLowerCase() === "s") { overlay === "sources" ? closeOverlay() : openOverlay("sources"); return; }
       if (event.key.toLowerCase() === "t") { setTheme(stage.dataset.theme === "dark" ? "light" : "dark"); return; }
       if (overlay) return;
       if (["ArrowRight", " ", "PageDown", "Enter"].includes(event.key)) { event.preventDefault(); forward(); }

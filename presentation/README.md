@@ -21,9 +21,11 @@ Open <http://localhost:8080>.
 - First or last slide: `Home` or `End`
 - Slide overview: `Esc`
 - Speaker notes: `N`
+- Sources and scope: `S`
 - Keyboard help: `?`
 - Dark or light theme: `T`
-- Replay the active CLI animation: `R`
+- Play, pause, replay, or scrub progressive beats with the visible controls
+- Replay the active CLI animation or reset the active diagram: `R`
 - Full screen: `F`
 
 The URL hash identifies the active slide, so `#8` opens slide 8 directly.
@@ -37,12 +39,14 @@ Presented by Rudraksh Karpe and Satyam Soni.
 
 - September 10, 2026, 10:40–11:05 JST
 - Hall C
-- 16 slides
-- 24.5 minutes of planned material, including two recorded CLI sequences and
+- 18 slides
+- 21 minutes of planned material, including two recorded CLI sequences and
   four minutes for questions
 
 See [TALK-NOTES.md](TALK-NOTES.md) for the stage plan and
-[SOURCES.md](SOURCES.md) for claim provenance.
+[SOURCES.md](SOURCES.md) for source provenance. [CLAIM-LEDGER.md](CLAIM-LEDGER.md)
+separates confirmed behavior, dated snapshots, community opinion, and
+illustrative motion.
 
 ## Source
 
@@ -61,6 +65,12 @@ with scripts rewritten around real agentsmd commands and evidence.
 The decision-workflow layout is informed by
 [`get-vix/vix`](https://github.com/get-vix/vix), while the nodes describe only
 the capture, reflection, evaluation, and promotion behavior implemented here.
+The light-first system anatomy and presenter-controlled motion adapt the visual
+grammar of
+[`Inside an Inference Request`](https://rudrakshkarpe.com/presentations/inside-an-inference-request)
+through the
+[`animated-technical-illustrations`](https://github.com/shivaylamba/animated-technical-illustrations)
+skill.
 
 ## Rebuild the CLI recordings
 
@@ -68,3 +78,16 @@ The checked-in GIFs are generated from
 [`scripts/render_cli_gifs.mjs`](scripts/render_cli_gifs.mjs). The script uses
 Playwright and FFmpeg so the terminal media remains reproducible rather than a
 hand-edited animation.
+
+## Validate the interactive deck
+
+With the local server running, use the bundled workspace Node.js packages:
+
+```bash
+WORKSPACE_NODE_MODULES=/path/to/bundled/node_modules \
+  node presentation/scripts/validate_deck.mjs
+```
+
+The check covers all 18 slides at 320px, 768px, and desktop widths, along with
+deep links, keyboard stepping, replay, image loading, source visibility, and
+the reduced-motion final state.
