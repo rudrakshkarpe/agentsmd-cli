@@ -33,7 +33,6 @@ for (const viewport of viewports) {
       notes: document.querySelectorAll(".slide .slide-notes").length,
       duplicateIds: ids.filter((id, index) => ids.indexOf(id) !== index),
       brokenImages: [...document.images].filter(image => !image.complete || !image.naturalWidth).map(image => image.src),
-      videos: [...document.querySelectorAll("video source")].map(source => source.src),
       bodyOverflow: document.documentElement.scrollWidth > innerWidth,
       stageOverflow: document.getElementById("stage").getBoundingClientRect().width > innerWidth + 1,
     };
@@ -42,7 +41,6 @@ for (const viewport of viewports) {
   if (result.notes !== result.slides) failures.push(`${viewport.width}px: ${result.slides - result.notes} slides lack notes`);
   if (result.duplicateIds.length) failures.push(`${viewport.width}px: duplicate ids ${result.duplicateIds.join(", ")}`);
   if (result.brokenImages.length) failures.push(`${viewport.width}px: broken images ${result.brokenImages.join(", ")}`);
-  if (result.videos.length !== 1) failures.push(`${viewport.width}px: expected one introduction video, found ${result.videos.length}`);
   if (result.bodyOverflow || result.stageOverflow) failures.push(`${viewport.width}px: horizontal overflow`);
   if (browserErrors.length) failures.push(`${viewport.width}px: browser errors ${browserErrors.join(" | ")}`);
   await context.close();
@@ -57,6 +55,8 @@ const reduced = await reducedPage.evaluate(() => ({
 }));
 if (reduced.hiddenFragments) failures.push(`reduced motion: ${reduced.hiddenFragments} fragments remain hidden`);
 if (!reduced.finalCaptionVisible) failures.push("reduced motion: final architecture caption is hidden");
+await reducedPage.goto(`${baseUrl}/#3`, { waitUntil: "domcontentloaded" });
+if ((await reducedPage.locator(".context-caption span:last-child").evaluate(element => getComputedStyle(element).opacity)) !== "1") failures.push("reduced motion: final introduction caption is hidden");
 await reducedContext.close();
 
 const interactionContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -72,10 +72,14 @@ await interactionPage.getByRole("button", { name: "Sources", exact: true }).clic
 if (!(await interactionPage.locator("#sources").evaluate(element => element.classList.contains("on")))) failures.push("sources overlay did not open");
 await interactionPage.keyboard.press("s");
 await interactionPage.goto(`${baseUrl}/#3`, { waitUntil: "domcontentloaded" });
-await interactionPage.waitForTimeout(350);
-const filmState = await interactionPage.locator("[data-intro-video]").evaluate(video => ({ paused: video.paused, currentTime: video.currentTime }));
-if (filmState.paused || filmState.currentTime <= 0) failures.push("introduction film did not autoplay");
-if (!(await interactionPage.locator("#stage").evaluate(element => element.classList.contains("film-active")))) failures.push("introduction film did not enter cinema mode");
+await interactionPage.keyboard.press("ArrowRight");
+if ((await interactionPage.locator("#beat-count").textContent()) !== "1/6") failures.push("controlled introduction did not advance one beat");
+await interactionPage.keyboard.press("r");
+if ((await interactionPage.locator("#beat-count").textContent()) !== "0/6") failures.push("controlled introduction did not replay from beat zero");
+if (!(await interactionPage.locator("#stage").evaluate(element => element.classList.contains("context-active")))) failures.push("controlled introduction did not enter its dark context theme");
+for (let index = 0; index < 7; index++) await interactionPage.keyboard.press("ArrowRight");
+if ((await interactionPage.locator("#count").textContent()) !== "4 / 18") failures.push("controlled introduction did not advance directly to the community posts");
+if ((await interactionPage.locator("#section").textContent()) !== "Voices") failures.push("slide 4 is not the community-post section");
 if ((await interactionPage.locator("#stage").getAttribute("data-theme")) !== "light") failures.push("fresh context did not use the light theme");
 await interactionContext.close();
 

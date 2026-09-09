@@ -1384,11 +1384,45 @@
     .bridge-pulse::before { content: ""; position: absolute; top: -4px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); animation: bridge-transfer 1.8s ease-in-out infinite; }
     @keyframes bridge-transfer { 50%,100% { left: calc(100% - 10px); background: var(--success); } }
 
-    .intro-film-slide { padding: 0; background: #000 !important; }
-    .intro-film-slide video { display: block; width: 100%; height: 100%; background: #000; object-fit: contain; }
-    .film-cue { position: absolute; right: 3.2%; bottom: 3.2%; color: rgba(255,255,255,.5); font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-    .stage.film-active .deck-chrome, .stage.film-active .stage-progress { opacity: 0; }
-    .stage.film-active::before { display: none; }
+    .stage.context-active {
+      --paper: #000;
+      --paper-2: #101010;
+      --ink: #fff;
+      --ink-dim: #c6c9cf;
+      --ink-faint: #777d86;
+      --line: #242424;
+      --line-strong: #484848;
+      --signal: #ff9d00;
+      --success: #69d5a3;
+      --warning: #ff9d00;
+    }
+    .stage.context-active::before { display: none; }
+    .stage.context-active .theme-toggle { visibility: hidden; }
+    .context-story-slide h2 { max-width: none; font-size: clamp(36px,4.6vw,62px); }
+    .context-story-stage { position: relative; margin-top: 16px; padding-top: 42px; }
+    .context-map { display: block; width: 100%; height: 330px; overflow: visible; }
+    .context-map text { fill: var(--ink); font-family: var(--mono); }
+    .context-map .frame { fill: none; stroke: var(--line-strong); stroke-width: 1.5; }
+    .context-map .code-line { stroke: var(--ink-faint); stroke-width: 4; stroke-linecap: round; }
+    .context-map .flow { fill: none; stroke: #8c939e; stroke-width: 2; }
+    .context-map .flow.warning { stroke: var(--warning); }
+    .context-map .flow.success { stroke: var(--success); }
+    .context-map .flow.missing { stroke: var(--warning); stroke-dasharray: 7 7; }
+    .context-map .label { fill: var(--ink-faint); font-size: 10px; font-weight: 600; letter-spacing: .1em; }
+    .context-map .title { font-family: var(--sans); font-size: 21px; font-weight: 600; }
+    .context-map .detail { fill: var(--ink-faint); font-size: 11px; }
+    .context-map .warning-text { fill: var(--warning); }
+    .context-map .success-text { fill: var(--success); }
+    .context-map .socket { fill: var(--paper); stroke: var(--warning); stroke-width: 2; }
+    .context-map .packet { fill: var(--signal); opacity: 0; }
+    .context-map g[data-fragment="4"] .packet, .context-map g[data-fragment="5"] .packet { fill: var(--success); }
+    .context-map g.is-current .packet { opacity: 1; animation: context-packet 1.2s ease-in-out infinite; }
+    @keyframes context-packet { 50% { filter: drop-shadow(0 0 9px currentColor); transform: translateX(11px); } }
+    .context-caption { position: absolute; top: 0; left: 0; right: 0; min-height: 32px; }
+    .context-caption span { position: absolute; inset: 0; color: var(--ink-dim); font: 500 clamp(12px,1vw,15px)/1.4 var(--mono); opacity: 0; }
+    .context-caption span.is-current { opacity: 1; }
+    .context-summary { position: absolute; right: 0; bottom: 5px; display: flex; gap: 30px; color: var(--ink-faint); font: 500 10px var(--mono); }
+    .context-summary strong { color: var(--ink); font-weight: 600; }
 
     .system-stage { position: relative; margin-top: 12px; padding-top: 38px; }
     .system-map { display: block; width: 100%; height: 330px; overflow: visible; }
@@ -1433,8 +1467,8 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
       .fragment, .slide.on .fragment { opacity: 1 !important; transform: none !important; }
-      .tweet-caption article, .system-caption span { opacity: 0 !important; }
-      .tweet-caption article:last-child, .system-caption span:last-child { opacity: 1 !important; transform: none !important; }
+      .tweet-caption article, .system-caption span, .context-caption span { opacity: 0 !important; }
+      .tweet-caption article:last-child, .system-caption span:last-child, .context-caption span:last-child { opacity: 1 !important; transform: none !important; }
     }
   </style>
 </head>
@@ -1475,17 +1509,106 @@
       <aside class="slide-notes">Keep this short. Introduce names and organizations only. Avoid biographies. The shared connection is infrastructure around developers and agent systems. Transition: Start from first principles.</aside>
     </section>
 
-    <section class="slide intro-film-slide" id="slide-03" data-title="AGENTS.md introduction" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 3 | AGENTS.md introduction | 1.5 minutes</span>
-      <video data-intro-video muted playsinline preload="metadata" poster="assets/agentsmd-introduction-poster.jpg" aria-label="AGENTS.md introduction film showing why coding agents need repository context">
-        <source src="assets/agentsmd-introduction.mp4" type="video/mp4" />
-      </video>
-      <span class="film-cue">Click right to continue · R to restart</span>
-      <aside class="slide-notes">Play the 76-second introduction without narration. It establishes the core distinction: an agent can inspect code but still lacks the repository's working context. AGENTS.md records that context so the agent can follow the team's conventions. The film is muted by design. Press R to restart it. Transition: the convention moved beyond one product and into neutral stewardship.</aside>
+    <section class="slide context-story-slide" id="slide-03" data-title="Why AGENTS.md exists" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 3 | Why AGENTS.md exists | 1.5 minutes</span>
+      <div class="eyebrow">The repository context gap</div>
+      <h2>Why AGENTS.md exists</h2>
+      <div class="context-story-stage">
+        <div class="context-caption" aria-live="polite">
+          <span class="is-current" data-beat-caption="0">The coding agent can inspect the repository.</span>
+          <span data-beat-caption="1">The repository does not explain how this team works.</span>
+          <span data-beat-caption="2">The agent guesses, makes a mistake, and needs a correction.</span>
+          <span data-beat-caption="3">The developer records that correction as repository guidance.</span>
+          <span data-beat-caption="4">The next session loads AGENTS.md before work begins.</span>
+          <span data-beat-caption="5">The agent follows the convention instead of repeating the mistake.</span>
+          <span data-beat-caption="6">README.md answers people. AGENTS.md answers coding agents.</span>
+        </div>
+        <svg class="context-map" viewBox="0 0 1160 340" role="img" aria-label="Code flows to a coding agent. Missing repository context causes a wrong command and failed test. A developer records the correction in AGENTS.md. The next session reads the file and follows the convention.">
+          <defs>
+            <marker id="context-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#8c939e"></path></marker>
+            <marker id="context-warning-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#ff9d00"></path></marker>
+            <marker id="context-success-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#69d5a3"></path></marker>
+          </defs>
+
+          <g>
+            <text class="label" x="42" y="73">REPOSITORY</text>
+            <rect class="frame" x="42" y="88" width="220" height="110" rx="8"></rect>
+            <line class="code-line" x1="65" y1="116" x2="205" y2="116"></line>
+            <line class="code-line" x1="65" y1="139" x2="225" y2="139"></line>
+            <line class="code-line" x1="65" y1="162" x2="180" y2="162"></line>
+            <text class="detail" x="65" y="185">code is visible</text>
+            <path class="flow" d="M262 143 H430" marker-end="url(#context-arrow)"></path>
+            <text class="label" x="455" y="73">CODING AGENT</text>
+            <rect class="frame" x="430" y="104" width="190" height="78" rx="39"></rect>
+            <circle class="socket" cx="525" cy="129" r="7"></circle>
+            <text class="title" x="525" y="163" text-anchor="middle">AGENT</text>
+          </g>
+
+          <g data-fragment="1">
+            <path class="flow missing" d="M525 182 V224" marker-end="url(#context-warning-arrow)"></path><circle class="packet" cx="525" cy="197" r="5"></circle>
+            <text class="label warning-text" x="448" y="246">TEAM CONTEXT MISSING</text>
+          </g>
+
+          <g data-fragment="2">
+            <path class="flow warning" d="M620 143 H845" marker-end="url(#context-warning-arrow)"></path><circle class="packet" cx="725" cy="143" r="5"></circle>
+            <text class="label warning-text" x="870" y="104">FIRST ATTEMPT</text>
+            <text class="title warning-text" x="870" y="136">Wrong command</text>
+            <text class="detail" x="870" y="159">test fails</text>
+          </g>
+
+          <g data-fragment="3">
+            <path class="flow warning" d="M930 165 V260 H690 V285" marker-end="url(#context-warning-arrow)"></path><circle class="packet" cx="815" cy="260" r="5"></circle>
+            <text class="label warning-text" x="745" y="282">DEVELOPER WRITES THE FIX</text>
+            <rect class="frame" x="430" y="255" width="260" height="68" rx="8"></rect>
+            <text class="label warning-text" x="452" y="278">REPOSITORY GUIDANCE</text>
+            <text class="title" x="452" y="306">AGENTS.md</text>
+          </g>
+
+          <g data-fragment="4">
+            <path class="flow success" d="M555 255 V184" marker-end="url(#context-success-arrow)"></path><circle class="packet" cx="555" cy="221" r="5"></circle>
+            <text class="detail success-text" x="575" y="222">loaded before work</text>
+          </g>
+
+          <g data-fragment="5">
+            <path class="flow success" d="M620 166 H760 V206 H845" marker-end="url(#context-success-arrow)"></path><circle class="packet" cx="760" cy="181" r="5"></circle>
+            <text class="label success-text" x="870" y="191">NEXT SESSION</text>
+            <text class="title success-text" x="870" y="223">Convention followed</text>
+            <text class="detail" x="870" y="246">test passes</text>
+          </g>
+        </svg>
+        <div class="context-summary" data-fragment="6"><span><strong>README.md</strong> for people</span><span><strong>AGENTS.md</strong> for coding agents</span></div>
+      </div>
+      <aside class="slide-notes">Use the controls or advance one beat per click. Beat 0 establishes that the agent can inspect code. Beat 1 shows the missing repository context. Beat 2 shows the resulting guess and failed test. Beat 3 turns the developer's correction into durable repository guidance. Beat 4 loads that guidance in the next session. Beat 5 shows the same agent following the convention. Beat 6 names the division of responsibility between README.md and AGENTS.md. The example is conceptual and makes no performance claim. Transition directly to the community posts: a shared file solves discovery, but does it stay correct?</aside>
+    </section>
+
+    <section class="slide" id="slide-market-voices" data-title="Adoption exposed a maintenance problem" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 4 | Adoption exposed a maintenance problem | 1.5 minutes</span>
+      <div class="eyebrow">Community conversation</div>
+      <h2>Adoption exposed a maintenance problem</h2>
+      <div class="tweet-story">
+        <div class="tweet-deck" aria-label="Stack of community posts about AGENTS.md maintenance">
+          <figure class="tweet-card shown"><img src="assets/tweet-swyx-stale-agentsmd.jpeg" alt="Post from swyx describing stale AGENTS.md instructions blocking a long-running task" /></figure>
+          <figure class="tweet-card" data-fragment="1"><img src="assets/tweet-ryan-dahl-antipattern.jpeg" alt="Post from Ryan Dahl questioning stale agent instruction files" /></figure>
+          <figure class="tweet-card" data-fragment="2"><img src="assets/tweet-matt-lukianski-fragmentation.jpeg" alt="Post from Matt Lukianski describing fragmented instruction surfaces" /></figure>
+          <figure class="tweet-card" data-fragment="3"><img src="assets/tweet-andrej-karpathy-instructions.jpeg" alt="Post from Andrej Karpathy describing agents ignoring AGENTS.md guidance" /></figure>
+          <figure class="tweet-card" data-fragment="4"><img src="assets/tweet-prasenjit-sarkar-coordination.jpeg" alt="Post from Prasenjit Sarkar describing inconsistent context across agents" /></figure>
+        </div>
+        <div>
+          <div class="tweet-caption" aria-live="polite">
+            <article class="is-current" data-beat-caption="0"><small>Stale guidance</small><strong>Old instructions can keep an agent on the wrong path</strong><p>A file loaded automatically can outlive the decision that created it.</p></article>
+            <article data-beat-caption="1"><small>Reactive skepticism</small><strong>Developers question files that drift without review</strong><p>The concern targets stale and vague guidance, not the need for repository context.</p></article>
+            <article data-beat-caption="2"><small>Fragmented context</small><strong>Teams maintain several instruction surfaces</strong><p>Switching tools becomes harder when each agent reads a different file.</p></article>
+            <article data-beat-caption="3"><small>Weak adherence</small><strong>More instructions do not guarantee better code</strong><p>Rules need specific scope and observable validation.</p></article>
+            <article data-beat-caption="4"><small>Coordination</small><strong>Shared behavior requires an auditable source</strong><p>Teams need to know which agent read which guidance and why it changed.</p></article>
+          </div>
+          <p class="tweet-source">Speaker-supplied screenshots. Account, date, and engagement remain visible in each image.</p>
+        </div>
+      </div>
+      <aside class="slide-notes">The first post is visible on entry. Reveal one additional post per click. Treat these posts as community perspectives, not benchmark evidence. The through-line is practical: discovery has a shared format, while maintenance remains manual and fragmented. The screenshots came from the speaker and retain the original account names and dates. Transition: this debate grew as the convention moved beyond one product.</aside>
     </section>
 
     <section class="slide timeline-slide" id="slide-04" data-title="AGENTS.md adoption and stewardship" data-duration="1 minute">
-      <span class="slide-meta">Slide 4 | AGENTS.md adoption and stewardship | 1 minute</span>
+      <span class="slide-meta">Slide 5 | AGENTS.md adoption and stewardship | 1 minute</span>
       <div class="eyebrow">One convention, wider stewardship</div>
       <h2>AGENTS.md adoption and stewardship</h2>
       <div class="evolution-rail" aria-label="AGENTS.md evolution timeline">
@@ -1510,34 +1633,7 @@
           <p>OpenAI reported adoption across more than 60,000 projects and frameworks at donation time.</p>
         </article>
       </div>
-      <aside class="slide-notes">Beat 0: OpenAI released AGENTS.md in August 2025 as a predictable place for repository instructions. Beat 1: On December 9, 2025, OpenAI contributed AGENTS.md as a founding project of the Agentic AI Foundation under the Linux Foundation. Beat 2: OpenAI and the Linux Foundation reported adoption by more than 60,000 open-source projects and agent frameworks at that time. The GitHub star figure is a dated September 2026 snapshot. Sources: openai.com/index/agentic-ai-foundation, linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, github.com/agentsmd/agents.md.</aside>
-    </section>
-
-    <section class="slide" id="slide-market-voices" data-title="Adoption exposed a maintenance problem" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 5 | Adoption exposed a maintenance problem | 1.5 minutes</span>
-      <div class="eyebrow">Community conversation</div>
-      <h2>Adoption exposed a maintenance problem</h2>
-      <div class="tweet-story">
-        <div class="tweet-deck" aria-label="Stack of community posts about AGENTS.md maintenance">
-          <figure class="tweet-card" data-fragment="1"><img src="assets/tweet-swyx-stale-agentsmd.jpeg" alt="Post from swyx describing stale AGENTS.md instructions blocking a long-running task" /></figure>
-          <figure class="tweet-card" data-fragment="2"><img src="assets/tweet-ryan-dahl-antipattern.jpeg" alt="Post from Ryan Dahl questioning stale agent instruction files" /></figure>
-          <figure class="tweet-card" data-fragment="3"><img src="assets/tweet-matt-lukianski-fragmentation.jpeg" alt="Post from Matt Lukianski describing fragmented instruction surfaces" /></figure>
-          <figure class="tweet-card" data-fragment="4"><img src="assets/tweet-andrej-karpathy-instructions.jpeg" alt="Post from Andrej Karpathy describing agents ignoring AGENTS.md guidance" /></figure>
-          <figure class="tweet-card" data-fragment="5"><img src="assets/tweet-prasenjit-sarkar-coordination.jpeg" alt="Post from Prasenjit Sarkar describing inconsistent context across agents" /></figure>
-        </div>
-        <div>
-          <div class="tweet-caption" aria-live="polite">
-            <article class="is-current" data-beat-caption="0"><small>Before the first click</small><strong>A shared format solved discovery</strong><p>It did not solve maintenance, evidence, or cross-tool consistency.</p></article>
-            <article data-beat-caption="1"><small>Stale guidance</small><strong>Old instructions can keep an agent on the wrong path</strong><p>A file loaded automatically can outlive the decision that created it.</p></article>
-            <article data-beat-caption="2"><small>Reactive skepticism</small><strong>Developers question files that drift without review</strong><p>The concern targets stale and vague guidance, not the need for repository context.</p></article>
-            <article data-beat-caption="3"><small>Fragmented context</small><strong>Teams maintain several instruction surfaces</strong><p>Switching tools becomes harder when each agent reads a different file.</p></article>
-            <article data-beat-caption="4"><small>Weak adherence</small><strong>More instructions do not guarantee better code</strong><p>Rules need specific scope and observable validation.</p></article>
-            <article data-beat-caption="5"><small>Coordination</small><strong>Shared behavior requires an auditable source</strong><p>Teams need to know which agent read which guidance and why it changed.</p></article>
-          </div>
-          <p class="tweet-source">Speaker-supplied screenshots. Account, date, and engagement remain visible in each image.</p>
-        </div>
-      </div>
-      <aside class="slide-notes">Reveal one post per click. Treat these posts as community perspectives, not benchmark evidence. The through-line is practical: discovery has a shared format, while maintenance remains manual and fragmented. The screenshots came from the speaker and retain the original account names and dates. Transition: look at the maintenance workflow teams have today.</aside>
+      <aside class="slide-notes">Beat 0: OpenAI released AGENTS.md in August 2025 as a predictable place for repository instructions. Beat 1: On December 9, 2025, OpenAI contributed AGENTS.md as a founding project of the Agentic AI Foundation under the Linux Foundation. Beat 2: OpenAI and the Linux Foundation reported adoption by more than 60,000 open-source projects and agent frameworks at that time. The GitHub star figure is a dated September 2026 snapshot. Sources: openai.com/index/agentic-ai-foundation, linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, github.com/agentsmd/agents.md. Transition: adoption makes the manual maintenance workflow worth examining.</aside>
     </section>
 
     <section class="slide authoring-slide" id="slide-05" data-title="The current maintenance workflow" data-duration="45 seconds">
@@ -1916,7 +2012,7 @@
       notes: document.getElementById("notes"),
       sources: document.getElementById("sources")
     };
-    const sections = ["Open", "Open", "Context", "Evolution", "Voices", "Today", "Problem", "Method", "Bridge", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Evidence", "Try it", "Close"];
+    const sections = ["Open", "Open", "Context", "Voices", "Evolution", "Today", "Problem", "Method", "Bridge", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Evidence", "Try it", "Close"];
     let current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1) || 1) - 1));
     let step = 0;
     let overlay = null;
@@ -1950,7 +2046,6 @@
     const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
     const fragmentGroups = {
-      "slide-03": [[".numbered-points li:nth-child(2)"], [".numbered-points li:nth-child(3)"], [".principles-image"], [".takeaway-box"]],
       "slide-06": [[".problem-item:nth-child(2)"], [".problem-item:nth-child(3)"], [".problem-item:nth-child(4)"], [".feedback-question"]],
       "slide-07": [[".discipline-rule:nth-child(2)"], [".discipline-rule:nth-child(3)"], [".discipline-conclusion"]],
       "slide-10": [[".file-pane:nth-child(2)"]],
@@ -2043,12 +2138,7 @@
     function playActiveMedia() {
       const terminal = slides[current].querySelector("[data-terminal]");
       const gif = slides[current].querySelector("[data-gif]");
-      const video = slides[current].querySelector("[data-intro-video]");
-      document.querySelectorAll("[data-intro-video]").forEach(item => { if (item !== video) item.pause(); });
-      if (video) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      } else if (terminal) playTerminal(terminal);
+      if (terminal) playTerminal(terminal);
       else if (gif) {
         const source = gif.getAttribute("src");
         gif.setAttribute("src", "");
@@ -2131,7 +2221,7 @@
       current = Math.max(0, Math.min(slides.length - 1, next));
       step = Math.max(0, Math.min(maxStep(current), targetStep));
       slides.forEach((slide, index) => slide.classList.toggle("on", index === current));
-      stage.classList.toggle("film-active", slides[current].classList.contains("intro-film-slide"));
+      stage.classList.toggle("context-active", slides[current].classList.contains("context-story-slide"));
       [...dots.children].forEach((dot, index) => dot.classList.toggle("on", index === current));
       [...overviewGrid.children].forEach((card, index) => card.classList.toggle("current", index === current));
       count.textContent = `${current + 1} / ${slides.length}`;
