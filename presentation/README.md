@@ -1,8 +1,8 @@
 # Let AGENTS.md Write Itself
 
 Animated web presentation for AGNTCon + MCPCon Japan 2026. This copy lives
-with the implementation so the product demo, benchmark evidence, and talk
-claims can be reviewed together.
+with the implementation so the product demo and talk claims can be reviewed
+together.
 
 ## Run locally
 
@@ -41,7 +41,7 @@ Presented by Rudraksh Karpe and Satyam Soni.
 
 - September 10, 2026, 10:40–11:05 JST
 - Hall C
-- 18 slides
+- 17 slides
 - 21 minutes of planned material, including the controlled AGENTS.md
   introduction, two recorded CLI sequences, and
   four minutes for questions
@@ -56,12 +56,12 @@ illustrative motion.
 The original material was copied from
 [`satyampsoni/agentsmd-agntcon-japan`](https://github.com/satyampsoni/agentsmd-agntcon-japan)
 at commit `544295b9768b65059359cf6e7a762f43a4cad82f`, then updated with the
-implemented agentsmd workflow and the checked-in `study-v1` result.
+implemented agentsmd workflow.
 
 The refreshed layout and interaction model take structural inspiration from
 [`abhishekpanditofficial/agentcon-japan`](https://github.com/abhishekpanditofficial/agentcon-japan).
-This includes the fixed 16:9 stage, progress rail, presenter chrome, staggered
-reveals, theme switcher, overview, notes, help, and hash navigation.
+This includes the fixed 16:9 stage, staggered reveals, overview, notes, help,
+and hash navigation.
 The replayable terminal follows the approach used by
 [`rohitg00/agentmemory`](https://github.com/rohitg00/agentmemory/tree/main/website),
 with scripts rewritten around real agentsmd commands and evidence.
@@ -91,6 +91,6 @@ WORKSPACE_NODE_MODULES=/path/to/bundled/node_modules \
   node presentation/scripts/validate_deck.mjs
 ```
 
-The check covers all 18 slides at 320px, 768px, and desktop widths, along with
+The check covers all 17 slides at 320px, 768px, and desktop widths, along with
 deep links, keyboard stepping, replay, image loading, source visibility, and
 the reduced-motion final state.

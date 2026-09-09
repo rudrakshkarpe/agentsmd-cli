@@ -17,5 +17,4 @@ project specification.
 | Learned rules remain pending until a human or configured evaluation gate promotes them. | Confirmed behavior | High | Learning and automation packages, project invariants | Amber candidate precedes the green ledger |
 | Automatic promotion depends on a successful evaluation command and confidence policy. | Configuration-dependent | High | Automation policy and tests | Gate annotation names both conditions |
 | Rendering preserves maintainer guidance and adds targeted learned-rule deltas. | Confirmed behavior | High | Ledger and render implementation | Green packet reaches the learned section only |
-| Baseline and learned guidance each passed three recorded trials on one Go task. | Confirmed, narrow study | High | `benchmarks/config-precedence/results/study-v1/report.md` | Benchmark slide retains the single-task caveat |
 | Motion duration represents causal order. | Illustrative | High | Presentation design | No latency or performance claim is encoded by animation speed |
