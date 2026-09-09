@@ -21,12 +21,12 @@ repositories. It covers one task, one model, and three trials per condition.
 
 ## Story beats before the terminal demo
 
-- Slide 3 is the 76-second AGENTS.md introduction film. Let it play without
-  narration. Press `R` to restart it during rehearsal.
-- Slide 4 unfolds the August 2025 release, December 2025 AAIF contribution,
-  and the dated adoption snapshot.
-- Slide 5 reveals one community post per click. Describe these as perspectives,
+- Slide 3 recreates the introduction as six controlled beats. Advance one beat
+  per sentence or use the play and scrub controls.
+- Slide 4 reveals one community post per click. Describe these as perspectives,
   not experimental evidence.
+- Slide 5 unfolds the August 2025 release, December 2025 AAIF contribution,
+  and the dated adoption snapshot.
 - Slide 6 shows the manual synchronization gap.
 - Slide 9 introduces the agentsmd contribution without implying model training.
 - Slide 10 follows one session record through reflection, evaluation, the
