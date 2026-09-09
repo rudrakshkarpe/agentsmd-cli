@@ -4,8 +4,8 @@
 
 The deck has enough material for the 25-minute slot after the benchmark and
 demo sections are grounded in repository evidence. The planned content now
-uses 18.5 minutes, followed by four minutes for questions. That leaves roughly
-2.5 minutes for transitions or a slow live command.
+uses 20.5 minutes, followed by four minutes for questions. That leaves roughly
+30 seconds for transitions, so rehearse the progressive reveals closely.
 
 The strongest story is narrow and auditable:
 
@@ -24,8 +24,9 @@ repositories. It covers one task, one model, and three trials per condition.
 
 Run from the `agentsmd-cli` repository root.
 
-Slides 9 and 11 contain replayable terminal sequences. Press `R` while either
-slide is active, or use its Replay control.
+Slides 10 and 12 contain looping terminal recordings. Press `R` while either
+slide is active to restart its GIF from the first frame. Slide 11 exposes the
+same lifecycle as speaker-controlled workflow fragments.
 
 ```bash
 # 1. Show the static starting instructions.
