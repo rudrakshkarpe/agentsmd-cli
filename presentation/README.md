@@ -30,6 +30,7 @@ Open <http://localhost:8080>.
 
 The URL hash identifies the active slide, so `#8` opens slide 8 directly.
 Click the left third of the stage to move back and the rest to move forward.
+The introduction film on slide 3 starts automatically. Press `R` to restart it.
 
 ## Session
 
@@ -40,7 +41,8 @@ Presented by Rudraksh Karpe and Satyam Soni.
 - September 10, 2026, 10:40–11:05 JST
 - Hall C
 - 18 slides
-- 21 minutes of planned material, including two recorded CLI sequences and
+- 21 minutes of planned material, including the AGENTS.md introduction film,
+  two recorded CLI sequences, and
   four minutes for questions
 
 See [TALK-NOTES.md](TALK-NOTES.md) for the stage plan and

@@ -25,7 +25,7 @@ for (const viewport of viewports) {
   page.on("console", message => {
     if (message.type() === "error") browserErrors.push(message.text());
   });
-  await page.goto(`${baseUrl}/#10`, { waitUntil: "networkidle" });
+  await page.goto(`${baseUrl}/#10`, { waitUntil: "domcontentloaded" });
   const result = await page.evaluate(() => {
     const ids = [...document.querySelectorAll("[id]")].map(element => element.id);
     return {
@@ -33,6 +33,7 @@ for (const viewport of viewports) {
       notes: document.querySelectorAll(".slide .slide-notes").length,
       duplicateIds: ids.filter((id, index) => ids.indexOf(id) !== index),
       brokenImages: [...document.images].filter(image => !image.complete || !image.naturalWidth).map(image => image.src),
+      videos: [...document.querySelectorAll("video source")].map(source => source.src),
       bodyOverflow: document.documentElement.scrollWidth > innerWidth,
       stageOverflow: document.getElementById("stage").getBoundingClientRect().width > innerWidth + 1,
     };
@@ -41,6 +42,7 @@ for (const viewport of viewports) {
   if (result.notes !== result.slides) failures.push(`${viewport.width}px: ${result.slides - result.notes} slides lack notes`);
   if (result.duplicateIds.length) failures.push(`${viewport.width}px: duplicate ids ${result.duplicateIds.join(", ")}`);
   if (result.brokenImages.length) failures.push(`${viewport.width}px: broken images ${result.brokenImages.join(", ")}`);
+  if (result.videos.length !== 1) failures.push(`${viewport.width}px: expected one introduction video, found ${result.videos.length}`);
   if (result.bodyOverflow || result.stageOverflow) failures.push(`${viewport.width}px: horizontal overflow`);
   if (browserErrors.length) failures.push(`${viewport.width}px: browser errors ${browserErrors.join(" | ")}`);
   await context.close();
@@ -48,7 +50,7 @@ for (const viewport of viewports) {
 
 const reducedContext = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
 const reducedPage = await reducedContext.newPage();
-await reducedPage.goto(`${baseUrl}/#10`, { waitUntil: "networkidle" });
+await reducedPage.goto(`${baseUrl}/#10`, { waitUntil: "domcontentloaded" });
 const reduced = await reducedPage.evaluate(() => ({
   hiddenFragments: [...document.querySelectorAll(".slide.on .fragment")].filter(element => getComputedStyle(element).opacity === "0").length,
   finalCaptionVisible: getComputedStyle(document.querySelector(".slide.on .system-caption span:last-child")).opacity === "1",
@@ -59,15 +61,21 @@ await reducedContext.close();
 
 const interactionContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const interactionPage = await interactionContext.newPage();
-await interactionPage.goto(`${baseUrl}/#18`, { waitUntil: "networkidle" });
+await interactionPage.goto(`${baseUrl}/#18`, { waitUntil: "domcontentloaded" });
 if ((await interactionPage.locator("#count").textContent()) !== "18 / 18") failures.push("deep link: #18 did not open the final slide");
-await interactionPage.goto(`${baseUrl}/#10`, { waitUntil: "networkidle" });
+await interactionPage.goto(`${baseUrl}/#10`, { waitUntil: "domcontentloaded" });
 await interactionPage.keyboard.press("ArrowRight");
-if ((await interactionPage.locator("#beat-count").textContent()) !== "1/6") failures.push("keyboard: ArrowRight did not advance one architecture beat");
+if ((await interactionPage.locator("#beat-count").textContent()) !== "1/5") failures.push("keyboard: ArrowRight did not advance one architecture beat");
 await interactionPage.keyboard.press("r");
-if ((await interactionPage.locator("#beat-count").textContent()) !== "0/6") failures.push("replay: R did not reset the architecture");
+if ((await interactionPage.locator("#beat-count").textContent()) !== "0/5") failures.push("replay: R did not reset the architecture");
 await interactionPage.getByRole("button", { name: "Sources", exact: true }).click();
 if (!(await interactionPage.locator("#sources").evaluate(element => element.classList.contains("on")))) failures.push("sources overlay did not open");
+await interactionPage.keyboard.press("s");
+await interactionPage.goto(`${baseUrl}/#3`, { waitUntil: "domcontentloaded" });
+await interactionPage.waitForTimeout(350);
+const filmState = await interactionPage.locator("[data-intro-video]").evaluate(video => ({ paused: video.paused, currentTime: video.currentTime }));
+if (filmState.paused || filmState.currentTime <= 0) failures.push("introduction film did not autoplay");
+if (!(await interactionPage.locator("#stage").evaluate(element => element.classList.contains("film-active")))) failures.push("introduction film did not enter cinema mode");
 if ((await interactionPage.locator("#stage").getAttribute("data-theme")) !== "light") failures.push("fresh context did not use the light theme");
 await interactionContext.close();
 
