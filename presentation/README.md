@@ -29,16 +29,22 @@ Presented by Rudraksh Karpe and Satyam Soni.
 
 - September 10, 2026, 10:40–11:05 JST
 - Hall C
-- 13 slides
-- 21.5 minutes of planned material, including a five-minute demo and four
-  minutes for questions
+- 14 slides
+- 22.5 minutes of planned material, including two live terminal sequences and
+  four minutes for questions
 
 See [TALK-NOTES.md](TALK-NOTES.md) for the stage plan and
 [SOURCES.md](SOURCES.md) for claim provenance.
 
 ## Source
 
-Copied from
+The original material was copied from
 [`satyampsoni/agentsmd-agntcon-japan`](https://github.com/satyampsoni/agentsmd-agntcon-japan)
 at commit `544295b9768b65059359cf6e7a762f43a4cad82f`, then updated with the
 implemented agentsmd workflow and the checked-in `study-v1` result.
+
+The refreshed layout takes structural inspiration from
+[`abhishekpanditofficial/agentcon-japan`](https://github.com/abhishekpanditofficial/agentcon-japan).
+The replayable terminal follows the approach used by
+[`rohitg00/agentmemory`](https://github.com/rohitg00/agentmemory/tree/main/website),
+with scripts rewritten around real agentsmd commands and evidence.

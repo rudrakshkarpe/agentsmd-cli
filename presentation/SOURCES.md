@@ -33,3 +33,11 @@ September 9, 2026. Treat it as a dated snapshot.
 Terminal-Bench and SWE-bench motivate isolated tasks and executable
 verification. GEPA and ACE motivate reflection and incremental instruction
 updates. The local study is smaller and should be described as such.
+
+## Presentation structure
+
+- [`abhishekpanditofficial/agentcon-japan`](https://github.com/abhishekpanditofficial/agentcon-japan)
+  informed the restrained chrome, typography, and architecture-first sequence.
+- [`rohitg00/agentmemory/website`](https://github.com/rohitg00/agentmemory/tree/main/website)
+  informed the replayable terminal behavior. The terminal scripts use this
+  project's commands and checked-in evidence rather than AgentMemory copy.
