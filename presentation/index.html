@@ -1202,6 +1202,38 @@
     .help-grid { display: grid; grid-template-columns: 160px 1fr; gap: 14px 24px; max-width: 720px; margin-top: 32px; font-size: 20px; }
     .help-grid dt { color: #4da3ff; font-family: var(--mono); }
     .notes-body { max-width: 900px; margin-top: 32px; color: #d0d6de; font-size: 28px; line-height: 1.55; }
+    .command-surface { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 34px; }
+    .command-lane { min-height: 300px; padding: 22px 20px; border-top: 3px solid var(--signal); background: color-mix(in srgb, var(--paper-2) 84%, transparent); }
+    .command-lane h3 { margin-bottom: 18px; font-size: clamp(17px,1.55vw,24px); }
+    .command-lane code { display: block; margin: 9px 0; color: var(--ink-dim); font-size: clamp(10px,.88vw,14px); }
+    .command-lane code strong { color: var(--signal); font-weight: 500; }
+    .command-foot { margin-top: 24px; color: var(--ink-faint); font: 500 clamp(9px,.8vw,13px)/1.4 var(--mono); text-align: center; }
+    .gif-demo-layout { display: grid; grid-template-columns: .58fr 1.42fr; gap: 44px; align-items: center; margin-top: 22px; }
+    .gif-copy h2 { max-width: 7.8em; }
+    .gif-copy p { max-width: 30ch; margin-top: 18px; color: var(--ink-dim); font-size: clamp(13px,1.18vw,18px); }
+    .demo-gif { display: block; width: 100%; border: 1px solid var(--line-strong); border-radius: 14px; background: #050609; box-shadow: 0 28px 70px rgba(0,0,0,.36); }
+    .media-caption { margin-top: 12px; color: var(--ink-faint); font: 500 clamp(8px,.72vw,12px)/1.4 var(--mono); }
+    .workflow-board { margin-top: 26px; }
+    .provider-strip { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 19px; }
+    .provider-strip span { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper-2); color: var(--ink-dim); font: 500 clamp(9px,.75vw,12px)/1 var(--mono); }
+    .workflow-row { display: grid; grid-template-columns: 1fr 42px 1fr 42px 1fr 42px 1.2fr; align-items: stretch; }
+    .workflow-node { min-height: 126px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper-2); }
+    .workflow-node small { display: block; color: var(--signal); font: 600 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .workflow-node strong { display: block; margin-top: 9px; font-size: clamp(16px,1.35vw,21px); }
+    .workflow-node p { margin-top: 8px; color: var(--ink-dim); font-size: clamp(10px,.88vw,14px); line-height: 1.4; }
+    .workflow-link { position: relative; align-self: center; height: 2px; overflow: visible; background: var(--line-strong); }
+    .workflow-link::after { content: ""; position: absolute; top: -3px; right: -1px; border: 4px solid transparent; border-left-color: var(--signal); }
+    .workflow-link::before { content: ""; position: absolute; top: 0; left: -30%; width: 28%; height: 2px; background: var(--signal); animation: workflow-packet 1.8s linear infinite; }
+    @keyframes workflow-packet { to { left: 105%; } }
+    .decision-row { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 24px; align-items: center; margin-top: 20px; }
+    .decision-gate { padding: 18px 24px; border: 2px solid var(--warning); border-radius: 14px; text-align: center; }
+    .decision-gate strong { display: block; color: var(--warning); font-size: clamp(17px,1.4vw,22px); }
+    .decision-gate span { display: block; margin-top: 7px; color: var(--ink-dim); font-size: clamp(10px,.82vw,13px); }
+    .decision-outcomes { display: grid; gap: 7px; }
+    .decision-outcomes span { padding: 7px 10px; border-left: 3px solid var(--success); color: var(--ink-dim); font: 500 clamp(9px,.78vw,12px)/1.25 var(--mono); }
+    .decision-outcomes span:nth-child(2) { border-color: var(--warning); }
+    .decision-outcomes span:nth-child(3) { border-color: #ef6b73; }
+    .markdown-output { margin-top: 18px; padding: 12px 18px; border: 1px solid color-mix(in srgb, var(--success) 50%, var(--line)); border-radius: 12px; color: var(--success); font: 500 clamp(10px,.88vw,14px)/1.45 var(--mono); text-align: center; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .fragment { opacity: 1; transform: none; } }
   </style>
 </head>
@@ -1210,7 +1242,7 @@
     <div class="stage-progress" id="progress"></div>
     <div class="deck-chrome">
       <div class="chrome-top"><span class="chrome-mark"><i class="chrome-dot"></i><span>agentsmd self-improvement</span></span><span id="section">Open</span></div>
-      <div class="chrome-bottom"><span>Rudraksh Karpe · Satyam Soni · AgentCon Japan 2026</span><span class="chrome-end"><span class="theme-toggle"><button type="button" data-theme-choice="dark" class="on">Dark</button><button type="button" data-theme-choice="light">Light</button></span><span class="page-pill" id="count">1 / 14</span></span></div>
+      <div class="chrome-bottom"><span>Rudraksh Karpe · Satyam Soni · AgentCon Japan 2026</span><span class="chrome-end"><span class="theme-toggle"><button type="button" data-theme-choice="dark" class="on">Dark</button><button type="button" data-theme-choice="light">Light</button></span><span class="page-pill" id="count">1 / 16</span></span></div>
     </div>
     <img class="brand" src="assets/agnt_mcpcon_japan26_bug_white.svg" alt="AGNTCon + MCPCon Japan" />
 
@@ -1385,17 +1417,60 @@
       <aside class="slide-notes">Capture differs by provider. Everything after normalization is shared. The ledger is the source of truth, and AGENTS.md is rendered from targeted deltas.</aside>
     </section>
 
-    <section class="slide cli-intro-slide" id="slide-09" data-title="CLI setup" data-duration="2 minutes">
-      <span class="slide-meta">Slide 9 | CLI setup | 2 minutes</span>
-      <div class="clean-terminal-layout">
-        <div><div class="eyebrow">Live CLI</div><h2>Setup takes three commands</h2><p class="cli-summary" style="margin-top:20px">Initialize repository state, inspect the developer environment, then connect the coding CLI the team already uses.</p></div>
-        <div class="clean-terminal" data-terminal="setup"><div class="clean-terminal-head"><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><span class="clean-terminal-title">agentsmd · project setup</span></div><pre></pre><button class="terminal-replay" type="button">Replay</button></div>
+    <section class="slide" id="slide-cli-surface" data-title="The agentsmd CLI surface" data-duration="1 minute">
+      <span class="slide-meta">Slide 9 | The agentsmd CLI surface | 1 minute</span>
+      <div class="eyebrow">Product surface</div><h2>The agentsmd CLI surface</h2>
+      <div class="command-surface">
+        <div class="command-lane"><h3>Author</h3><code><strong>init</strong> · detect and scaffold</code><code><strong>templates</strong> · curated starts</code><code><strong>render</strong> · rebuild from ledger</code><code><strong>lint</strong> · find stale rules</code></div>
+        <div class="command-lane" data-fragment="1"><h3>Integrate</h3><code><strong>doctor</strong> · inspect setup</code><code><strong>connect</strong> · add provider hooks</code><code><strong>automate</strong> · set policy</code><code><strong>update</strong> · upgrade safely</code></div>
+        <div class="command-lane" data-fragment="2"><h3>Observe</h3><code><strong>task</strong> · group sessions</code><code><strong>sessions</strong> · inspect trajectories</code><code><strong>progress</strong> · compare outcomes</code><code><strong>capture</strong> · normalize a run</code></div>
+        <div class="command-lane" data-fragment="3"><h3>Improve</h3><code><strong>learn</strong> · propose one rule</code><code><strong>pending</strong> · review queue</code><code><strong>promote / reject</strong></code><code><strong>benchmark</strong> · held-out gate</code></div>
       </div>
-      <aside class="slide-notes">This terminal uses current command names and condensed real output. Run the same init, doctor, and connect commands during the live demonstration.</aside>
+      <p class="command-foot" data-fragment="4">Version and maintenance commands: log · diff · blame · revert · tag · prune · savings</p>
+      <aside class="slide-notes">This is the implemented command tree. The public workflow stays small. Advanced history and maintenance commands remain available for auditing and recovery.</aside>
     </section>
 
-    <section class="slide demo-slide" id="slide-10" data-title="The targeted AGENTS.md update" data-duration="2 minutes">
-      <span class="slide-meta">Slide 10 | Before and after AGENTS.md | 2 minutes</span>
+    <section class="slide cli-intro-slide" id="slide-09" data-title="Repository setup in the CLI" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 10 | Repository setup in the CLI | 1.5 minutes</span>
+      <div class="gif-demo-layout">
+        <div class="gif-copy"><div class="eyebrow">Recorded CLI</div><h2>Project setup</h2><p>The CLI detects Go, writes a structured AGENTS.md, checks the machine, connects the coding agent, and shows the reflection policy.</p><p class="media-caption">13-second loop · press R to restart</p></div>
+        <img class="demo-gif" data-gif src="assets/agentsmd-setup.gif" alt="Recorded agentsmd CLI setup with init, doctor, connect, and automate" />
+      </div>
+      <aside class="slide-notes">This GIF comes from the current binary's interface and command output. The home path is shortened to ~/work/envmerge for projection. Pause on doctor to explain that provider integrations remain optional.</aside>
+    </section>
+
+    <section class="slide" id="slide-learning-workflow" data-title="Session evidence workflow" data-duration="2 minutes">
+      <span class="slide-meta">Slide 11 | Session evidence workflow | 2 minutes</span>
+      <div class="eyebrow">Decision workflow</div><h2>Session evidence workflow</h2>
+      <div class="workflow-board">
+        <div class="provider-strip"><span>Codex</span><span>Claude Code</span><span>Cursor</span><span>goose</span></div>
+        <div class="workflow-row">
+          <div class="workflow-node"><small>01</small><strong>Capture</strong><p>Commands, file changes, tests, duration, token counts, and Git state.</p></div><div class="workflow-link"></div>
+          <div class="workflow-node" data-fragment="1"><small>02</small><strong>Normalize</strong><p>Every provider becomes one typed trajectory tied to a logical task.</p></div><div class="workflow-link fragment" data-fragment="2"></div>
+          <div class="workflow-node" data-fragment="2"><small>03</small><strong>Reflect</strong><p>A GEPA-style reflector returns one verdict and, when justified, one narrow rule.</p></div><div class="workflow-link fragment" data-fragment="3"></div>
+          <div class="workflow-node" data-fragment="3"><small>04</small><strong>Candidate</strong><p>Scope, provenance, confidence, and near-duplicate checks enter the proposal record.</p></div>
+        </div>
+        <div class="decision-row">
+          <div class="workflow-node" data-fragment="4"><small>05</small><strong>Evidence check</strong><p>Fresh workspace, relevant tests, and the held-out verifier.</p></div>
+          <div class="decision-gate" data-fragment="5"><strong>Promotion gate</strong><span>Evaluation must pass. Automatic promotion also requires the confidence policy.</span></div>
+          <div class="decision-outcomes" data-fragment="6"><span>Pass: promote to ledger</span><span>Review: keep pending</span><span>Fail: reject the proposal</span></div>
+        </div>
+        <div class="markdown-output" data-fragment="7">AGENTS.md keeps maintainer guidance and receives only the validated learned-rule delta</div>
+      </div>
+      <aside class="slide-notes">The reflector is provider-pluggable. GEPA inspires the reflect, mutate, evaluate, select pattern, but agentsmd does not train a model. A no-change verdict is valid and prevents instruction bloat.</aside>
+    </section>
+
+    <section class="slide learning-terminal-slide" id="slide-11" data-title="A session becomes a rule" data-duration="2.5 minutes">
+      <span class="slide-meta">Slide 12 | A session becomes a rule | 2.5 minutes</span>
+      <div class="gif-demo-layout">
+        <div class="gif-copy"><div class="eyebrow">Recorded study</div><h2>A session becomes a rule</h2><p>A Go configuration task exposes wasted test retries. The proposal stays reviewable until promotion records its task and run provenance.</p><p class="media-caption">19-second loop · press R to restart</p></div>
+        <img class="demo-gif" data-gif src="assets/agentsmd-learning.gif" alt="Recorded agentsmd learning workflow from task and sessions to proposal, promotion, blame, and progress" />
+      </div>
+      <aside class="slide-notes">Pause after pending. The active file remains unchanged at that point. Promotion writes r000 to the ledger and renders the learned block. The final progress output compares two already-recorded successful sessions.</aside>
+    </section>
+
+    <section class="slide demo-slide" id="slide-10" data-title="The targeted AGENTS.md update" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 13 | Before and after AGENTS.md | 1.5 minutes</span>
       <div class="eyebrow">Before and after</div><h2>The loop adds two precise rules</h2>
       <div class="file-diff">
         <div class="file-pane"><header>BEFORE · STATIC GUIDANCE</header><pre># AGENTS.md
@@ -1420,20 +1495,11 @@
 <span class="added">+ - Begin config bugs in loader.go and its tests.</span>
 <span class="added">+ - Keep GOCACHE inside restricted workspaces.</span></pre></div>
       </div>
-      <aside class="slide-notes">The slide shortens the exact rules for readability. The original maintainer guidance remains intact. Show the complete two-line diff during the terminal demo.</aside>
-    </section>
-
-    <section class="slide learning-terminal-slide" id="slide-11" data-title="The learning loop in the CLI" data-duration="3 minutes">
-      <span class="slide-meta">Slide 11 | The learning loop in the CLI | 3 minutes</span>
-      <div class="clean-terminal-layout">
-        <div><div class="eyebrow">Recorded study</div><h2>Session evidence becomes a reviewable rule</h2><p class="subtitle" style="margin-top:20px">The active file does not change until the proposal passes its gate.</p></div>
-        <div class="clean-terminal" data-terminal="learn"><div class="clean-terminal-head"><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><i class="clean-terminal-dot"></i><span class="clean-terminal-title">agentsmd · task config-precedence</span></div><pre></pre><button class="terminal-replay" type="button">Replay</button></div>
-      </div>
-      <aside class="slide-notes">Pause after pending. Each proposal carries the originating task and session. Promotion creates a typed ledger version only after review or configured evaluation.</aside>
+      <aside class="slide-notes">The original maintainer guidance remains intact. The two recorded rules come from two separate baseline trajectories. The slide shortens their wording for projection.</aside>
     </section>
 
     <section class="slide benchmarks-slide" id="slide-12" data-title="Recorded held-out result" data-duration="2 minutes">
-      <span class="slide-meta">Slide 12 | Recorded held-out result | 2 minutes</span>
+      <span class="slide-meta">Slide 14 | Recorded held-out result | 2 minutes</span>
       <div class="eyebrow">Six real runs</div><h2>Success held while median cost fell</h2>
       <p class="benchmark-summary">Six real runs on the same Go configuration task, graded with hidden tests after each agent exits.</p>
       <div class="benchmark-grid">
@@ -1454,7 +1520,7 @@
     </section>
 
     <section class="slide repo-qr-slide" id="slide-13" data-title="Scan to use agentsmd-cli" data-duration="0.5 minute">
-      <span class="slide-meta">Slide 13 | Scan to use agentsmd-cli | 0.5 minute</span>
+      <span class="slide-meta">Slide 15 | Scan to use agentsmd-cli | 0.5 minute</span>
       <h2>Scan to use agentsmd-cli</h2>
       <img class="repo-qr" src="assets/agentsmd-cli-qr.png" alt="QR code for the agentsmd-cli GitHub repository" />
       <a class="repo-url" href="https://github.com/rudrakshkarpe/agentsmd-cli">github.com/rudrakshkarpe/agentsmd-cli</a>
@@ -1463,7 +1529,7 @@
     </section>
 
     <section class="slide qna-slide" id="slide-14" data-title="Q&amp;A" data-duration="4 minutes">
-      <span class="slide-meta">Slide 14 | Q&amp;A | 4 minutes</span>
+      <span class="slide-meta">Slide 16 | Q&amp;A | 4 minutes</span>
       <h2 class="qna-title">Q&amp;A</h2>
       <aside class="slide-notes">Open the floor for audience questions.</aside>
     </section>
@@ -1503,7 +1569,7 @@
       help: document.getElementById("help"),
       notes: document.getElementById("notes")
     };
-    const sections = ["Open", "Open", "Context", "Context", "Problem", "Problem", "Method", "Architecture", "Demo", "Demo", "Learning loop", "Evidence", "Try it", "Close"];
+    const sections = ["Open", "Open", "Context", "Context", "Problem", "Problem", "Method", "Architecture", "CLI", "Demo", "Workflow", "Learning loop", "Result", "Evidence", "Try it", "Close"];
     let current = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1) || 1) - 1));
     let step = 0;
     let overlay = null;
@@ -1547,6 +1613,7 @@
         element.dataset.fragment = String(index + 1);
       })));
     });
+    document.querySelectorAll("[data-fragment]").forEach(element => element.classList.add("fragment"));
     slides.forEach((slide, index) => slide.dataset.section = sections[index]);
 
     function maxStep(index = current) {
@@ -1589,7 +1656,13 @@
 
     function playActiveTerminal() {
       const terminal = slides[current].querySelector("[data-terminal]");
-      if (terminal) playTerminal(terminal); else terminalRun++;
+      const gif = slides[current].querySelector("[data-gif]");
+      if (terminal) playTerminal(terminal);
+      else if (gif) {
+        const source = gif.getAttribute("src");
+        gif.setAttribute("src", "");
+        requestAnimationFrame(() => gif.setAttribute("src", source));
+      } else terminalRun++;
     }
 
     slides.forEach((slide, index) => {
