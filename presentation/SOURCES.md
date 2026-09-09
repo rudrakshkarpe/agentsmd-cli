@@ -37,7 +37,9 @@ updates. The local study is smaller and should be described as such.
 ## Presentation structure
 
 - [`abhishekpanditofficial/agentcon-japan`](https://github.com/abhishekpanditofficial/agentcon-japan)
-  informed the restrained chrome, typography, and architecture-first sequence.
+  informed the Poppins and IBM Plex typography, restrained presenter chrome,
+  progress rail, staggered fragment pacing, dark and light themes, overview,
+  notes, keyboard help, hash navigation, and architecture-first sequence.
 - [`rohitg00/agentmemory/website`](https://github.com/rohitg00/agentmemory/tree/main/website)
   informed the replayable terminal behavior. The terminal scripts use this
   project's commands and checked-in evidence rather than AgentMemory copy.
