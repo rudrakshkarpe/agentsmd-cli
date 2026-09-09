@@ -1384,23 +1384,38 @@
     .bridge-pulse::before { content: ""; position: absolute; top: -4px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--signal); animation: bridge-transfer 1.8s ease-in-out infinite; }
     @keyframes bridge-transfer { 50%,100% { left: calc(100% - 10px); background: var(--success); } }
 
-    .system-stage { position: relative; margin-top: 10px; }
-    .system-map { display: block; width: 100%; height: 390px; overflow: visible; }
-    .system-map .scope { fill: color-mix(in srgb, var(--paper-2) 74%, transparent); stroke: var(--line); stroke-width: 1.5; }
-    .system-map .node-box { fill: var(--paper-2); stroke: var(--line-strong); stroke-width: 1.5; }
-    .system-map .node-box.source { stroke: var(--signal); }
-    .system-map .node-box.control { stroke: var(--warning); }
-    .system-map .node-box.persist { stroke: var(--success); }
+    .intro-film-slide { padding: 0; background: #000 !important; }
+    .intro-film-slide video { display: block; width: 100%; height: 100%; background: #000; object-fit: contain; }
+    .film-cue { position: absolute; right: 3.2%; bottom: 3.2%; color: rgba(255,255,255,.5); font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .stage.film-active .deck-chrome, .stage.film-active .stage-progress { opacity: 0; }
+    .stage.film-active::before { display: none; }
+
+    .system-stage { position: relative; margin-top: 12px; padding-top: 38px; }
+    .system-map { display: block; width: 100%; height: 330px; overflow: visible; }
     .system-map text { fill: var(--ink); font-family: var(--mono); }
-    .system-map .node-title { font-size: 18px; font-weight: 600; }
-    .system-map .node-sub { fill: var(--ink-faint); font-size: 11px; }
-    .system-map .edge { fill: none; stroke: var(--line-strong); stroke-width: 2; marker-end: url(#system-arrow); }
-    .system-map .edge.optional { stroke-dasharray: 8 7; }
+    .system-map .flow-base { stroke: var(--line-strong); stroke-width: 2; }
+    .system-map .flow-segment { stroke: var(--signal); stroke-width: 3; }
+    .system-map .flow-segment.approved { stroke: var(--success); }
+    .system-map .flow-segment.pending { stroke: var(--warning); stroke-dasharray: 6 6; }
+    .system-map .flow-tick { fill: var(--paper); stroke: var(--line-strong); stroke-width: 2; }
+    .system-map .stage-rule { stroke: var(--line); stroke-width: 1; }
+    .system-map .step { fill: var(--ink-faint); font-size: 10px; font-weight: 600; letter-spacing: .11em; }
+    .system-map .stage-title { font-family: var(--sans); font-size: 21px; font-weight: 600; }
+    .system-map .stage-detail { fill: var(--ink-faint); font-size: 11px; }
+    .system-map .decision { fill: var(--paper); stroke: var(--warning); stroke-width: 2; }
+    .system-map .decision-mark { fill: var(--warning); font-family: var(--sans); font-size: 19px; font-weight: 700; text-anchor: middle; }
+    .system-map .audit-line { stroke: var(--line); stroke-width: 1; }
+    .system-map .audit-title { fill: var(--ink-faint); font-size: 9px; font-weight: 600; letter-spacing: .1em; }
+    .system-map .audit-item { fill: var(--ink-dim); font-size: 11px; }
+    .system-map .success-text { fill: var(--success); }
+    .system-map .warning-text { fill: var(--warning); }
     .system-map .packet { fill: var(--signal); opacity: 0; }
-    .system-map .is-current .packet, .system-map .packet.is-current { opacity: 1; animation: system-packet 1.4s ease-in-out infinite; }
-    @keyframes system-packet { 50% { filter: drop-shadow(0 0 7px var(--signal)); transform: translateX(12px); } }
-    .system-caption { position: absolute; z-index: 2; top: 67px; left: 6%; right: 6%; min-height: 30px; text-align: center; }
-    .system-caption span { position: absolute; inset: 0; color: var(--ink-dim); font: 500 clamp(10px,.85vw,13px)/1.4 var(--mono); opacity: 0; }
+    .system-map g[data-fragment="4"] .packet, .system-map g[data-fragment="5"] .packet { fill: var(--success); }
+    .system-map g.is-current .packet { opacity: 1; animation: system-packet 1.2s ease-in-out infinite; }
+    .system-map g.is-current .flow-tick { stroke: var(--signal); fill: var(--signal); }
+    @keyframes system-packet { 50% { filter: drop-shadow(0 0 8px var(--signal)); transform: translateX(10px); } }
+    .system-caption { position: absolute; top: 0; left: 0; right: 0; min-height: 30px; text-align: left; }
+    .system-caption span { position: absolute; inset: 0; color: var(--ink-dim); font: 500 clamp(11px,.92vw,14px)/1.4 var(--mono); opacity: 0; }
     .system-caption span.is-current { opacity: 1; }
 
     .beat-controls { display: none; align-items: center; gap: 8px; pointer-events: auto; }
@@ -1460,19 +1475,13 @@
       <aside class="slide-notes">Keep this short. Introduce names and organizations only. Avoid biographies. The shared connection is infrastructure around developers and agent systems. Transition: Start from first principles.</aside>
     </section>
 
-    <section class="slide principles-slide" id="slide-03" data-title="What Is AGENTS.md?" data-duration="1 minute">
-      <span class="slide-meta">Slide 3 | What Is AGENTS.md? | 1 minute</span>
-      <h2>What Is AGENTS.md?</h2>
-      <div class="principles-layout">
-        <ol class="numbered-points">
-          <li>AGENTS.md is a repository-local instruction file for AI coding agents.</li>
-          <li>Agents can see the code, but they don't automatically know the project's conventions, workflows, boundaries, or validation requirements.</li>
-          <li>The agent discovers AGENTS.md, loads its instructions into context, and uses them while planning, editing, testing, and reviewing code.</li>
-        </ol>
-        <img class="principles-image" src="assets/agentsmd-ecosystem.png" alt="AGENTS.md ecosystem and supported coding agents" />
-      </div>
-      <div class="takeaway-box">README.md serves people. AGENTS.md guides coding agents.</div>
-      <aside class="slide-notes">Explain that agents can inspect code, but they do not automatically know repository-specific decisions. AGENTS.md gives them a predictable place for those instructions. The applicable file can be nested, and the closest file wins. Transition: This convention is now bigger than one tool.</aside>
+    <section class="slide intro-film-slide" id="slide-03" data-title="AGENTS.md introduction" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 3 | AGENTS.md introduction | 1.5 minutes</span>
+      <video data-intro-video muted playsinline preload="metadata" poster="assets/agentsmd-introduction-poster.jpg" aria-label="AGENTS.md introduction film showing why coding agents need repository context">
+        <source src="assets/agentsmd-introduction.mp4" type="video/mp4" />
+      </video>
+      <span class="film-cue">Click right to continue · R to restart</span>
+      <aside class="slide-notes">Play the 76-second introduction without narration. It establishes the core distinction: an agent can inspect code but still lacks the repository's working context. AGENTS.md records that context so the agent can follow the team's conventions. The film is muted by design. Press R to restart it. Transition: the convention moved beyond one product and into neutral stewardship.</aside>
     </section>
 
     <section class="slide timeline-slide" id="slide-04" data-title="AGENTS.md adoption and stewardship" data-duration="1 minute">
@@ -1655,74 +1664,90 @@
       <aside class="slide-notes">Beat 0: the static workflow still provides useful repository context. Beat 1: agentsmd captures evidence at the task boundary. Beat 2: the evidence produces at most one narrow candidate. The candidate stays reviewable and only a successful gate can promote it. agentsmd does not retrain the model and it does not rewrite the entire file. Transition: now unfold the system one component at a time.</aside>
     </section>
 
-    <section class="slide experience-slide" id="slide-08" data-title="One shared loop across coding CLIs" data-duration="1.5 minutes">
-      <span class="slide-meta">Slide 10 | agentsmd architecture | 1.5 minutes</span>
-      <div class="eyebrow">One task, unfolded</div>
-      <h2>One shared loop across coding CLIs</h2>
+    <section class="slide experience-slide" id="slide-08" data-title="AGENTS.md update workflow" data-duration="1.5 minutes">
+      <span class="slide-meta">Slide 10 | agentsmd workflow | 1.5 minutes</span>
+      <div class="eyebrow">One task boundary</div>
+      <h2>AGENTS.md update workflow</h2>
       <div class="system-stage">
-        <div class="system-rail" aria-label="agentsmd lifecycle phases">
-          <span class="shown">Agents</span><span data-fragment="1">Capture</span><span data-fragment="2">Normalize</span><span data-fragment="3">Reflect</span><span data-fragment="4">Gate</span><span data-fragment="5">Ledger</span><span data-fragment="6">Render</span>
-        </div>
-        <svg class="system-map" viewBox="0 0 1160 390" role="img" aria-label="Coding agents emit provider events. agentsmd captures and normalizes them, reflects once at the task boundary, evaluates a candidate rule, stores approved rules in a ledger, and renders a targeted AGENTS.md update.">
-          <defs>
-            <marker id="system-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--signal)"></path></marker>
-          </defs>
-          <rect class="scope" x="305" y="250" width="655" height="108" rx="14"></rect>
-          <text class="node-sub" x="326" y="276">PROJECT-LOCAL .agentsmd/ STATE</text>
+        <svg class="system-map" viewBox="0 0 1160 370" role="img" aria-label="A coding session becomes a normalized run record. Reflection may create one rule candidate. Tests and policy either keep it pending or approve it. Approved guidance enters the rule ledger and renders as a targeted AGENTS.md update.">
+          <line class="flow-base" x1="90" y1="190" x2="1110" y2="190"></line>
+          <line class="stage-rule" x1="205" y1="48" x2="205" y2="315"></line>
+          <line class="stage-rule" x1="435" y1="48" x2="435" y2="315"></line>
+          <line class="stage-rule" x1="650" y1="48" x2="650" y2="315"></line>
+          <line class="stage-rule" x1="840" y1="48" x2="840" y2="315"></line>
+          <line class="stage-rule" x1="1005" y1="48" x2="1005" y2="315"></line>
 
           <g>
-            <rect class="node-box source" x="15" y="88" width="135" height="126" rx="12"></rect>
-            <text class="node-title" x="32" y="120">Coding agents</text>
-            <text class="node-sub" x="32" y="151">Codex</text><text class="node-sub" x="32" y="171">Claude Code</text><text class="node-sub" x="32" y="191">Cursor · goose</text>
+            <text class="step" x="18" y="72">INPUT</text>
+            <text class="stage-title" x="18" y="104">Coding session</text>
+            <text class="stage-detail" x="18" y="134">Codex · Claude Code</text>
+            <text class="stage-detail" x="18" y="153">Cursor · goose</text>
+            <circle class="flow-tick" cx="90" cy="190" r="7"></circle>
           </g>
+
           <g data-fragment="1">
-            <path class="edge" d="M150 151 H180"></path><circle class="packet" cx="164" cy="151" r="5"></circle>
-            <rect class="node-box source" x="180" y="102" width="135" height="98" rx="12"></rect>
-            <text class="node-title" x="197" y="135">Adapters</text><text class="node-sub" x="197" y="161">hooks · transcripts</text><text class="node-sub" x="197" y="179">session exports</text>
+            <line class="flow-segment" x1="90" y1="190" x2="320" y2="190"></line><circle class="packet" cx="196" cy="190" r="6"></circle>
+            <text class="step" x="230" y="72">01 CAPTURE</text>
+            <text class="stage-title" x="230" y="104">Run record</text>
+            <text class="stage-detail" x="230" y="134">commands + file diff</text>
+            <text class="stage-detail" x="230" y="153">tests + duration + cost</text>
+            <circle class="flow-tick" cx="320" cy="190" r="7"></circle>
+            <text class="audit-item" x="230" y="304">run r014</text>
           </g>
+
           <g data-fragment="2">
-            <path class="edge" d="M315 151 H345"></path><circle class="packet" cx="329" cy="151" r="5"></circle>
-            <rect class="node-box" x="345" y="102" width="145" height="98" rx="12"></rect>
-            <text class="node-title" x="362" y="135">Trajectory</text><text class="node-sub" x="362" y="161">commands · files</text><text class="node-sub" x="362" y="179">tests · cost · Git</text>
-            <path class="edge optional" d="M417 200 V294"></path>
-            <rect class="node-box persist" x="335" y="294" width="165" height="44" rx="8"></rect><text class="node-sub" x="357" y="321">runs/*.json</text>
+            <line class="flow-segment" x1="320" y1="190" x2="540" y2="190"></line><circle class="packet" cx="420" cy="190" r="6"></circle>
+            <text class="step" x="460" y="72">02 REFLECT</text>
+            <text class="stage-title" x="460" y="104">One candidate</text>
+            <text class="stage-detail" x="460" y="134">task boundary only</text>
+            <text class="stage-detail" x="460" y="153">or no change</text>
+            <circle class="flow-tick" cx="540" cy="190" r="7"></circle>
+            <text class="audit-item" x="460" y="304">proposal p007</text>
           </g>
+
           <g data-fragment="3">
-            <path class="edge" d="M490 151 H520"></path><circle class="packet" cx="504" cy="151" r="5"></circle>
-            <rect class="node-box" x="520" y="102" width="140" height="98" rx="12"></rect>
-            <text class="node-title" x="537" y="135">Reflector</text><text class="node-sub" x="537" y="161">one task-boundary</text><text class="node-sub" x="537" y="179">verdict · or no change</text>
+            <line class="flow-segment" x1="540" y1="190" x2="745" y2="190"></line><circle class="packet" cx="635" cy="190" r="6"></circle>
+            <text class="step" x="675" y="72">03 VERIFY</text>
+            <text class="stage-title" x="675" y="104">Evaluation gate</text>
+            <text class="stage-detail" x="675" y="134">tests + policy</text>
+            <text class="stage-detail" x="675" y="153">regression check</text>
+            <path class="decision" d="M745 170 L765 190 L745 210 L725 190 Z"></path><text class="decision-mark" x="745" y="197">?</text>
+            <line class="flow-segment pending" x1="745" y1="211" x2="745" y2="267"></line>
+            <text class="audit-title warning-text" x="675" y="286">FAIL · KEEP PENDING</text>
           </g>
+
           <g data-fragment="4">
-            <path class="edge" d="M660 151 H690"></path><circle class="packet" cx="674" cy="151" r="5"></circle>
-            <rect class="node-box control" x="690" y="102" width="135" height="98" rx="12"></rect>
-            <text class="node-title" x="707" y="135">Eval gate</text><text class="node-sub" x="707" y="161">tests · confidence</text><text class="node-sub" x="707" y="179">regression check</text>
-            <path class="edge optional" d="M757 200 V294"></path>
-            <rect class="node-box control" x="675" y="294" width="165" height="44" rx="8"></rect><text class="node-sub" x="701" y="321">pending/*.json</text>
+            <line class="flow-segment approved" x1="765" y1="190" x2="915" y2="190"></line><circle class="packet" cx="830" cy="190" r="6"></circle>
+            <text class="step success-text" x="865" y="72">04 COMMIT</text>
+            <text class="stage-title" x="865" y="104">Rule ledger</text>
+            <text class="stage-detail" x="865" y="134">text + scope</text>
+            <text class="stage-detail" x="865" y="153">run provenance</text>
+            <circle class="flow-tick" cx="915" cy="190" r="7"></circle>
+            <text class="audit-item success-text" x="865" y="304">rule v0012</text>
           </g>
+
           <g data-fragment="5">
-            <path class="edge" d="M825 151 H855"></path><circle class="packet" cx="839" cy="151" r="5"></circle>
-            <rect class="node-box persist" x="855" y="102" width="135" height="98" rx="12"></rect>
-            <text class="node-title" x="872" y="135">Rule ledger</text><text class="node-sub" x="872" y="161">text · provenance</text><text class="node-sub" x="872" y="179">version · evidence</text>
-            <path class="edge optional" d="M922 200 V294"></path>
-            <rect class="node-box persist" x="855" y="294" width="165" height="44" rx="8"></rect><text class="node-sub" x="884" y="321">ledger.json</text>
+            <line class="flow-segment approved" x1="915" y1="190" x2="1110" y2="190"></line><circle class="packet" cx="1000" cy="190" r="6"></circle>
+            <text class="step success-text" x="1030" y="72">05 RENDER</text>
+            <text class="stage-title" x="1030" y="104">AGENTS.md</text>
+            <text class="stage-detail" x="1030" y="134">maintainer text</text>
+            <text class="stage-detail success-text" x="1030" y="153">+ validated delta</text>
+            <circle class="flow-tick" cx="1110" cy="190" r="7"></circle>
           </g>
-          <g data-fragment="6">
-            <path class="edge" d="M990 151 H1020"></path><circle class="packet" cx="1004" cy="151" r="5"></circle>
-            <rect class="node-box persist" x="1020" y="88" width="125" height="126" rx="12"></rect>
-            <text class="node-title" x="1036" y="121">AGENTS.md</text><text class="node-sub" x="1036" y="151">maintainer text</text><text class="node-sub" x="1036" y="171">+</text><text class="node-sub" x="1036" y="191">validated delta</text>
-          </g>
+
+          <line class="audit-line" x1="230" y1="322" x2="1110" y2="322"></line>
+          <text class="audit-title" x="18" y="326">PROJECT LOCAL AUDIT TRAIL</text>
         </svg>
         <div class="system-caption" aria-live="polite">
-          <span class="is-current" data-beat-caption="0">Provider behavior differs. Every agent still reads the same repository instruction surface.</span>
-          <span data-beat-caption="1">Thin adapters capture hooks, transcripts, or exported sessions without changing the downstream loop.</span>
-          <span data-beat-caption="2">Normalization records commands, file changes, tests, cost, duration, and Git state in one trajectory.</span>
-          <span data-beat-caption="3">Reflection runs once at the task boundary and may correctly propose no AGENTS.md change.</span>
-          <span data-beat-caption="4">The candidate stays pending until evaluation and policy checks pass.</span>
-          <span data-beat-caption="5">Approved guidance enters a typed ledger with task and run provenance.</span>
-          <span data-beat-caption="6">Rendering preserves maintainer guidance and adds only the validated rule delta.</span>
+          <span class="is-current" data-beat-caption="0">The coding tool changes. The evidence path stays the same.</span>
+          <span data-beat-caption="1">agentsmd records what changed, what ran, and whether the task succeeded.</span>
+          <span data-beat-caption="2">Reflection returns at most one narrow rule, and often returns no change.</span>
+          <span data-beat-caption="3">The candidate cannot modify AGENTS.md until tests and policy approve it.</span>
+          <span data-beat-caption="4">Approval writes a versioned rule with the run that justified it.</span>
+          <span data-beat-caption="5">Rendering preserves maintainer text and applies only the validated delta.</span>
         </div>
       </div>
-      <aside class="slide-notes">Use the visible controls or click to reveal the system. Beat 0 establishes the coding agents. Beat 1 shows provider-specific capture. Beat 2 normalizes evidence and persists the run. Beat 3 reflects once at the task boundary. Beat 4 keeps the candidate pending while tests and policy run. Beat 5 promotes approved guidance to the ledger with provenance. Beat 6 renders the targeted delta into AGENTS.md. Dashed connectors mean persistence, not mandatory synchronous calls. Capture mechanics vary by provider.</aside>
+      <aside class="slide-notes">This slide follows one payload from a coding session to AGENTS.md. Beat 0 names the provider boundary. Beat 1 captures observable session evidence in a run record. Beat 2 produces at most one narrow candidate at the task boundary. Beat 3 shows the only branch: a failed gate keeps the proposal pending. Beat 4 commits an approved rule and its provenance to the ledger. Beat 5 renders only that delta while preserving maintainer-authored text. The bottom line is an audit trail, not another execution path. Capture mechanics vary by provider.</aside>
     </section>
 
     <section class="slide" id="slide-cli-surface" data-title="The agentsmd CLI surface" data-duration="45 seconds">
@@ -2015,10 +2040,15 @@
       }
     }
 
-    function playActiveTerminal() {
+    function playActiveMedia() {
       const terminal = slides[current].querySelector("[data-terminal]");
       const gif = slides[current].querySelector("[data-gif]");
-      if (terminal) playTerminal(terminal);
+      const video = slides[current].querySelector("[data-intro-video]");
+      document.querySelectorAll("[data-intro-video]").forEach(item => { if (item !== video) item.pause(); });
+      if (video) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else if (terminal) playTerminal(terminal);
       else if (gif) {
         const source = gif.getAttribute("src");
         gif.setAttribute("src", "");
@@ -2101,6 +2131,7 @@
       current = Math.max(0, Math.min(slides.length - 1, next));
       step = Math.max(0, Math.min(maxStep(current), targetStep));
       slides.forEach((slide, index) => slide.classList.toggle("on", index === current));
+      stage.classList.toggle("film-active", slides[current].classList.contains("intro-film-slide"));
       [...dots.children].forEach((dot, index) => dot.classList.toggle("on", index === current));
       [...overviewGrid.children].forEach((card, index) => card.classList.toggle("current", index === current));
       count.textContent = `${current + 1} / ${slides.length}`;
@@ -2108,7 +2139,7 @@
       applyFragments();
       updateProgress();
       if (updateHash && location.hash !== `#${current + 1}`) history.replaceState(null, "", `#${current + 1}`);
-      playActiveTerminal();
+      playActiveMedia();
     }
 
     function forward() {
@@ -2140,7 +2171,7 @@
       if (["ArrowLeft", "PageUp", "Backspace"].includes(event.key)) { event.preventDefault(); back(); }
       if (event.key === "Home") go(0);
       if (event.key === "End") go(slides.length - 1);
-      if (event.key.toLowerCase() === "r") playActiveTerminal();
+      if (event.key.toLowerCase() === "r") playActiveMedia();
       if (event.key.toLowerCase() === "f") document.documentElement.requestFullscreen?.();
     });
   </script>
