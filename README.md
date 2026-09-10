@@ -2,43 +2,82 @@
 
 # agentsmd
 
-### Let `AGENTS.md` learn from the work your coding agent just did.
+### Let `AGENTS.md` learn from the work your coding agent just completed.
 
-Author, version, measure, and improve repository instructions from real agent trajectories—without fine-tuning or framework lock-in.
+**Capture real coding sessions. Propose one narrow lesson. Validate it. Promote only what earns its place.**
+
+agentsmd is a local-first CLI for authoring, versioning, measuring, and safely improving repository instructions—without fine-tuning, reinforcement learning, or coding-agent lock-in.
 
 [![CI](https://img.shields.io/github/actions/workflow/status/rudrakshkarpe/agentsmd-cli/ci.yml?branch=main&style=for-the-badge&logo=github&label=CI)](https://github.com/rudrakshkarpe/agentsmd-cli/actions/workflows/ci.yml)
 [![Go](https://img.shields.io/github/go-mod/go-version/rudrakshkarpe/agentsmd-cli?style=for-the-badge&logo=go)](go.mod)
 [![License](https://img.shields.io/github/license/rudrakshkarpe/agentsmd-cli?style=for-the-badge)](LICENSE)
 
-[Install](#install) · [Quick start](#quick-start) · [Learning example](#a-real-learning-example) · [Evidence](#benchmark-method) · [CLI](#cli) · [Go library](#go-library) · [Roadmap](#roadmap)
+[Install](#install) · [Quick start](#quick-start) · [How it works](#how-it-works) · [Learning example](#a-real-learning-example) · [CLI reference](#cli) · [Safety](#safety-and-trust-model) · [Roadmap](#roadmap)
 
 </div>
 
-> **Active development.** Project detection, cross-CLI lifecycle capture, automatic reflection queues, command-based evaluation gates, opt-in automatic promotion, and macOS/Linux releases work today. One reproducible held-out study is now included; a broad multi-task benchmark and offline optimization remain in development.
+![Introducing agentsmd CLI: coding-session evidence becomes controlled, provenance-backed improvements to AGENTS.md](docs/assets/agentsmd-cli-overview.png)
 
-## Why agentsmd?
+> [!IMPORTANT]
+> **Active development.** Project detection, cross-CLI lifecycle capture, durable reflection queues, command-based evaluation gates, opt-in automatic promotion, and checksummed macOS/Linux releases work today. One reproducible held-out study is included; broader multi-task results and offline optimization remain in development.
 
-`AGENTS.md` tells coding agents how to work in a repository. But the file is usually static: it drifts as the code changes, accumulates stale rules, and cannot learn when an agent repeatedly explores the same wrong path.
+## The problem
 
-agentsmd adds an evidence loop around that file:
+`AGENTS.md` tells coding agents how to work inside a repository: which commands to run, which boundaries to respect, and how to validate a change. The file is usually static, even though the repository and the agents working in it are not. Useful corrections stay trapped in session transcripts; stale rules survive; repeated explorations consume time and tokens.
+
+agentsmd adds a controlled evidence loop around the file:
 
 ```text
 run a task → capture its trajectory → reflect once at the task boundary
            → propose one rule → review and validate → promote → measure
 ```
 
-The active file never changes merely because a model suggested something. Every learned rule starts in a pending queue, carries its source run and task, and becomes active only after review or evaluation.
+The active file never changes merely because a model suggested something. Every learned rule begins as a pending proposal, carries its source run and logical task, and becomes active only after human review or a configured evaluation gate.
 
-## CLI showcase
+## What ships today
 
-The write target is universal: all four tools read `AGENTS.md`. Capture is implemented separately because every CLI records sessions differently.
+| Capability | What it provides |
+|---|---|
+| **Repository-aware setup** | Conservative project detection, useful `AGENTS.md` scaffolding, reusable templates, and diagnostics. |
+| **Cross-CLI capture** | Project-local lifecycle integrations for goose, Codex, Claude Code, and Cursor. |
+| **Provider-neutral evidence** | Normalized trajectories with Git state, changed files, duration, test outcome, model, tokens, and available commands. |
+| **Logical task correlation** | Groups related sessions across providers, branches, and explicit project tasks without conflating unrelated work on `main`. |
+| **Bounded reflection** | Reflects once at a task boundary and returns one narrow candidate—or an explicit no-change verdict. |
+| **Durable automation** | Idempotent background reflection queue with conservative lock recovery through `agentsmd doctor --repair`. |
+| **Controlled promotion** | Pending review, command-based evaluation, confidence policy, near-duplicate checks, and opt-in automatic promotion. |
+| **Auditable instructions** | Structured rule ledger, typed versions, provenance, targeted rendering, history, diff, tags, blame, and revert. |
+| **Local-first privacy** | Raw evidence stays local; configurable RE2 patterns redact only the copy sent to an external reflector. |
+| **Reproducible evaluation** | Fresh-workspace before/after benchmarks, held-out verification, multi-task suites, and single-rule ablations. |
+
+## The self-improving loop
+
+```mermaid
+flowchart LR
+    A[Agent session] --> B[Capture evidence]
+    B --> C[Normalize trajectory]
+    C --> D{Reflect once}
+    D -->|No durable lesson| E[No change]
+    D -->|One narrow lesson| F[Pending proposal]
+    F --> G{Review + evaluate}
+    G -->|Fail| H[Reject]
+    G -->|Needs judgment| I[Keep pending]
+    G -->|Pass| J[Promote to ledger]
+    J --> K[Render validated delta]
+    K --> L[AGENTS.md]
+```
+
+This is repository-level learning, not model training. Future agents receive better context because the project retained a verified lesson; the underlying model weights remain unchanged.
+
+## Coding-harness support
+
+The write target is universal: every supported tool reads `AGENTS.md`. Capture stays provider-specific because each CLI records sessions differently; all adapters normalize into the same trajectory schema.
 
 <table>
 <tr>
 <td align="center" width="25%">
-<a href="https://claude.com/product/claude-code"><img src="https://github.com/anthropics.png?size=120" alt="Claude Code" width="48" height="48" /></a><br/>
-<strong>Claude Code</strong><br/>
-<sub>Session hook + JSONL normalization</sub>
+<a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="goose" width="48" height="48" /></a><br/>
+<strong>goose</strong><br/>
+<sub>Project hook plugin</sub>
 </td>
 <td align="center" width="25%">
 <a href="https://github.com/openai/codex"><img src="https://github.com/openai.png?size=120" alt="Codex CLI" width="48" height="48" /></a><br/>
@@ -46,17 +85,19 @@ The write target is universal: all four tools read `AGENTS.md`. Capture is imple
 <sub>Project SessionEnd hook</sub>
 </td>
 <td align="center" width="25%">
+<a href="https://claude.com/product/claude-code"><img src="https://github.com/anthropics.png?size=120" alt="Claude Code" width="48" height="48" /></a><br/>
+<strong>Claude Code</strong><br/>
+<sub>Session hook + JSONL normalization</sub>
+</td>
+<td align="center" width="25%">
 <a href="https://cursor.com"><picture><source media="(prefers-color-scheme: dark)" srcset="https://svgl.app/library/cursor_dark.svg"><img src="https://svgl.app/library/cursor_light.svg" alt="Cursor" width="48" height="48" /></picture></a><br/>
 <strong>Cursor</strong><br/>
 <sub>Project sessionEnd hook</sub>
 </td>
-<td align="center" width="25%">
-<a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="goose" width="48" height="48" /></a><br/>
-<strong>goose</strong><br/>
-<sub>Project hook plugin</sub>
-</td>
 </tr>
 </table>
+
+Each connector preserves existing provider settings. Session-end evidence is persisted immediately; transcript parsing, Git enrichment, reflection, and evaluation continue through a detached local worker.
 
 ## Install
 
