@@ -1,6 +1,6 @@
 <div align="center">
 
-# agentsmd CLI
+# AGENTSMD CLI
 
 ### Let `AGENTS.md` learn from the work your coding agent just completed.
 
