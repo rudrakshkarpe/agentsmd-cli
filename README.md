@@ -1,6 +1,6 @@
 <div align="center">
 
-# agentsmd
+# agentsmd CLI
 
 ### Let `AGENTS.md` learn from the work your coding agent just completed.
 
@@ -51,20 +51,7 @@ The active file never changes merely because a model suggested something. Every 
 
 ## The self-improving loop
 
-```mermaid
-flowchart LR
-    A[Agent session] --> B[Capture evidence]
-    B --> C[Normalize trajectory]
-    C --> D{Reflect once}
-    D -->|No durable lesson| E[No change]
-    D -->|One narrow lesson| F[Pending proposal]
-    F --> G{Review + evaluate}
-    G -->|Fail| H[Reject]
-    G -->|Needs judgment| I[Keep pending]
-    G -->|Pass| J[Promote to ledger]
-    J --> K[Render validated delta]
-    K --> L[AGENTS.md]
-```
+![The AGENTS.md self-improving loop: supported coding harnesses feed a common capture, normalization, reflection, evidence, and promotion workflow](docs/assets/agentsmd-self-improving-loop.png)
 
 This is repository-level learning, not model training. Future agents receive better context because the project retained a verified lesson; the underlying model weights remain unchanged.
 
@@ -72,7 +59,7 @@ This is repository-level learning, not model training. Future agents receive bet
 
 The write target is universal: every supported tool reads `AGENTS.md`. Capture stays provider-specific because each CLI records sessions differently; all adapters normalize into the same trajectory schema.
 
-<table>
+<table align="center" width="100%">
 <tr>
 <td align="center" width="25%">
 <a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="goose" width="48" height="48" /></a><br/>
@@ -422,35 +409,44 @@ The CLI is one consumer of reusable packages:
 
 ## Roadmap
 
+<details open>
+<summary><strong>Available today</strong></summary>
+
 - [x] Go library and Cobra CLI
-- [x] Authoring, typed versions, blame, and rule ledger
-- [x] Pending-rule review and deterministic demo path
-- [x] Claude Code trajectory normalization
-- [x] Provider-neutral task-boundary reflector
-- [x] Reproducible single-task held-out evaluation runner and evidence bundle
-- [x] Multi-task held-out benchmark runner with single-rule ablations
+- [x] Repository detection, templates, and diagnostics
+- [x] Authoring, typed versions, blame, revert, and structured rule ledger
+- [x] Pending-rule review with promote and reject decisions
+- [x] Provider-neutral task-boundary reflector with an explicit no-change verdict
 - [x] Codex, Claude Code, Cursor, and goose lifecycle connectors
-- [ ] Rich transcript normalization beyond Claude Code
-- [x] Logical-task identity across related sessions
-- [x] Provider-qualified session identity and automatic Git/duration evidence capture
-- [x] Configurable command/test outcome capture through the evaluation gate
-- [x] Local session listing and complete run inspection
-- [x] Idempotent background reflection queue
+- [x] Claude Code JSONL trajectory normalization
+- [x] Logical-task identity and before/after progress comparisons
+- [x] Git, changed-file, duration, model, token, and evaluation evidence capture
+- [x] Idempotent background reflection queue and conservative recovery
 - [x] Opt-in automatic promotion behind evaluation and confidence gates
-- [x] Logical-task correlation and before/after progress comparisons
-- [ ] Watch daemon with session staleness detection
-- [ ] Offline GEPA optimization bridge
-- [x] Reproducible benchmark report and token-usage evidence
+- [x] Single-task and multi-task held-out benchmark runners
+- [x] Single-rule ablations, reproducible reports, and token-usage evidence
 - [x] Checksummed macOS and Linux release archives with a shell installer
-- [ ] Signed releases and Homebrew installation
 
-See the [development roadmap](ROADMAP.md), [120-slice commit plan](docs/COMMIT-ROADMAP.md), [AgentCon demo plan](docs/AGENTCON-DEMO.md), and [presentation deck](presentation/README.md).
+</details>
 
-## AgentCon Japan
+<details>
+<summary><strong>In progress</strong></summary>
 
-agentsmd is being developed for **“Let AGENTS.md Write Itself: Self-Improving Coding Agents, No RL Required!”**, presented by Rudraksh Karpe and Satyam Soni at AgentCon Japan on September 10, 2026.
+- [ ] Rich transcript normalization for providers beyond Claude Code
+- [ ] Watch daemon with session-staleness detection
+- [ ] Offline GEPA optimization bridge
 
-The demo will use recorded trajectories and reproducible task runs. Claims about task success, regressions, or token savings will be published only with the model, task, seeds, success criteria, and evaluation cost needed to reproduce them.
+</details>
+
+<details>
+<summary><strong>Distribution next</strong></summary>
+
+- [ ] Signed release artifacts
+- [ ] Homebrew installation
+
+</details>
+
+See the [development roadmap](ROADMAP.md), [implementation plan](docs/COMMIT-ROADMAP.md), and [presentation deck](presentation/README.md).
 
 ## Development
 
